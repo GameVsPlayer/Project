@@ -1,0 +1,118 @@
+{
+  "name": "karenbot-vue",
+  "version": "6.0.0",
+  "description": "KarenBot Vue",
+  "author": "GameVsPlayer",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit",
+    "test:e2e": "vue-cli-service test:e2e",
+    "lint": "vue-cli-service lint",
+    "start": "vue-cli-service serve --open"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "core-js": "^3.6.0",
+    "eslint-plugin-vue-libs": "^4.0.0",
+    "mdbvue": "^6.1.1",
+    "particles.js": "^2.0.0",
+    "vue": "^2.6.11",
+    "vue-analytics": "^5.20.1",
+    "vue-axios": "^2.1.5",
+    "vue-recaptcha-v3": "^1.8.0",
+    "vue-router": "^3.0.3",
+    "vuex": "^3.1.2"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.26",
+    "@fortawesome/free-solid-svg-icons": "^5.12.0",
+    "@fortawesome/vue-fontawesome": "^0.1.9",
+    "@vue/cli-plugin-babel": "^4.1.1",
+    "@vue/cli-plugin-e2e-cypress": "^4.1.1",
+    "@vue/cli-plugin-eslint": "^4.1.1",
+    "@vue/cli-plugin-unit-jest": "^4.1.1",
+    "@vue/cli-service": "^4.1.1",
+    "@vue/test-utils": "1.0.0-beta.29",
+    "app-manifest-loader": "^2.4.1",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "^23.6.0",
+    "del-cli": "^3.0.0",
+    "eslint": "^5.16.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "node-sass": "^4.13.0",
+    "path": "^0.12.7",
+    "register-service-worker": "^1.6.2",
+    "sass-loader": "^8.0.0",
+    "vue-meta": "^2.3.1",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "rules": {
+      "no-console": 0
+    },
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "overrides": [
+      {
+        "files": [
+          "**/__tests__/*.{j,t}s?(x)"
+        ],
+        "env": {
+          "jest": true
+        }
+      }
+    ]
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json",
+      "vue"
+    ],
+    "transform": {
+      "^.+\\.vue$": "vue-jest",
+      ".+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$": "jest-transform-stub",
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "snapshotSerializers": [
+      "jest-serializer-vue"
+    ],
+    "testMatch": [
+      "**/tests/unit/**/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx)"
+    ],
+    "testURL": "http://localhost/",
+    "watchPlugins": [
+      "jest-watch-typeahead/filename",
+      "jest-watch-typeahead/testname"
+    ]
+  },
+  "//": "git+https://oauth2:REPLACE_WITH_YOUR_TOKEN@git.mdbootstrap.com/mdb/vue/vu-pro.git",
+  "license": "SEE LICENSE IN <license.pdf>"
+}

@@ -1,0 +1,21 @@
+{
+    "name": "Gamu.tk",
+    "short_name": "Gamu",
+	"descriptiom": "My simple custom webpage.",
+	"start_url": "https://gamu.tk/",
+	"display": "standalone",
+    "icons": [
+        {
+            "src": "/assets/android-chrome-192x192.png?v=QEGnAa5L58",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/android-chrome-512x512.png?v=QEGnAa5L58",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#0085f1",
+    "background_color": "#000000"
+}

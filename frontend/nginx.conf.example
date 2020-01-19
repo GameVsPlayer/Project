@@ -1,0 +1,152 @@
+
+#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+	upstream backend {
+		server localhost:1026;
+	}
+    #tcp_nopush     on;
+	sendfile on;
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+	
+	upstream bot {
+		server localhost:1025;
+	}
+
+    gzip  on;
+
+    server {
+		proxy_set_header  X-Real-IP  $remote_addr;
+        listen       80 http2;
+        server_name  localhost;
+		
+        return 301 https://$host$request_uri;
+
+    }
+
+	server {
+		server_name bot;
+		allow 127.0.0.1;
+		deny all;
+	}
+
+
+    # HTTPS server
+    #
+    server {
+		proxy_set_header  X-Real-IP  $remote_addr;
+		include mime.types;
+        listen       443 ssl http2;
+		listen		 [::]:443 ssl http2;
+        server_name  https;
+		
+	    charset utf-8;
+	    
+        ssl_certificate      cert.pem;
+        ssl_certificate_key  cert.key;
+
+        ssl_session_cache    shared:SSL:5m;
+        ssl_session_timeout  1h;
+
+        ssl_ciphers  HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers  on;
+		
+		location /bot {
+			proxy_buffering off;
+			proxy_cache off;
+			gzip  off;
+			rewrite ^/bot/(.*) /$1 break;
+			proxy_pass http://bot;
+		}
+		
+		location /backend {
+			if ($http_user_agent ~* "HeadlessChrome") {
+				return 403;
+			}
+			proxy_buffering off;
+			proxy_cache off;
+			gzip  off;
+			rewrite ^/backend/(.*) /$1 break;
+		    proxy_pass http://backend;
+	    }
+		
+		index   index.html index.htm;
+		
+		location /twitch {
+			return https://twitch.tv/gamevsplayer/;
+		}
+		location /donate {
+			return https://streamlabs.com/GameVsPlayer/;
+		}
+		location /twitter {
+			return https://twitter.com/gamevsplayer/;
+		}
+		location /youtube {
+			return https://www.youtube.com/channel/UCXzTjDH9pmLKpTYyHaiuoHw?sub_confirmation=1/;
+		}
+		location /steam {
+			return https://steamcommunity.com/id/GameVsPlayer/;
+		}
+		location /osu {
+			return https://osu.ppy.sh/users/9921345/;
+		}
+		location /speedrun {
+			return https://www.speedrun.com/gamevsplayer/;
+		}
+		location /discord {
+			return https://discordapp.com/invite/XgNTgQ3/;
+		}
+		location /github {
+			return https://github.com/GameVsPlayer/Karenbot/;
+		}
+		location /xbox {
+			return https://account.xbox.com/Profile?xr=mebarnav&rtc=1/;
+		}
+		location /invite {
+			return https://discordapp.com/oauth2/authorize?client_id=480384407979556898&permissions=271607878&scope=bot/;
+		}
+		location /sub {
+			return https://www.twitch.tv/products/gamevsplayer/;
+		}
+
+		location = /robots.txt {
+			root /usr/share/nginx/static/;
+		}
+		location = /sitemap.xml {
+			root /usr/share/nginx/static/;		
+		}
+		location = /manifest.json {
+			root /usr/share/nginx/static/;
+		}
+		location = /browserconfig.xml {
+			root /usr/share/nginx/static/;
+		}
+		location = /safari-pinned-tab.svg {
+			root /usr/share/nginx/static/;
+		}
+		location = /favicon.png {
+			root /usr/share/nginx/static/;
+		}
+		location /assets/ {
+			alias /usr/share/nginx/static/assets/;
+		}
+		location @rewrites {
+			rewrite ^(.+)$ /index.html last;
+		}
+		
+    }
+}
