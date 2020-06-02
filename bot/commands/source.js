@@ -30,7 +30,7 @@ module.exports.run = async (bot, message, args) => {
     }
     if (!validURL(args.join('%20'))) return message.channel.send('That is not a valid url');
     const sourceAPI = `https://saucenao.com/search.php?db=999&output_type=2&numres=3&url=${args.join('%20')}&key=${bot.config.saucenaoAPI}`;
-    //console.log(sourceAPI);
+    //bot.logger.info(sourceAPI);
     let source = await fetch(sourceAPI);
     source = await source.json();
     if (source.results == undefined || source.results[0].header.similarity < 90) return message.channel.send('No results found!');

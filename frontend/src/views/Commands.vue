@@ -24,10 +24,11 @@
     metaInfo() {
       return {
         meta: [{
-            'description': 'description',
+            'name': 'description',
             content: 'This page shows a list of commands for my bot',
             vmid: 'description'
           },
+          { 'itemprop': "description", content: "This page shows a list of commands for my bot", vmid: "itemprop:description"},
           {
             'property': 'og:description',
             content: 'This page shows a list of commands for my bot',

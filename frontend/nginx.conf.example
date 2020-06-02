@@ -30,40 +30,33 @@ http {
     gzip  on;
 
     server {
-		proxy_set_header  X-Real-IP  $remote_addr;
-        listen       80 http2;
-        server_name  localhost;
-		
-        return 301 https://$host$request_uri;
-
-    }
-
-	server {
-		server_name bot;
-		allow 127.0.0.1;
-		deny all;
-	}
-
-
-    # HTTPS server
-    #
-    server {
-		proxy_set_header  X-Real-IP  $remote_addr;
 		include mime.types;
+		proxy_set_header  X-Real-IP  $remote_addr;
         listen       443 ssl http2;
 		listen		 [::]:443 ssl http2;
         server_name  https;
 		
-	    charset utf-8;
-	    
-        ssl_certificate      cert.pem;
+        charset utf-8;
+		
+		ssl_certificate      cert.pem;
         ssl_certificate_key  cert.key;
-
-        ssl_session_cache    shared:SSL:5m;
+		
+		ssl_session_cache    shared:SSL:5m;
         ssl_session_timeout  1h;
 
         ssl_ciphers  HIGH:!aNULL:!MD5;
         ssl_prefer_server_ciphers  on;
+	    
+		error_page 403 /403.html;
+        location = /403.html {
+                root /usr/share/nginx/errors;
+                internal;
+        }		
+		error_page 404 /404.html;
+        location = /404.html {
+                root /usr/share/nginx/errors;
+                internal;
+        }
 		
 		location /bot {
 			proxy_buffering off;
@@ -122,31 +115,44 @@ http {
 		location /sub {
 			return https://www.twitch.tv/products/gamevsplayer/;
 		}
+		location /beatsaber {
+			return https://scoresaber.com/u/76561198107669918/;
+		}
 
+		location /merch {
+			return https://merch.streamelements.com/gamevsplayer/;
+		}
 		location = /robots.txt {
-			root /usr/share/nginx/static/;
+			root /usr/share/nginx/static/assets;
 		}
 		location = /sitemap.xml {
-			root /usr/share/nginx/static/;		
+			root /usr/share/nginx/static/assets;		
 		}
 		location = /manifest.json {
-			root /usr/share/nginx/static/;
+			root /usr/share/nginx/static/assets;
 		}
 		location = /browserconfig.xml {
-			root /usr/share/nginx/static/;
+			root /usr/share/nginx/static/assets;
 		}
 		location = /safari-pinned-tab.svg {
-			root /usr/share/nginx/static/;
+			root /usr/share/nginx/static/assets;
 		}
 		location = /favicon.png {
-			root /usr/share/nginx/static/;
+			root /usr/share/nginx/static/assets;
 		}
 		location /assets/ {
 			alias /usr/share/nginx/static/assets/;
 		}
-		location @rewrites {
-			rewrite ^(.+)$ /index.html last;
+		location / {
+			try_files $uri $uri/ /index.html;
 		}
 		
+
     }
+
+	server {
+		server_name bot;
+		allow 127.0.0.1;
+		deny all;
+	}
 }

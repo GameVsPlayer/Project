@@ -44,7 +44,7 @@ export default {
   name: "stats",
   mounted: function() {
     this.update();
-    this.metaInfo;
+    this.metaInfo
   },
   data() {
     return {
@@ -60,7 +60,7 @@ export default {
         "message",
         function(e) {
           let data = JSON.parse(e.data);
-          if (document.getElementsByClassName("stats").length == 0)
+          if (document.getElementsByClassName("stats").length === 0)
             return source.close();
           document.getElementById("users").innerHTML = data.users;
           document.getElementById("servers").innerHTML = data.servers;
@@ -97,9 +97,14 @@ export default {
     return {
       meta: [
         {
-          description: "description",
+          name: "description",
           content: "This page shows some stats about my bot",
           vmid: "description"
+        },
+        {
+          itemprop: "description",
+          content: "This page shows some stats about my bot",
+          vmid: "itemprop:description"
         },
         {
           property: "og:description",

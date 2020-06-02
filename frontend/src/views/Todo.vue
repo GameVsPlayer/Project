@@ -77,7 +77,7 @@ export default {
         "message",
         e => {
           let data = JSON.parse(e.data);
-          if (document.getElementsByClassName("Todo").length == 0)
+          if (document.getElementsByClassName("Todo").length === 0)
             return source.close();
           if (data.todos[0] === null) {
             return (this.todos = undefined);
@@ -141,14 +141,19 @@ export default {
     return {
       meta: [
         {
-          description: "description",
+          name: "description",
           content: "This page shows my current bot/website todo list",
           vmid: "description"
         },
         {
-          property: "og:description",
+          itemprop: "description",
           content: "This page shows my current bot/website todo list",
-          vmid: "og:description"
+          vmid: "itemprop:description"
+        },
+        {
+          itemprop: "description",
+          content: "This page shows my current bot/website todo list",
+          vmid: "itemprop:description"
         },
         {
           property: "og:title",

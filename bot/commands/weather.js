@@ -7,7 +7,7 @@ const d2d = require('degrees-to-direction');
 module.exports.run = async (bot, message, args) => {
     if (!args[0]) return message.channel.send("No location specified").catch();
     const city2geoAPI = `https://api.opencagedata.com/geocode/v1/json?q=${args.join('%20')}&key=${bot.config.opencagedata}`;
-    //console.log(city2geoAPI);
+    //bot.logger.info(city2geoAPI);
     const geo = await fetch(city2geoAPI);
     const goeJSON = await geo.json();
     if (goeJSON.status.code != 200) return message.channel.send(`Something went wrong Error: ${goeJSON.status.message}`);

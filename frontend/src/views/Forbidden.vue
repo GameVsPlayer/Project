@@ -1,6 +1,6 @@
 <template>
-  <div class="PNF">
-    <h2>The Requested Page or File could <b>Not</b> be found</h2>
+  <div class="FBN">
+    <h2>The Requested Page or File is forbidden be found</h2>
   </div>
 </template>
 
@@ -8,23 +8,23 @@
   // @ is an alias to /src
 
   export default {
-    name: "PageNotFound",
+    name: "Forbidden",
     components: {},
     metaInfo() {
       return {
         meta: [{
             'name': 'description',
-            content: 'This page doesn\'t exist',
+            content: 'This page is Forbidden',
             vmid: 'description'
           },
           {
           itemprop: "description",
-          content: "This page doesn\'t exist",
+          content: "This page is Forbidden",
           vmid: "itemprop:description"
         },
           {
             'property': 'og:description',
-            content: 'This page doesn\'t exist',
+            content: 'This page is Forbidden',
             vmid: 'og:description'
           },
           {
@@ -60,7 +60,7 @@
   };
 </script>
 <style scoped>
-  .PNF {
+  .FBN {
     margin-top: 8rem;
   }
 </style>

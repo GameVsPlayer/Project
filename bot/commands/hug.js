@@ -44,7 +44,7 @@ module.exports.run = async (bot, message, args) => {
 
     if (await bot.db.hugsDB.findOne({
             userid: hugUser.id
-        }) == null) {
+        }) === null) {
         const data = {
             userid: hugUser.id,
             amount: 0

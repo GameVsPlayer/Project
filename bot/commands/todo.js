@@ -48,7 +48,7 @@ module.exports.run = async (bot, message, args) => {
         if (!id.match(objectIDCheck)) return message.channel.send("That is not a valid id");
         if (await bot.db.todoDB.findOne({
                 _id: id
-            }) == null) {
+            }) === null) {
             return message.channel.send("That is not a ID that is currently in use!");
         } else {
             await bot.db.todoDB.findOneAndUpdate({
@@ -66,7 +66,7 @@ module.exports.run = async (bot, message, args) => {
         if (!content) return message.channel.send("No updated value was entered");
         if (await bot.db.todoDB.findOne({
                 _id: id
-            }) == null) {
+            }) === null) {
             return message.channel.send("That is not a ID that is currently in use!");
         } else {
             await bot.db.todoDB.findOneAndUpdate({

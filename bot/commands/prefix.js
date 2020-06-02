@@ -16,7 +16,7 @@ module.exports.run = async (bot, message, args) => {
 
     fs.writeFile("./datastorage/prefixes.json", JSON.stringify(prefixes), (err) => {
         if (err) {
-            console.log(err)
+            bot.logger.info(err)
 
         }
     });

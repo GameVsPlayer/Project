@@ -41,7 +41,7 @@ module.exports.run = async (bot, message, args) => {
 
     if (await bot.db.patsDB.findOne({
             userid: hpUser.id
-        }) == null) {
+        }) === null) {
         const data = {
             userid: hpUser.id,
             amount: 0

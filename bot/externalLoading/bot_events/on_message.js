@@ -9,7 +9,7 @@ let servers = {};
 
 module.exports.run = async (bot, message) => {
 
-    if (isNaN(bot.stats.userMessages)) {
+    if (Number.isNaN(bot.stats.userMessages)) {
         reload(bot);
         bot.stats.userMessages = 0;
         bot.stats.botCommands = 0;
@@ -20,13 +20,13 @@ module.exports.run = async (bot, message) => {
 
     if (message.author.bot) return;
 
-    if (message.channel.type == "dm") {
-        console.log(bot.config.prefix);
+    if (message.channel.type === "dm") {
+        bot.logger.info(bot.config.prefix);
         if (!message.content.startsWith(`${bot.config.prefix}todo`)) return;
         if (message.author.id !== bot.config.ownerID) return;
         let dmFile = bot.commands.get("todo");
 
-        if (dmFile) dmFile.run(bot, message).catch(err => console.log("Todo Error  " + err));
+        if (dmFile) dmFile.run(bot, message).catch(err => bot.logger.info("Todo Error  " + err));
 
     }
 
@@ -55,7 +55,7 @@ module.exports.run = async (bot, message) => {
             userid: message.author.id
         }).catch(async (err) => {
             if (err) {
-                return console.error(err);
+                return bot.logger.error(err);
             }
             if (await xp === null) {
                 const data = {
@@ -63,7 +63,7 @@ module.exports.run = async (bot, message) => {
                     level: 1,
                     messageCount: 1
                 }
-                await bot.db.xpDB.insertOne(data).catch((e) => console.error(e));
+                await bot.db.xpDB.insertOne(data).catch((e) => bot.logger.error(e));
             }
             if (xp !== null) {
                 let l = xp.level;
@@ -77,7 +77,7 @@ module.exports.run = async (bot, message) => {
                     "$inc": {
                         messageCount: 1
                     }
-                }).catch((e) => console.error(e));
+                }).catch((e) => bot.logger.error(e));
 
                 messagesNeed = Math.floor((l * 100) * (0.5 * l));
                 if (i >= messagesNeed) messages = messagesNeed; // level     
@@ -89,13 +89,13 @@ module.exports.run = async (bot, message) => {
                         "$inc": {
                             level: 1
                         }
-                    }).catch((e) => console.error(e));
+                    }).catch((e) => bot.logger.error(e));
                     if (2 >= l) return;
                     else if (!sendMessages) {
                         let levelUpEmbed = new Discord.RichEmbed()
                             .setTitle("Level Up!")
                             .setDescription(`${message.author} You have send ${(i)} Messages, so you leveled up! You are now level ${l + 1}!`);
-                        message.channel.send(levelUpEmbed).catch((e) => console.error(e));
+                        message.channel.send(levelUpEmbed).catch((e) => bot.logger.error(e));
                     }
                 }
             }
@@ -109,9 +109,9 @@ module.exports.run = async (bot, message) => {
     //if(message.content.startsWith(prefix + "a")) captcha(message).catch(); mainCommand = 1;
     { //cmds
         if (message.content.startsWith(prefix + "blUser") && message.author.id == bot.config.ownerID) {
-            if (args[0] == null) return message.reply("No userID specified");
-            if (isNaN(args[0])) return message.reply("Thats not a ID");
-            if (args[0].length != 18) return message.channel.send("Thats not a valid id");
+            if (args[0] === null) return message.reply("No userID specified");
+            if (Number.isNaN(args[0])) return message.reply("Thats not a ID");
+            if (args[0].length !== 18) return message.channel.send("Thats not a valid id");
             mainCommand = 1;
             bot.blackListedUsers[args[0]] = {
                 date: moment(moment.now()).format("DD/MM/YYYY hh:mm:ss")
@@ -125,9 +125,9 @@ module.exports.run = async (bot, message) => {
 
         if (message.content.startsWith(prefix + "blGuild") && message.author.id == bot.config.ownerID) {
             mainCommand = 1;
-            if (args[0] == null) return message.reply("No guildID specified");
-            if (isNaN(args[0])) return message.reply("Thats not a ID");
-            if (args[0].length != 18) return message.channel.send("Thats not a valid id");
+            if (args[0] === null) return message.reply("No guildID specified");
+            if (Number.isNaN(args[0])) return message.reply("Thats not a ID");
+            if (args[0].length !== 18) return message.channel.send("Thats not a valid id");
             bot.blackListedGuilds[args[0]] = {
                 date: moment(moment.now()).format("DD/MM/YYYY hh:mm:ss")
             }
@@ -141,7 +141,7 @@ module.exports.run = async (bot, message) => {
         if (message.content.startsWith(prefix + "unblGuild") && message.author.id == bot.config.ownerID) {
             mainCommand = 1;
             if (!args[0]) return message.channel.send("No guild to be unblocked specified")
-            if (args[0].length != 18) return message.channel.send("No valid id specified");
+            if (args[0].length !== 18) return message.channel.send("No valid id specified");
 
             if (bot.blackListedGuilds[args[0]] == undefined) return message.channel.send("No blacklisted Guild with that id found")
 
@@ -149,13 +149,13 @@ module.exports.run = async (bot, message) => {
 
             fs.writeFile("./datastorage/blackListedGuilds.json", JSON.stringify(bot.blackListedGuilds), (err) => {
                 if (err) throw err;
-                console.error(err);
+                bot.logger.error(err);
             })
         }
         if (message.content.startsWith(prefix + "unblUser") && message.author.id == bot.config.ownerID) {
             mainCommand = 1;
             if (!args[0]) return message.channel.send("No user to be unblocked specified")
-            if (args[0].length != 18) return message.channel.send("No valid id specified");
+            if (args[0].length !== 18) return message.channel.send("No valid id specified");
 
             if (bot.blackListedUsers[args[0]] == undefined) return message.channel.send("No User Guild with that id found")
 
@@ -163,7 +163,7 @@ module.exports.run = async (bot, message) => {
 
             fs.writeFile("./datastorage/blackListedUsers.json", JSON.stringify(bot.blackListedUsers), (err) => {
                 if (err) throw err;
-                console.error(err);
+                bot.logger.error(err);
             })
         }
         if (message.content.startsWith(prefix + "reload") && message.author.id == bot.config.ownerID) {
@@ -190,10 +190,10 @@ module.exports.run = async (bot, message) => {
 
 
         if (message.content.startsWith(prefix + "leave") && message.author.id == bot.config.ownerID) {
-            if (args[0] == undefined) return;
+            if (args[0] === undefined) return;
             var guildID = bot.guilds.find("id", args[0])
 
-            if (guildID == null) return;
+            if (guildID === null) return;
             guildID.leave().catch();
             mainCommand = true;
             return message.channel.send(`Sucessfully left ${args[0]}`);
@@ -201,10 +201,10 @@ module.exports.run = async (bot, message) => {
         }
         if (mainCommand === true) return;
 
-        if (message.content.startsWith(prefix)) console.log("[" + moment().format('D.MM, h:mm a') + "]" + "[" + message.guild.name + "]" + "[" + message.channel.name + "]" + "[" + message.author.username + "]" + message.content)
+        if (message.content.startsWith(prefix)) bot.logger.info("[" + moment().format('D.MM, h:mm a') + "]" + "[" + message.guild.name + "]" + "[" + message.channel.name + "]" + "[" + message.author.username + "]" + message.content)
         if (!message.guild.me.hasPermission("SEND_MESSAGES")) return;
 
-        if (message.content.startsWith(prefix + "global_messages") && message && !sendMessages && messagesGlobal != 0 && uptimeMin != 0) {
+        if (message.content.startsWith(prefix + "global_messages") && message && !sendMessages && messagesGlobal !== 0 && uptimeMin !== 0) {
             return message.channel.send(`${messagesGlobal} Messages have been send globaly since the bot last restarted thats ${messagesGlobal / uptimeMin} Messages per minute!`)
         }
 
@@ -213,10 +213,10 @@ module.exports.run = async (bot, message) => {
         var cmdcheckargs = /[a-z]/i;
         var slicedPrefix = message.content.slice(prefix.length)
         var check = (slicedPrefix).match(cmdcheckargs)
-        if (check == null) return;
+        if (check === null) return;
         if (!message.content.startsWith(prefix) && check !== true && slicedPrefix.length < 2) return;
 
-        //if (message.content.startsWith(prefix + "captcha")) captcha(message).catch(err => console.log(err))
+        //if (message.content.startsWith(prefix + "captcha")) captcha(message).catch(err => bot.logger.info(err))
 
         if (message.content == `${prefix}maintenance`) {
             if (message.author.id === (bot.config.ownerID)) {
@@ -274,7 +274,7 @@ module.exports.run = async (bot, message) => {
                             });
                         } catch (err) {
                             message.channel.fetchMessage(global.songsMessage).catch()
-                                .then((msg) => msg.delete());
+                                .then((msg) => msg.delete()).catch();
                             if (!sendMessages) return message.channel.send("No or invalid value entered, cancelling video selection");
                             else return;
                         }
@@ -296,7 +296,7 @@ module.exports.run = async (bot, message) => {
                     if (!validate) return message.channel.send("No Song could be found").catch()
                 }
             }
-            if (videoURL == "") videoURL = args.join(" ");
+            if (videoURL === "") videoURL = args.join(" ");
 
             if (!YTDL.validateURL(videoURL)) return;
 
@@ -336,7 +336,7 @@ module.exports.run = async (bot, message) => {
                             if (sendMessages) return;
                             else message.channel.send(`Something went wrong ${err}`)
                         })
-                        .catch(console.error);
+                        .catch((e) => bot.logger.error(e));
 
 
                 })
@@ -352,7 +352,7 @@ module.exports.run = async (bot, message) => {
             if (!message.member.voiceChannel) {
                 if (sendMessages) return;
                 return message.reply("You must be in a voicechannel").catch()
-                    .catch(console.error);
+                    .catch((e) => bot.logger.error(e));
 
             }
             if (message.member.voiceChannelID != message.guild.me.voiceChannelID) {
@@ -370,7 +370,7 @@ module.exports.run = async (bot, message) => {
             });
             if (sendMessages) return;
             return message.channel.send(`${message.author} skipped the song!`)
-                .catch(console.error);
+                .catch((e) => bot.logger.error(e));
 
         }
 
@@ -419,7 +419,7 @@ module.exports.run = async (bot, message) => {
             else if (!server.dispatcher) return message.channel.send("There is no music playing right now");
             if (sendMessages) null;
             else if (!messageArray[1]) return message.channel.send(`The current volume is ${server.dispatcher.volume}`);
-            if (isNaN(messageArray[1])) return message.channel.send("That is not a number!");
+            if (Number.isNaN(messageArray[1])) return message.channel.send("That is not a number!");
             Math.floor(messageArray[1]);
             if (messageArray[1] > 10) return message.channel.send("Please specify a value between 0 and 10")
 
@@ -444,12 +444,12 @@ module.exports.run = async (bot, message) => {
 
     let commandfile = bot.commands.get(cmd.slice(prefix.length));
 
-    if (!message.guild.me.hasPermission("SEND_MESSAGES")) return console.log(`${message.guild.name} doesnt allow me to chat!`);
+    if (!message.guild.me.hasPermission("SEND_MESSAGES")) return bot.logger.info(`${message.guild.name} doesnt allow me to chat!`);
 
     if (commandfile) {
         commandfile.run(bot, message, args, ops).catch((err) => {
             message.channel.send(`Error ${err}`);
-            console.log(`Command Error: ${commandfile.help.name} ${err}`);
+            bot.logger.info(`Command Error: ${commandfile.help.name} ${err}`);
         });
     } else if (!sendMessages) {
         message.channel.send("That is no valid command!")
@@ -483,7 +483,7 @@ async function play(connection, message, bot) {
     }), {
         bitrate: 192000
     });
-    server.dispatcher.on("error", console.error);
+    server.dispatcher.on("error", bot.logger.error);
     let info = await YTDL.getInfo(server.queue[0]).catch();
     if (!message.guild.me.hasPermission("SEND_MESSAGES")) return;
 
@@ -519,7 +519,7 @@ async function captcha(message) { // Source https://github.com/y21/discordcaptch
         };
     }
 
-    if (captchaConfig[message.guild.id].captcha != true) {
+    if (captchaConfig[message.guild.id].captcha !== true) {
         return;
     }
 
@@ -577,7 +577,7 @@ function reload(bot) {
     fs.readdir(path.join(__dirname, '../../commands'), (err, files) => {
 
 
-        if (err) console.log(err);
+        if (err) bot.logger.info(err);
 
         let jsfile = files.filter((f) => f.split(".").pop() === "js")
         if (jsfile.length <= 0) {

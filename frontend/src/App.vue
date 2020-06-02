@@ -82,9 +82,19 @@ export default {
     return {
       meta: [
         {
-          description: "description",
+          name: "description",
           content: "This is my small website used for links and my bot",
           vmid: "description"
+        },
+        {
+          name: "theme-color",
+          content: "#0085f1",
+          vmid: "theme-color"
+        },
+        {
+          itemprop: "description",
+          content: "This is my small website used for links and my bot",
+          vmid: "itemprop:description"
         },
         {
           property: "og:description",
@@ -119,6 +129,10 @@ export default {
         {
           name: "viewport",
           content: "width=device-width, initial-scale=1.0"
+        },
+        {
+          name: "Content-Language",
+          content: "en-us"
         },
         {
           chartest: "UTF-8"

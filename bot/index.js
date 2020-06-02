@@ -2,7 +2,7 @@ const path = require('path');
 require('dotenv').config({
     path: path.join(__dirname, '/.env')
 });
-
+const logger = require('./logger');
 
 const botconfig = process.env;
 const Discord = require("discord.js");
@@ -19,8 +19,8 @@ const mongoClient = new MongoClient(uri, {
 let dbLoad = false;
 
 mongoClient.connect(async (err) => {
-    if (err) console.log(err);
-    console.log("Connected to database");
+    if (err) bot.logger.error(err);
+    bot.logger.info("Connected to database");
     bot.db = mongoClient.db("datastorage");
     bot.db.hugsDB = bot.db.collection("hugs");
     bot.db.patsDB = bot.db.collection("pats");
@@ -45,6 +45,7 @@ bot.stats = new Discord.Collection;
 bot.mutes = require("./datastorage/mutes.json");
 bot.blackListedGuilds = require("./datastorage/blackListedGuilds.json");
 bot.blackListedUsers = require("./datastorage/blackListedUsers.json");
+bot.logger = logger;
 var loggedIN = 0;
 const YouTube = require("simple-youtube-api");
 
@@ -58,9 +59,9 @@ bot.changes = "live integration to show when I am streaming and sending a ping";
 
 bot.youtube = new YouTube(bot.config.googleAPI);
 
-bot.on("reconnecting", async () => {
-    console.log("reconnecting")
-});
+/*bot.on("reconnecting", async () => {
+    bot.logger.info("reconnecting")
+});*/
 
 setInterval(() => {
     let duration = moment.duration(bot.uptime)
@@ -96,7 +97,7 @@ bot.on("ready", async () => {
         };
     });
 
-    bot.serverList.sort((a, b) => (a.MemberCount < b.MemberCount) ? 1 : -1);
+    bot.serverList.sort((a, b) => b.MemberCount - a.MemberCount);
 
 
 
@@ -106,7 +107,7 @@ bot.on("ready", async () => {
     /////////
 
 
-    console.log(`${bot.user.username} is online!`);
+    bot.logger.info(`${bot.user.username} is online!`);
 
     if (dbLoad === false) await sleep(5000);
     i = 0;
@@ -127,28 +128,38 @@ bot.on("ready", async () => {
     setInterval(async () => {
         //97947067
         //
+        let stat = '';
+        let fet = await fetch('https://decapi.me/twitch/uptime/gamevsplayer')
+	    fet = await fet.text()
+        if(fet.includes('offline')) return
+        
         let twitchStatus = await fetch(`https://api.twitch.tv/helix/streams?user_id=97947067`, {
             method: 'GET',
             headers: {
-                "Client-ID": bot.config.TwitchID
+                "Client-ID": bot.config.TwitchID,
+                "Authorization": `Bearer ${bot.config.TwitchAuth}`
             }
-        }).catch((err) => console.log(err));
+        }).catch((err) => bot.logger.error(err));
         twitchStatus = await twitchStatus.json();
+       
+        if(twitchStatus.data === undefined) return;
+
 
         if (twitchStatus.data[0] !== undefined) {
             if (twitchStatus.data[0].type === 'live') {
                 let twitchGame = await fetch(`https://api.twitch.tv/helix/games?id=${twitchStatus.data[0].game_id}`, {
                     method: 'GET',
                     headers: {
-                        "Client-ID": bot.config.TwitchID
+                        "Client-ID": bot.config.TwitchID,
+                        "Authorization": `Bearer ${bot.config.TwitchAuth}`
                     }
                 });
                 twitchGame = await twitchGame.json();
                 bot.user.setActivity(`${twitchGame.data[0].name} on Twitch!`, {
                     url: `https://twitch.tv/${twitchStatus.data[0].user_name}`,
                     type: 'STREAMING'
-                }).catch(err => console.error(err));
-                if (notification == false) {
+                }).catch(err => bot.logger.error(err));
+                if (notification === false) {
 
                     let messageChannel = await bot.channels.get("154338003207061504");
                     let pingRole = await messageChannel.guild.roles.get("426742035761070091");
@@ -180,20 +191,20 @@ bot.on("ready", async () => {
     }, 60000);
 
     function activityLoop() {
-        if (bot.indexActivity == 0) {
+        if (bot.indexActivity === 0) {
             bot.user.setActivity(`MAINTENANCE`, {
                 type: "PLAYING"
             }).catch();
 
             return;
-        } else if (bot.indexActivity == 1) {
+        } else if (bot.indexActivity === 1) {
             let activityAmount = (bot.activities).size;
             if (curActivity > activityAmount) curActivity = 1;
             let activity = bot.activities.get(curActivity);
-            if (activity) activity.run(bot).catch((error) => console.error(error));
+            if (activity) activity.run(bot).catch((error) => bot.logger.error(error));
             else return;
             curActivity++;
-        } else if (bot.indexActivity == 2) {
+        } else if (bot.indexActivity === 2) {
             return;
         };
     };
@@ -217,7 +228,7 @@ bot.on("ready", async () => {
 
                 fs.writeFile("./datastorage/mutes.json", JSON.stringify(bot.mutes), err => {
                     if (err) throw err;
-                    console.error(err);
+                    bot.logger.error(err);
                 })
             }
         }
@@ -225,7 +236,7 @@ bot.on("ready", async () => {
     }, 5000)
     // makes cmds work on first message
     setInterval(() => {
-        if (ran == true) return
+        if (ran === true) return
 
         let load = bot.events.get("message");
 
@@ -245,13 +256,13 @@ bot.on("ready", async () => {
 
 
 bot.on("message", async message => {
-    //console.log(blackListed)
+    //bot.logger.info(blackListed)
     //return;
     // ------------------------------------------------------------------
-    if (loggedIN = 0) return;
+    if (loggedIN === 0) return;
     if (dbLoad === false) return;
 
-    if (message.channel.type != "dm") {
+    if (message.channel.type !== "dm") {
 
         let prefix = process.env.prefix;
 
@@ -276,7 +287,7 @@ bot.on("message", async message => {
     let eventLoader = bot.events.get("message");
 
     if (eventLoader === undefined) return;
-    eventLoader.run(bot, message) //.catch(err => console.log("Event loading Error  " + err));
+    eventLoader.run(bot, message) //.catch(err => bot.logger.info("Event loading Error  " + err));
 
 
 
@@ -287,10 +298,10 @@ bot.on("message", async message => {
 // -----------------------------------------------------------------
 bot.on("guildCreate", guild => {
 
-    console.log(`Joined ${guild.name}`)
+    bot.logger.info(`Joined ${guild.name}`)
     let defaultChannel = "";
     guild.channels.forEach((channel) => {
-        if (channel.type === "text" && defaultChannel == "") {
+        if (channel.type === "text" && defaultChannel === "") {
             if (channel.permissionsFor(guild.me).has("SEND_MESSAGES")) {
                 defaultChannel = channel;
             }
@@ -309,42 +320,44 @@ bot.on("guildCreate", guild => {
 
 
     defaultChannel.send(guildJoin)
-        .catch(console.error);
+        .catch(bot.logger.error);
 
 });
 
 bot.on("guildMemberAdd", async member => {
-    if (loggedIN != 1) return;
+    if (loggedIN !== 1) return;
 
 });
 
-bot.on("error", console.error);
+bot.on("error", (err) => bot.logger.error(err));
 
-if (botconfig.botToken == "") return console.error("Bot token not set")
+if (botconfig.botToken === "") return bot.logger.error("Bot token not set")
 
 bot.login(botconfig.botToken)
-    .catch(console.log);
+    //.catch((e) => bot.logger.info(e));
 
 var loggedIN = 1;
 //return;
 
 
 process.on('unhandledRejection', (reason, p) => {
-    console.log('Unhandled Rejection at:', p, 'reason:', reason);
+    bot.logger.error(`Unhandled Rejection at: ${reason.stack || reason}`);
     // application specific logging, throwing an error, or other logic here
 });
 
 bot.on('disconnect', function (erMsg, code) {
-    console.log('----- Bot disconnected from Discord with code', code, 'for reason:', erMsg, '-----');
-    bot.login(botconfig.botToken);
+    bot.logger.error(`----- Bot disconnected from Discord with code, ${code}, for reason: ${erMsg} -----`);
 });
 
-bot.on('warn', console.warn);
+bot.on('warn', (warn) => bot.logger.warn(warn));
 
-bot.on('resume', console.log);
+//bot.on('resume', (resume) => bot.logger.info(resume));
 
-// bot.on('debug', console.log);
+// bot.on('debug', bot.logger.info);
 
+bot.on('shardError', error => {
+    bot.logger.error('A websocket connection encountered an error:', error);
+});
 
 
 
@@ -358,7 +371,7 @@ websiteReload();
 function websiteReload() {
 
     fs.readdir(__dirname + "/externalLoading/website", (err, files) => {
-        if (err) console.log(err);
+        if (err) bot.logger.info(err);
         let jsfile = files.filter(f => f.split(".").pop() === "js")
         if (jsfile.length <= 0) {
             return;
@@ -371,7 +384,7 @@ function websiteReload() {
             let websiteLoader = bot.website.get("website");
 
             setTimeout(() => {
-                websiteLoader.run(bot).catch(err => console.log("Website loading Error  " + err));
+                websiteLoader.run(bot).catch(err => bot.logger.error("Website loading Error  " + err));
             }, 5000);
         });
     })

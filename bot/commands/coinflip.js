@@ -44,7 +44,7 @@ module.exports.run = async (bot, message, args) => {
 
 
 
-            if (a == args2) {
+            if (a === args2) {
                 match = `**You guessed ${a} correctly and earned 2x of your bet balance**`
             } else match = "**You guessed wrong and lost your bet amount**";
 
@@ -58,7 +58,7 @@ module.exports.run = async (bot, message, args) => {
 
             await message.channel.send(embed).catch()
 
-            if (a != args2) {
+            if (a !== args2) {
 
                 return await bot.db.moneyDB.findOneAndUpdate({
                     userid: message.author.id

@@ -68,7 +68,7 @@ export default {
         "message",
         e => {
           let data = JSON.parse(e.data);
-          if (document.getElementsByClassName("Serverstats").length == 0)
+          if (document.getElementsByClassName("Serverstats").length === 0)
             return source.close();
           this.servers = data.list;
         },
@@ -94,9 +94,14 @@ export default {
     return {
       meta: [
         {
-          description: "description",
+          name: "description",
           content: "This page shows some stats about Servers my bot is in",
           vmid: "description"
+        },
+        {
+          itemprop: "description",
+          content: "This page shows some stats about Servers my bot is in",
+          vmid: "itemprop:description"
         },
         {
           property: "og:description",

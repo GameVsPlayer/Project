@@ -3,7 +3,7 @@ const osu = require('ojsama');
 
 module.exports.run = async (bot, message, args) => {
     return;
-    if (bot.config.osuAPI == "") return console.log("OSU API Key not set")
+    if (bot.config.osuAPI === "") return bot.logger.info("OSU API Key not set")
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
 
 
@@ -33,17 +33,17 @@ module.exports.run = async (bot, message, args) => {
 
     var map = parser.map;
     if (map == undefined) return message.channel.send("No map found!");
-    console.log(map.toString());
+    bot.logger.info(map.toString());
 
     if (mods) {
-        console.log("+" + osu.modbits.string(mods));
+        bot.logger.info("+" + osu.modbits.string(mods));
     }
 
     var stars = new osu.diff().calc({
         map: map,
         mods: mods
     });
-    console.log(stars.toString());
+    bot.logger.info(stars.toString());
 
     var pp = osu.ppv2({
         stars: stars,
@@ -55,8 +55,8 @@ module.exports.run = async (bot, message, args) => {
     var max_combo = map.max_combo();
     combo = combo || max_combo;
 
-    console.log(pp.computed_accuracy.toString());
-    console.log(combo + "/" + max_combo + "x");
+    bot.logger.info(pp.computed_accuracy.toString());
+    bot.logger.info(combo + "/" + max_combo + "x");
 
     return;
 

@@ -10,7 +10,7 @@ module.exports.run = async (bot, message) => {
     let _font = await jimp.loadFont(jimp.FONT_SANS_64_BLACK);
     let avatarURL = `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png?size=256`;
     let _avatar = await jimp.read(avatarURL);
-    //return console.log(avatarURL)
+    //return bot.logger.info(avatarURL)
     let xpDB = await bot.db.xpDB.findOne({
         userid: message.author.id
     });

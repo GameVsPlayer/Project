@@ -32,7 +32,7 @@ module.exports.run = async (bot, message, args) => {
         memberA = message.author;
     }
     memberA = memberA || global.autocomplete || message.author;
-    if (!memberA) return message.reply("No user found.").catch((err) => console.error(err));
+    if (!memberA) return message.reply("No user found.").catch((err) => bot.logger.error(err));
     memberA = await message.guild.members.get(memberA.id || memberA);
 
     avatarURL = `https://cdn.discordapp.com/avatars/${memberA.user.id}/${memberA.user.avatar}`;
@@ -46,7 +46,7 @@ module.exports.run = async (bot, message, args) => {
 
             .setDescription(`**LINK** ${avatarLink}`)
 
-        message.channel.send(embed).catch((err) => console.error(err));
+        message.channel.send(embed).catch((err) => bot.logger.error(err));
     });
 }
 module.exports.help = {

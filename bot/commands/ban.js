@@ -9,10 +9,12 @@ module.exports.run = async (bot, message, args) => {
     if (!message.guild.me.hasPermission("BAN_MEMBERS")) return message.channel.send("I do not have the permission to perform that action!")
     if (!message.member.hasPermission("BAN_MEMBERS")) return errors.noPerms(message, "BAN_MEMBERS").catch();
     if (bUser.hasPermission("BAN_MEMBERS")) {
-        return message.channel.send("That Person can't be banned!")
-            .then((message) => {
-                message.delete(5000).catch();
-            });
+        try {
+            return message.channel.send("That Person can't be banned!")
+                .then((message) => {
+                    message.delete(5000).catch();
+                });
+        } catch {}
     };
     if (!bReason) bReason = "no reason specified"
     let banEmbed = new Discord.RichEmbed()
@@ -24,13 +26,15 @@ module.exports.run = async (bot, message, args) => {
         .addField("Time", message.createdAt)
         .addField("Reason", bReason);
 
-    let banChannel = message.guild.channels.find(`name`, "reports");
+    let banChannel = message.guild.channels.find(`name`, "reports").catch();
     if (!banChannel) {
-        return message.channel.send("Can't find Reports Channel.")
-            .then((message) => {
-                message.delete(5000).catch();
-            });
-    }
+        try {
+            return message.channel.send("Can't find Reports Channel.")
+                .then((message) => {
+                    message.delete(5000).catch();
+                });
+        } catch {}
+    };
 
 
     message.guild.member(bUser).ban(bReason).catch();

@@ -6,13 +6,14 @@ const moment = require("moment-timezone");
 
 module.exports.run = async (bot, message, args) => {
 
-    if (bot.config.TwitchID == "") return console.log("Twitch ID not set")
+    if (bot.config.TwitchID === "") return bot.logger.info("Twitch ID not set")
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
     if (!args[0]) return message.channel.send("No user specified");
     let idGrab = await fetch(`https://api.twitch.tv/helix/users?login=${args[0]}`, {
         method: 'GET',
         headers: {
-            "Client-ID": `${bot.config.TwitchID}`
+            "Client-ID": `${bot.config.TwitchID}`,
+            "Authorization": `Bearer ${bot.config.TwitchAuth}`
         }
     });
 
@@ -28,7 +29,8 @@ module.exports.run = async (bot, message, args) => {
     followers = await fetch(followers, {
         method: 'GET',
         headers: {
-            "Client-ID": bot.config.TwitchID
+            "Client-ID": bot.config.TwitchID,
+            "Authorization": `Bearer ${bot.config.TwitchAuth}`
         }
     });
 
@@ -39,7 +41,8 @@ module.exports.run = async (bot, message, args) => {
     let body = await fetch(url, {
         method: 'GET',
         headers: {
-            "Client-ID": bot.config.TwitchID
+            "Client-ID": bot.config.TwitchID,
+            "Authorization": `Bearer ${bot.config.TwitchAuth}`
         }
     }).catch();
     body = await body.json();
@@ -75,7 +78,8 @@ module.exports.run = async (bot, message, args) => {
         let game = await fetch(`https://api.twitch.tv/helix/games?id=${body.game_id}`, {
             method: 'GET',
             headers: {
-                "Client-ID": bot.config.TwitchID
+                "Client-ID": bot.config.TwitchID,
+                "Authorization": `Bearer ${bot.config.TwitchAuth}`
             }
         });
         game = await game.json();

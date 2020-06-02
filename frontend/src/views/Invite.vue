@@ -15,7 +15,8 @@ export default {
  metaInfo() {
       return {
       meta: [
-            { 'description': 'description', content: 'This page lists an Invite link for my bot', vmid: 'description'},
+            { 'name': 'description', content: 'This page lists an Invite link for my bot', vmid: 'description'},
+            { 'itemprop': "description", content: "This page lists an Invite link for my bot", vmid: "itemprop:description"},
             { 'property': 'og:description', content: 'This page lists an Invite link for my bot', vmid: 'og:description' },
             { 'property': 'og:title', content: document.title, 'vmid': 'og:title'},
             { 'property': 'og:url', content: 'https://gamu.tk' +  window.location.pathname, 'vmid': 'og:url'},

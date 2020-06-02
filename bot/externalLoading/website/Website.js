@@ -9,7 +9,7 @@ module.exports.run = async (bot) => {
     let find = bot.db.todoDB.find();
     setTimeout(async () => {
         find.each(function (err, item) {
-            if (item == null) return;
+            if (item === null) return;
             dbData.push(item);
             todos.data = dbData;
         })
@@ -17,7 +17,7 @@ module.exports.run = async (bot) => {
     setInterval(async () => {
         dbData = [];
         find.each(function (err, item) {
-            if (item == null) return;
+            if (item === null) return;
             dbData.push(item);
             todos.data = dbData;
         })

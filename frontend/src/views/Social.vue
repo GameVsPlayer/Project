@@ -38,9 +38,14 @@ export default {
     return {
       meta: [
         {
-          description: "description",
+          name: "description",
           content: "This page shows a list of all my general online accounts",
           vmid: "description"
+        },
+        {
+          itemprop: "description",
+          content: "This page shows a list of all my general online accounts",
+          vmid: "itemprop:description"
         },
         {
           property: "og:description",

@@ -1,4 +1,3 @@
+Sitemap: https://www.gamu.tk/sitemap.xml
 User-Agent: *
-Disallow: 
-Allow: /
 Disallow: /imprint

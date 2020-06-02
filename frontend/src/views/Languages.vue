@@ -24,7 +24,7 @@
     metaInfo() {
       return {
         meta: [{
-            'description': 'description',
+            'name': 'description',
             content: 'This page lists all the languages supported by the translate command and their corresponding code',
             vmid: 'description'
           },

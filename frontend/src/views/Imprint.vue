@@ -5,7 +5,7 @@
       <dt>To view my contact information pls verify using <b>reCAPTCHA</b></dt>
     </dl>
     <dl v-else>
-      <dt v-for="(message,i) in info.message" :key='i'> <span v-html="message"></span></dt>
+      <dt v-for="(block,i) in message" :key="i" ><span v-html="block"/> </dt>
     </dl>
   </div>
 </template>
@@ -30,7 +30,8 @@
     name: "imprint",
     data() {
       return {
-        info: null
+        info: null,
+        message: null
       }
     },
     methods: {
@@ -43,9 +44,15 @@
             token: token
           })
           .then(res => {
+            this.message = JSON.parse(res.data.message);
             this.info = res.data;
           });
       },
+    },
+    mounted() {
+    (x => {
+        
+      })
     }
   };
 </script>

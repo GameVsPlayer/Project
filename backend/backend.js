@@ -4,7 +4,6 @@ const compression = require('compression');
 const fetch = require('node-fetch');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
-const info = require('info.json');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
@@ -98,7 +97,7 @@ app.post('/verify/', async (req, res) => {
     if (response.score >= 0.5) {
         res.json({
             status: 'accepted!',
-            message: info.info;
+            message: [info.info]
         });
     } else {
         res.json({
@@ -129,5 +128,5 @@ app.get('/serverStats/', (req, res) => {
 
 
 let listener = app.listen(process.env.backendPort || 1026, function () {
-    console.log('Backend running on port ' + listener.address().port);
+    bot.logger.info('Backend running on port ' + listener.address().port);
 });

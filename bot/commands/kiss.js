@@ -50,7 +50,7 @@ module.exports.run = async (bot, message, args) => {
 
     if (await bot.db.kissDB.findOne({
             userid: kissUser.id
-        }) == null) {
+        }) === null) {
         const data = {
             userid: kissUser.id,
             amount: 0

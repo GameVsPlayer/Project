@@ -1,20 +1,32 @@
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import 'bootstrap-css-only/css/bootstrap.min.css'
 import 'mdbvue/lib/css/mdb.min.css'
+import Pace from 'node-pace-progress'
 
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
 import VueAnalytics from 'vue-analytics'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import {
+  library
+} from '@fortawesome/fontawesome-svg-core'
+import {
+  faUserSecret
+} from '@fortawesome/free-solid-svg-icons'
+import {
+  FontAwesomeIcon
+} from '@fortawesome/vue-fontawesome'
 import VueMeta from 'vue-meta'
-import { VueReCaptcha } from 'vue-recaptcha-v3'
+import {
+  VueReCaptcha
+} from 'vue-recaptcha-v3'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-Vue.use(VueReCaptcha, { siteKey: '6LeJA8oUAAAAAKbysPFsF4Y-3aFnyPNgiWBLfPe7', theme: 'dark' })
+Vue.use(VueReCaptcha, {
+  siteKey: '6LeJA8oUAAAAAKbysPFsF4Y-3aFnyPNgiWBLfPe7',
+  theme: 'dark'
+})
 Vue.use(VueAxios, axios)
 
 Vue.use(VueMeta, {
@@ -33,7 +45,17 @@ Vue.config.productionTip = false;
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: h => h(App),
+  created() {
+    const html = document.documentElement // returns the html tag
+    html.setAttribute('lang', 'en-us')
+  },
+  mounted() {
+    Pace.start()
+    Pace.on('hide', () => {
+      document.dispatchEvent(new Event('app.rendered'));
+    })
+  }
 }).$mount('#app')
 
 

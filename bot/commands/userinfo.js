@@ -36,8 +36,8 @@ module.exports.run = async (bot, message, args) => {
 
 
     memberA = memberA || global.autocomplete || message.author;
-    if (!memberA) return message.reply("No user found.").catch((err) => console.error(err));   
-    memberA = await message.guild.members.get(memberA.id ||memberA);
+    if (!memberA) return message.reply("No user found.").catch((err) => bot.logger.error(err));
+    memberA = await message.guild.members.get(memberA.id || memberA);
 
     avatarURL = `https://cdn.discordapp.com/avatars/${memberA.user.id}/${memberA.user.avatar}`;
     const gMember = message.guild.member(memberA);
@@ -52,7 +52,7 @@ module.exports.run = async (bot, message, args) => {
         if (memberA.presence.status == "dnd") statusIcon = "[DnD]";
         if (memberA.presence.game !== null)
             if (memberA.presence.game.url !== null) statusIcon = "[Streaming]";
-        if (statusIcon == null) statusIcon = "[Offline]";
+        if (statusIcon === null) statusIcon = "[Offline]";
         if (memberA.presence.game !== undefined && statusIcon == "[Streaming]" && memberA.presence.game.timestamps !== null && memberA.presence.game.url !== null) game = {
             name: `Title: ${memberA.presence.game.name} \n streaming at ${memberA.presence.game.url}`,
             time: ""
@@ -84,14 +84,13 @@ module.exports.run = async (bot, message, args) => {
 
         if (game.name.length > 0 && game.time.length > 0 && game.name !== "Spotify") var gameF = `${game.name} playing Since ${game.time}`;
         else if (game.name == "Spotify" && memberA.presence.game.assets.largeImage.startsWith("spotify:")) var gameF = `${game.name} playing ${game.songName} \n by ${game.artist} \n in playlist ${game.playlist}`;
-        else if (game.name.length > 0 && gameF == null) var gameF = `${game.name}`;
+        else if (game.name.length > 0 && gameF === null) var gameF = `${game.name}`;
         else var gameF = "Nothing playing right now";
 
 
-    } catch (e) {
-    }
+    } catch (e) {}
 
-    if(gameF == undefined) gameF = memberA.presence.game;
+    if (gameF == undefined) gameF = memberA.presence.game;
 
     if (memberA.roles == undefined) {
         var fetched = message.guild.members.get(memberA.id);
@@ -118,7 +117,7 @@ module.exports.run = async (bot, message, args) => {
     if (mentionRole !== undefined) var mentionRole = mentionRole.toString();
     shortUrl.shorten(`${avatarURL}?size=2048`, function (avatarLink, err) {
 
-        if(err) return console.log(err);
+        if (err) return bot.logger.info(err);
         let embed = new Discord.RichEmbed()
 
             .setDescription(`**${memberA}'s Info**`)
