@@ -1,5 +1,5 @@
 module.exports.run = async (bot, message, args) => {
-    bot.user.setActivity(`on ${bot.guilds.size} Servers`, {
+    bot.user.setActivity(`on ${bot.guilds.cache.size} Servers`, {
         type: "PLAYING"
     }).catch((err) => bot.logger.error(err));
     return;
