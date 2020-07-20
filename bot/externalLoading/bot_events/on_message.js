@@ -5,6 +5,7 @@ const jimp = require("jimp");
 const fs = require("fs");
 const Discord = require("discord.js");
 const moment = require("moment-timezone");
+const { string } = require("mathjs");
 let servers = {};
 
 module.exports.run = async (bot, message) => {
@@ -36,7 +37,6 @@ module.exports.run = async (bot, message) => {
 
     var mainCommand = 0;
 
-    let youtube = bot.youtube;
 
     let messageArray = message.content.split(" ");
 
@@ -44,7 +44,7 @@ module.exports.run = async (bot, message) => {
 
     if (message.guild.id == bot.blackListedGuilds || message.author.id == bot.blackListedUsers) return;
 
-    let sendMessages = (!message.guild.me.hasPermission("SEND_MESSAGES"))
+    bot.sendMessages = (!message.guild.me.hasPermission("SEND_MESSAGES"))
 
     let sendEmbeds = (!message.guild.me.hasPermission("EMBED_LINKS"))
 
@@ -91,7 +91,7 @@ module.exports.run = async (bot, message) => {
                         }
                     }).catch((e) => bot.logger.error(e));
                     if (2 >= l) return;
-                    else if (!sendMessages) {
+                    else if (!bot.sendMessages) {
                         let levelUpEmbed = new Discord.MessageEmbed()
                             .setTitle("Level Up!")
                             .setDescription(`${message.author} You have send ${(i)} Messages, so you leveled up! You are now level ${l + 1}!`);
@@ -204,7 +204,7 @@ module.exports.run = async (bot, message) => {
         if (message.content.startsWith(prefix)) bot.logger.info("[" + moment().format('D.MM, h:mm a') + "]" + "[" + message.guild.name + "]" + "[" + message.channel.name + "]" + "[" + message.author.username + "]" + message.content)
         if (!message.guild.me.hasPermission("SEND_MESSAGES")) return;
 
-        if (message.content.startsWith(prefix + "global_messages") && message && !sendMessages && messagesGlobal !== 0 && uptimeMin !== 0) {
+        if (message.content.startsWith(prefix + "global_messages") && message && !bot.sendMessages && messagesGlobal !== 0 && uptimeMin !== 0) {
             return message.channel.send(`${messagesGlobal} Messages have been send globaly since the bot last restarted thats ${messagesGlobal / uptimeMin} Messages per minute!`)
         }
 
@@ -242,66 +242,28 @@ module.exports.run = async (bot, message) => {
     } { //music
         if (message.content.startsWith(prefix + "play")) {
             mainCommand = true;
-            if (sendMessages) return;
+            if (bot.sendMessages) return;
 
             if (!message.member.voice.channel) return message.reply("Please connect to a voice channel first!").catch();
 
             if (!args[0]) return message.reply("Please input something").catch();
 
-            let validate = await YTDL.validateURL(args[0])
+            let validate = YTDL.validateURL(args[0])
 
             let videoURL = "";
-            if (!validate) {
-                await YTSearch(args);
-                async function YTSearch(search) {
-                    var videos = await youtube.searchVideos(search.join(" "), 10).catch();
-                    let index = 0;
-                    var requesterID = message.author.id;
-                    if (sendMessages) return;
-                    if (videos.length < 1) return message.channel.send("I could not obtain any search results").catch()
-                    message.channel.send(`
-                ${videos.map((videos2) => `${++index} ${videos2.title}`).join('\n')}
-                
-    Please provide a value to select one of the search results ranging from 1-${videos.length}.
-                `).then((message) => global.songsMessage = message)
-                        .then(global.songsID = message.channel.id);
-                    try {
-                        try {
-                            var response = await message.channel.awaitMessages((message2) => message2.content > 0 && message2.content < 11 && message.author.id == requesterID, {
-                                maxMatches: 1,
-                                time: 10000,
-                                errors: ['time']
-                            });
-                        } catch (err) {
-                            message.channel.fetchMessage(global.songsMessage).catch()
-                                .then((msg) => msg.delete()).catch();
-                            if (!sendMessages) return message.channel.send("No or invalid value entered, cancelling video selection");
-                            else return;
-                        }
-                        const videoIndex = parseInt(response.first().content);
-                        var video = await youtube.getVideoByID(videos[videoIndex - 1].id);
-                    } catch (err) {
-                        message.channel.messages.fetch(global.songsMessage)
-                            .then((msg) => msg.delete());
-
-                        if (!sendMessages) return message.channel.send("I couldnt not obtain any search results.");
-                        else return;
-
-                    }
-                    videoURL = `https://www.youtube.com/watch?v=${video.id}`;
-                    let validate = await YTDL.validateURL(videoURL)
-                    message.channel.messages.fetch(global.songsMessage)
-                        .then((msg) => msg.delete());
-                    if (sendMessages) return;
-                    if (!validate) return message.channel.send("No Song could be found").catch()
-                }
+            if (validate) {
+               videoURL = args.join(" ");  
             }
-            if (videoURL === "") videoURL = args.join(" ");
+            else {
+                videoURL = await YTSearch(args, bot, message);
+            }
+      
+            if(typeof videoURL != "string" ) return
 
             if (!YTDL.validateURL(videoURL)) return;
 
             if (!message.member.voice.channel) {
-                if (sendMessages) return;
+                if (bot.sendMessages) return;
                 return message.reply("You must be in a voicechannel").catch()
             }
             if (!servers[message.guild.id]) {
@@ -310,22 +272,20 @@ module.exports.run = async (bot, message) => {
                     requester: []
                 }
             }
-            var server = servers[message.guild.id];
-
-
+            let server = servers[message.guild.id];
 
             server.queue.push(videoURL);
+
             server.requester.push(message.author);
 
-
-            if (sendMessages) return;
+            if (bot.sendMessages) return;
             else message.channel.send(`Added ${message.author}`);
             if (message.guild.me.hasPermission("MANAGE_MESSAGES")) {
                 message.delete({ timeout:0}).catch();
             }
             if (!message.guild.me.hasPermission("CONNECT")) {
                 server.queue = [];
-                if (sendMessages) return;
+                if (bot.sendMessages) return;
                 return message.channel.send("I dont have the connect permission").catch()
             }
 
@@ -333,42 +293,37 @@ module.exports.run = async (bot, message) => {
                 message.member.voice.channel.join().catch((err) => message.channel.send(`Something went wrong ${err}`)).then((connection) => {
 
                     play(connection, message, bot).catch(err => {
-                            if (sendMessages) return;
+                            if (bot.sendMessages) return;
                             else message.channel.send(`Something went wrong ${err}`)
                         })
                         .catch((e) => bot.logger.error(e));
-
-
                 })
             }
-
-
         }
-
 
         if (message.content.startsWith(prefix + "skip")) {
             mainCommand = 1;
             var server = servers[message.guild.id];
             if (!message.member.voice.channel) {
-                if (sendMessages) return;
+                if (bot.sendMessages) return;
                 return message.reply("You must be in a voicechannel").catch()
                     .catch((e) => bot.logger.error(e));
 
             }
             if (message.member.voice.channelID != message.guild.me.voice.channelID) {
-                if (sendMessages) return;
+                if (bot.sendMessages) return;
                 message.reply("You are not in the same voicechannel as me!").catch();
             }
 
 
             if (!message.guild.voice.connection)
-                if (sendMessages) return;
+                if (bot.sendMessages) return;
                 else return message.reply("There is no music playing!").catch();
             if (!server.dispatcher) return;
             server.dispatcher.destroy().catch((err) => {
-                if (!sendMessages) message.channel.send(`Something went wrong: ${err}`)
+                if (!bot.sendMessages) message.channel.send(`Something went wrong: ${err}`)
             });
-            if (sendMessages) return;
+            if (bot.sendMessages) return;
             return message.channel.send(`${message.author} skipped the song!`)
                 .catch((e) => bot.logger.error(e));
 
@@ -387,7 +342,7 @@ module.exports.run = async (bot, message) => {
 
         if (message.content.startsWith(prefix + "queue")) {
             mainCommand = 1;
-            if (sendMessages) return;
+            if (bot.sendMessages) return;
 
             var server = servers[message.guild.id];
             if (!server) return message.channel.send("No Songs in queue")
@@ -412,12 +367,12 @@ module.exports.run = async (bot, message) => {
         }
         if (message.content.startsWith(prefix + "volume")) {
             var server = servers[message.guild.id];
-            if (sendMessages) null;
+            if (bot.sendMessages) null;
             else if (!server) return message.channel.send("There is nothing playing right now");
             mainCommand = true;
-            if (sendMessages) null;
+            if (bot.sendMessages) null;
             else if (!server.dispatcher) return message.channel.send("There is no music playing right now");
-            if (sendMessages) null;
+            if (bot.sendMessages) null;
             else if (!messageArray[1]) return message.channel.send(`The current volume is ${server.dispatcher.volume}`);
             if (Number.isNaN(messageArray[1])) return message.channel.send("That is not a number!");
             Math.floor(messageArray[1]);
@@ -425,7 +380,7 @@ module.exports.run = async (bot, message) => {
 
             server.volume = messageArray[1];
             server.dispatcher.setVolumeLogarithmic(messageArray[1] / 5)
-            if (sendMessages) return;
+            if (bot.sendMessages) return;
             //else return message.channel.send(`The Volume was changed to ${Math.floor(messageArray[1])}`)
             server.dispatcher.on('volumeChange', (oldVolume, newVolume) => {
                 message.channel.send(`Volume changed from ${oldVolume} to ${newVolume}.`);
@@ -454,7 +409,7 @@ module.exports.run = async (bot, message) => {
             message.channel.send(`Error ${err}`);
             bot.logger.info(`Command Error: ${commandfile.help.name} ${err}`);
         });
-    } else if (!sendMessages) {
+    } else if (!bot.sendMessages) {
         message.channel.send("That is no valid command!")
             .then((message) => {
                 message.delete({ timeout:1000}).catch();
@@ -620,4 +575,41 @@ function reload(bot) {
 
 
     })
+}
+async function YTSearch(search, bot, message) {
+    let videos = await bot.youtube.searchVideos(search.join(" "), 10).catch();
+    let video,response;
+    let index = 0;
+    let requesterID = message.author.id;
+    if (bot.sendMessages) return;
+    if (videos.length < 1) return message.channel.send("I could not obtain any search results").catch()
+    message.channel.send(`
+${videos.map((videos2) => `${++index} ${videos2.title}`).join('\n')}
+
+Please provide a value to select one of the search results ranging from 1-${videos.length}.
+`).then((message) => global.songsMessage = message)
+        .then(global.songsID = message.channel.id);
+            await message.channel.awaitMessages((message2) => message2.content > 0 && message2.content < 11 && message.author.id == requesterID, {
+                max: 1,
+                time: 10000,
+                errors: ['time']
+            }).then(match => response = match)
+            .catch(err =>{
+            message.channel.messages.fetch(global.songsMessage).catch()
+                .then((msg) => msg.delete({timeout: 0})).catch();
+            if (!bot.sendMessages) return message.channel.send("No or invalid value entered, cancelling video selection").then((msg) => {msg.delete({timeout: 5000}).catch().then(
+                message.channel.messages.fetch(global.songsMessage)
+            .then((msg) => msg.delete({timeout: 0})
+            ))})
+            else return;
+        })
+        if(response) {
+        const videoIndex = parseInt(response.first().content);
+        video = await bot.youtube.getVideoByID(videos[videoIndex - 1].id);
+    videoURL = `https://www.youtube.com/watch?v=${video.id}`;
+    let validate = YTDL.validateURL(videoURL);
+    message.channel.messages.fetch(global.songsMessage)
+        .then((msg) => msg.delete({timeout: 0}));
+    if(validate) return videoURL;
+    }
 }

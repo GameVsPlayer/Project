@@ -50,7 +50,7 @@ var loggedIN = 0;
 const YouTube = require("simple-youtube-api");
 
 require('events').EventEmitter.defaultMaxListeners = 20;
-
+bot.extra = require('./externalLoading/extra');
 bot.config = botconfig;
 
 bot.version = '0.54';

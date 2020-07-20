@@ -73,10 +73,6 @@ module.exports.run = async (bot, message, args) => {
         source3URL = `${results[2].data.source} by ${results[2].data.creator[0]}`;
     }
 
-
-
-
-
     /**
      * sleeping
      * @param {number} time sleep timer.

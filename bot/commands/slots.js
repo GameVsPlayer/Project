@@ -31,15 +31,11 @@ module.exports.run = async (bot, message, args) => {
         return picked;
 
     }
-
-
     pick().then(async (a) => {
 
         pick().then(async (b) => {
 
             pick().then(async (c) => {
-
-
 
                 if (a == b && a == c) {
                     match = "Match"
@@ -52,10 +48,6 @@ module.exports.run = async (bot, message, args) => {
                     .setFooter(match)
                     .setColor(bot.config.color)
                     .addField("Money before", balance.balance)
-
-
-
-
 
                 if (a != b || a != c) {
 
@@ -101,9 +93,6 @@ module.exports.run = async (bot, message, args) => {
                     userid: message.author.id
                 })).balance);
                 return await message.channel.send(embed).catch();
-
-
-
             })
         })
     })

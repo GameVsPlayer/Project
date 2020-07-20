@@ -9,12 +9,7 @@ module.exports.run = async (bot, message, args) => {
         .setTitle("Help")
         .setDescription("If you need help with commands and see which are available go to https://gamu.tk/commands");
 
-
-
     message.channel.send(embed)
-
-
-
 
 }
 module.exports.help = {

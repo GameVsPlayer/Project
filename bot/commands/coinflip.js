@@ -38,11 +38,7 @@ module.exports.run = async (bot, message, args) => {
             return picked;
 
         }
-
-
         pick().then(async (a) => {
-
-
 
             if (a === args2) {
                 match = `**You guessed ${a} correctly and earned 2x of your bet balance**`
@@ -53,8 +49,6 @@ module.exports.run = async (bot, message, args) => {
                 .setTitle("**Coin Flip**")
                 .addField("Result", `**${a}** \n ${match}`)
                 .setColor(bot.config.color);
-
-
 
             await message.channel.send(embed).catch()
 
@@ -67,11 +61,7 @@ module.exports.run = async (bot, message, args) => {
                         balance: - +parseInt(args[0])
                     }
                 });
-
             }
-
-
-
             if (a == args2) {
 
                 await bot.db.moneyDB.findOneAndUpdate({
@@ -82,9 +72,6 @@ module.exports.run = async (bot, message, args) => {
                     }
                 });
             }
-
-
-
         })
     } else return message.reply("Please enter heads or tails")
 }
