@@ -19,7 +19,7 @@ module.exports.run = async (bot, message, args) => {
     //= body.list[0];
 
 
-    let embed = new Discord.RichEmbed()
+    let embed = new Discord.MessageEmbed()
         .setTitle(bodyConverted.word || "None")
         .addField("Defenition", bodyConverted.definition || "None")
         .addField("Upvotes 👍", bodyConverted.thumbs_up, true || "None")

@@ -8,7 +8,7 @@ module.exports.run = async (bot, message) => {
     if (!fs.existsSync(localFile)) localFile = "https://i.imgur.com/YwQjWm0.jpg";
     let _background = await jimp.read(localFile);
     let _font = await jimp.loadFont(jimp.FONT_SANS_64_BLACK);
-    let avatarURL = `https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png?size=256`;
+    let avatarURL = message.author.avatarURL({ format: 'png', dynamic: true, size: 1024 });
     let _avatar = await jimp.read(avatarURL);
     //return bot.logger.info(avatarURL)
     let xpDB = await bot.db.xpDB.findOne({

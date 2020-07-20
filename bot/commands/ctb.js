@@ -26,7 +26,7 @@ module.exports.run = async (bot, message, args) => {
     Avatar = `https://s.ppy.sh/a/${user_id}`
     if (body[0].pp_raw = NaN) return message.reply("No Data for that user found").catch();
 
-    osuEmbed = new Discord.RichEmbed()
+    osuEmbed = new Discord.MessageEmbed()
         .setTitle(`**${username} osuCtB**`)
         .addField("PP", `${pp}`)
         .addField("Accuracy", `${accuracy}%`, true)

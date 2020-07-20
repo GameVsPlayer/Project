@@ -61,7 +61,7 @@ module.exports.run = async (bot, message, args) => {
     return;
 
 
-    osuEmbed = new Discord.RichEmbed()
+    osuEmbed = new Discord.MessageEmbed()
         .setTitle(`${username} osuStd`)
         .addField("PP", `${pp}`)
         .addField("Accuracy", `${accuracy}%`, true)

@@ -4,11 +4,11 @@ const errors = require("../utils/errors.js");
 module.exports.run = async (bot, message, args) => {
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
 
-    let kUser = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+    let kUser = message.guild.member(message.mentions.users.first() || message.guild.members.fetch(args[0]));
     if (!kUser) {
         return message.channel.send("Can't find user!")
             .then((message) => {
-                message.delete(5000).catch();
+                message.delete({ timeout:5000}).catch();
             });
     }
 
@@ -22,11 +22,11 @@ module.exports.run = async (bot, message, args) => {
     if (kUser.hasPermission("KICK_MEMBERS")) {
         return message.channel.send("That Person can't be kicked!")
             .then((message) => {
-                message.delete(5000).catch();
+                message.delete({ timeout:5000}).catch();
             });
     }
     if (!kReason) kReason = "no reason specified";
-    let kickEmbed = new Discord.RichEmbed()
+    let kickEmbed = new Discord.MessageEmbed()
         .setDescription("Kick")
         .setColor("#FF0000")
         .addField("Kicked User", `${kUser} with ID ${kUser.id}`)
@@ -39,7 +39,7 @@ module.exports.run = async (bot, message, args) => {
     if (!kickChannel) {
         return message.channel.send("Can't find reports Channel.")
             .then((message) => {
-                message.delete(5000).catch();
+                message.delete({ timeout:5000}).catch();
             });
     }
 

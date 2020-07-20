@@ -10,7 +10,7 @@ module.exports.run = async (bot, message, args) => {
 
     if (!args[0]) return message.send("Proper Usage: <prefix>poll question").catch();
 
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
         .setColor(0xffffff)
         .setFooter("React to vote.")
         .setDescription(args.join(' '))

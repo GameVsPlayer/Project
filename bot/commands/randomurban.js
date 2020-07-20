@@ -5,7 +5,7 @@ module.exports.run = async (bot, message, args) => {
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
     urban.random().first((json) => {
 
-        let embed = new Discord.RichEmbed()
+        let embed = new Discord.MessageEmbed()
             .setTitle(json.word || "None")
             .addField("Defenition", json.definition || "None")
             .addField("Upvotes", json.thumbs_up, true || "None")

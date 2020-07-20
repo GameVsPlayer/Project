@@ -12,12 +12,12 @@ module.exports.run = async (bot, message, args) => {
         try {
             return message.channel.send("That Person can't be banned!")
                 .then((message) => {
-                    message.delete(5000).catch();
+                    message.delete({ timeout:5000}).catch();
                 });
         } catch {}
     };
     if (!bReason) bReason = "no reason specified"
-    let banEmbed = new Discord.RichEmbed()
+    let banEmbed = new Discord.MessageEmbed()
         .setDescription("Ban")
         .setColor("#FF0000")
         .addField("Banned User", `${bUser} with ID ${bUser.id}`)
@@ -31,7 +31,7 @@ module.exports.run = async (bot, message, args) => {
         try {
             return message.channel.send("Can't find Reports Channel.")
                 .then((message) => {
-                    message.delete(5000).catch();
+                    message.delete({ timeout:5000}).catch();
                 });
         } catch {}
     };

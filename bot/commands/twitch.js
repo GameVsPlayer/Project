@@ -61,7 +61,7 @@ module.exports.run = async (bot, message, args) => {
         })
         body2 = await body2.json();
 
-        offlineEmbed = new Discord.RichEmbed()
+        offlineEmbed = new Discord.MessageEmbed()
             .setTitle(`Twitch info of ${idGrab.login} `)
             .addField("Status", `Currently offline⚫`, true)
             .addField("Channel type", (idGrab.broadcaster_type).toUpperCase())
@@ -113,7 +113,7 @@ module.exports.run = async (bot, message, args) => {
         else if (seconds > 1) uptimeSeconds = `${seconds} Seconds`;
         else uptimeSeconds = "";
 
-        onlineEmbed = new Discord.RichEmbed()
+        onlineEmbed = new Discord.MessageEmbed()
             .setTitle(`Twitch info of ${idGrab.login}`)
             .addField("Status", `${body.type.toUpperCase()}🔴`, true)
             .setDescription(`**__Now Streaming: ${game} \n ${body.title}__**`)

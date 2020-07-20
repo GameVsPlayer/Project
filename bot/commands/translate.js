@@ -20,7 +20,7 @@ module.exports.run = async (bot, message, args) => {
         to: toTranslateTo
     }).then((res) => {
 
-        let embed = new Discord.RichEmbed()
+        let embed = new Discord.MessageEmbed()
 
             .setTitle("Translation")
             .addField("Initial language", originalLang, true)

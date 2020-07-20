@@ -61,7 +61,7 @@ module.exports.run = async (bot, message, args) => {
         [${recentScoresArray[1].name}](${recentScoresArray[1].url}) ${recentScoresArray[1].date}`;
     }
 
-    osuEmbed = new Discord.RichEmbed()
+    osuEmbed = new Discord.MessageEmbed()
         .setTitle(`**${username} osuMania**`)
         .addField("PP", `${pp}`)
         .addField("Accuracy", `${accuracy}%`, true)

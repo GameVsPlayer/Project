@@ -59,9 +59,7 @@ bot.changes = "live integration to show when I am streaming and sending a ping";
 
 bot.youtube = new YouTube(bot.config.googleAPI);
 
-/*bot.on("reconnecting", async () => {
-    bot.logger.info("reconnecting")
-});*/
+/*bot.on("shardReconnecting", , id => console.log(`Shard with ID ${id} reconnected.`));*/
 
 setInterval(() => {
     let duration = moment.duration(bot.uptime)
@@ -89,7 +87,7 @@ bot.on("ready", async () => {
             }
         })
     }, 1000);
-    bot.serverList = bot.guilds.map(g => {
+    bot.serverList = bot.guilds.cache.map(g => {
         return {
             Name: g.name,
             MemberCount: g.memberCount,
@@ -128,21 +126,33 @@ bot.on("ready", async () => {
     setInterval(async () => {
         //97947067
         //
-        let stat = '';
-        let fet = await fetch('https://decapi.me/twitch/uptime/gamevsplayer')
-	    fet = await fet.text()
-        if(fet.includes('offline')) return
+        let fet = await fetch('https://decapi.me/twitch/uptime/gamevsplayer',  {timeout: 5000}).catch();
+        if(!fet) {
+            notification = false;
+            return activityLoop();
+        }
+        
+        fet = await fet.text().catch()
+        if(fet.includes('offline')) {
+            notification = false;
+            return activityLoop();
+        }
         
         let twitchStatus = await fetch(`https://api.twitch.tv/helix/streams?user_id=97947067`, {
             method: 'GET',
             headers: {
                 "Client-ID": bot.config.TwitchID,
                 "Authorization": `Bearer ${bot.config.TwitchAuth}`
-            }
+            },
+            timeout: 5000
+            
         }).catch((err) => bot.logger.error(err));
         twitchStatus = await twitchStatus.json();
        
-        if(twitchStatus.data === undefined) return;
+        if(twitchStatus.data === undefined) {
+            notification = false;
+            return activityLoop();
+        }
 
 
         if (twitchStatus.data[0] !== undefined) {
@@ -152,8 +162,9 @@ bot.on("ready", async () => {
                     headers: {
                         "Client-ID": bot.config.TwitchID,
                         "Authorization": `Bearer ${bot.config.TwitchAuth}`
-                    }
-                });
+                    },
+                    timeout: 5000
+                },);
                 twitchGame = await twitchGame.json();
                 bot.user.setActivity(`${twitchGame.data[0].name} on Twitch!`, {
                     url: `https://twitch.tv/${twitchStatus.data[0].user_name}`,
@@ -162,10 +173,10 @@ bot.on("ready", async () => {
                 if (notification === false) {
 
                     let messageChannel = await bot.channels.get("154338003207061504");
-                    let pingRole = await messageChannel.guild.roles.get("426742035761070091");
+                    let pingRole = await messageChannel.guild.roles.cache.get("426742035761070091");
                     await pingRole.setMentionable(true);
 
-                    let pingEmbed = new Discord.RichEmbed()
+                    let pingEmbed = new Discord.MessageEmbed()
                         .setTitle("Now Streaming")
                         .setURL(`https://gamu.tk/twitch`)
                         .setColor(bot.config.color)
@@ -223,7 +234,7 @@ bot.on("ready", async () => {
 
             if (Date.now() > time) {
                 if (!message.guild.me.hasPermission("MANAGE_ROLES")) return
-                member.removeRole(mutedRole);
+                member.roles.remove(mutedRole);
                 delete bot.mutes[i];
 
                 fs.writeFile("./datastorage/mutes.json", JSON.stringify(bot.mutes), err => {
@@ -308,11 +319,11 @@ bot.on("guildCreate", guild => {
         }
     })
 
-    guildJoin = new Discord.RichEmbed()
+    guildJoin = new Discord.MessageEmbed()
 
         .setTitle("Karen Joined the Server!")
         .setColor(botconfig.color)
-        .setThumbnail(bot.user.displayAvatarURL)
+        .setThumbnail(bot.user.displayAvatarURL())
         .addField("Prefix", 'If you want to use a prefix other than "!!"')
         .addField("Prefix change", "Type !!prefix <your prefix>")
         .addField("❤", "I hope i can be helpful for you.")
@@ -340,13 +351,10 @@ var loggedIN = 1;
 //return;
 
 
-process.on('unhandledRejection', (reason, p) => {
-    bot.logger.error(`Unhandled Rejection at: ${reason.stack || reason}`);
-    // application specific logging, throwing an error, or other logic here
-});
+process.on('unhandledRejection', error => bot.logger.error('Uncaught Promise Rejection', error));
 
-bot.on('disconnect', function (erMsg, code) {
-    bot.logger.error(`----- Bot disconnected from Discord with code, ${code}, for reason: ${erMsg} -----`);
+bot.on('shardDisconnect', function (event, shardID) {
+    bot.logger.error(`----- Bot disconnected from Discord with code, ${event}, Shard: ${shardID} -----`);
 });
 
 bot.on('warn', (warn) => bot.logger.warn(warn));

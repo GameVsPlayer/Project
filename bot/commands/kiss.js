@@ -41,7 +41,7 @@ module.exports.run = async (bot, message, args) => {
 
     let username = match.bestMatch.target;
 
-    let member = message.guild.members.get(indexes[members.indexOf(username)]);
+    let member = message.guild.members.fetch(indexes[members.indexOf(username)]);
 
     let kissUser = message.guild.member(message.mentions.users.first()) || member;
     if (!kissUser) return message.reply("No user could be found!").then((msg) => msg.delete(5000).catch());
@@ -69,7 +69,7 @@ module.exports.run = async (bot, message, args) => {
     })
 
     var gif = Math.floor(Math.random() * (kissURL.length - 1) + 1);
-    let kissEmbed = new Discord.RichEmbed()
+    let kissEmbed = new Discord.MessageEmbed()
         .setColor(bot.color)
         .addField("Kisses", `${kissUser} has been kissed by ${message.member}`)
         .addField("Number of kisses that they have received", kiss.amount)

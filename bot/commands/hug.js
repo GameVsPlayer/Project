@@ -35,7 +35,7 @@ module.exports.run = async (bot, message, args) => {
 
     let username = match.bestMatch.target;
 
-    let member = message.guild.members.get(indexes[members.indexOf(username)]);
+    let member = message.guild.members.fetch(indexes[members.indexOf(username)]);
 
     let hugUser = message.guild.member(message.mentions.users.first()) || member;
     if (!hugUser) return message.reply("No user could be found!").then((msg) => msg.delete(5000).catch());
@@ -63,7 +63,7 @@ module.exports.run = async (bot, message, args) => {
         userid: hugUser.id
     })
     var gif = Math.floor(Math.random() * (hugURL.length - 1) + 1);
-    let hugEmbed = new Discord.RichEmbed()
+    let hugEmbed = new Discord.MessageEmbed()
         .setColor(bot.config.color)
         .addField("Hugs", `${hugUser} has been hugged by ${message.member}`)
         .addField("Number of Hugs that they have received", hug.amount)

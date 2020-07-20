@@ -42,7 +42,7 @@ module.exports.run = async (bot, message, args) => {
     weather.humidity = (weather.humidity * 100).toFixed(0);
 
 
-    let botembed = new Discord.RichEmbed()
+    let botembed = new Discord.MessageEmbed()
         .setTitle(`**Weather Information for ${city}**`)
         .setColor(bot.config.color)
         .addField("Current Temperature", `${weather.temperature}°C(${(weather.temperature * 9 / 5 + 32).toFixed(2)}°F) feels like ${weather.apparentTemperature}°C(${(weather.apparentTemperature * 9 / 5 + 32).toFixed(2)}°F)`, true)

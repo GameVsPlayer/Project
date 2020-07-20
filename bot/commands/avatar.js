@@ -26,20 +26,20 @@ module.exports.run = async (bot, message, args) => {
 
             let username = match.bestMatch.target;
 
-            global.autocomplete = message.guild.members.get(indexes[members.indexOf(username)]);
+            global.autocomplete = message.guild.members.fetch(indexes[members.indexOf(username)]);
         }
     } else {
         memberA = message.author;
     }
     memberA = memberA || global.autocomplete || message.author;
     if (!memberA) return message.reply("No user found.").catch((err) => bot.logger.error(err));
-    memberA = await message.guild.members.get(memberA.id || memberA);
+    memberA = await message.guild.members.fetch(memberA.id || memberA);
 
-    avatarURL = `https://cdn.discordapp.com/avatars/${memberA.user.id}/${memberA.user.avatar}`;
+    avatarURL = memberA.user.avatarURL({ format: 'png', dynamic: true, size: 1024 });
 
     shortUrl.shorten(`${avatarURL}?size=2048`, function (avatarLink, err) {
 
-        let embed = new Discord.RichEmbed()
+        let embed = new Discord.MessageEmbed()
             .addField("Avatar", `${memberA}`)
 
             .setImage(`${avatarURL}?size=128`)

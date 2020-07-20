@@ -21,7 +21,7 @@ Support Ticket creator (currently broken)
             });
 
             let author = message.author;
-            const newChannel = new Discord.RichEmbed()
+            const newChannel = new Discord.MessageEmbed()
                 .setColor(0x36393e)
                 .setAuthor(author.tag, author.displayAvatarURL())
                 .setFooter('Support Ticket Created')
@@ -30,7 +30,7 @@ Support Ticket creator (currently broken)
 
             await channel.send(newChannel);
 
-            const newTicket = new Discord.RichEmbed()
+            const newTicket = new Discord.MessageEmbed()
                 .setColor(0x36393e)
                 .setAuthor(`Hello, ${author.tag}`, author.displayAvatarURL())
                 .setFooter('Support Ticket Created');
@@ -44,14 +44,14 @@ Support Ticket creator (currently broken)
         }
         channel = bot.channels.get(active.channelID);
 
-        const dm = new Discord.RichEmbed()
+        const dm = new Discord.MessageEmbed()
             .setColor(0x36393e)
             .setAuthor(`Thank you, ${message.author.tag}`, message.author.displayAvatarURL())
             .setFooter(`Your message has been sent -- A staff member will be in contact soon`);
 
         await message.author.send(dm);
 
-        const embedRec = new Discord.RichEmbed()
+        const embedRec = new Discord.MessageEmbed()
             .setColor(0x36393e)
             .setAuthor(message.author.tag, message.author.displayAvatarURL())
             .setDescription(message.content)
@@ -74,7 +74,7 @@ Support Ticket creator (currently broken)
         if(!supportUser) return message.channel.delete();
 
         if(message.content.toLowerCase() === '?complete') {
-            const complete = new Discord.RichEmbed()
+            const complete = new Discord.MessageEmbed()
                 .setColor(0x36393e)
                 .setAuthor(`Hey, ${supportUser.tag}`, supportUser.displayAvatarURL())
                 .setFooter(`Ticket Closed -- GameVsPlayer Discord`)
@@ -87,7 +87,7 @@ Support Ticket creator (currently broken)
         db.delete(`support_${support.targetID}`);
 
         }
-        const embedRec = new Discord.RichEmbed()
+        const embedRec = new Discord.MessageEmbed()
             .setColor(0x36393e)
             .setAuthor(message.author.tag, message.author.displayAvatarURL())
             .setFooter(`Message Received -- GameVsPlayer Discord`)

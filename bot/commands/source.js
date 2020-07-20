@@ -8,7 +8,7 @@ module.exports.run = async (bot, message, args) => {
         return error
     });
     try {
-        message.delete().catch((error) => {
+        message.delete({ timeout:5000}).catch((error) => {
             return error
         });
     } catch (e) {}
@@ -92,7 +92,7 @@ module.exports.run = async (bot, message, args) => {
 
     if (reqURL == undefined) reqURL = args.join('%20');
 
-    let botembed = new Discord.RichEmbed()
+    let botembed = new Discord.MessageEmbed()
         .setTitle(`**Source**`)
         .setColor(bot.config.color)
         .addField("Requested link", reqURL, true)

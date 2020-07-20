@@ -12,7 +12,7 @@ module.exports.run = async (bot, message, args) => {
         return message.reply("That is not a valid calculation!").catch();
     }
 
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
         .setColor(bot.config.color)
         .setTitle("Math Calculation")
         .addField('Input', `\`\`\`js\n${args.join('')}\`\`\``)

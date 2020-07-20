@@ -6,9 +6,9 @@ module.exports.run = async (bot, message, args) => {
     if (Number.isNaN(args[0])) return message.reply("That is not a number!").catch();
     var clearNumber = Math.floor(args[0]);
     if (100 < clearNumber) return message.reply("Please choose a number between 1 and 100").catch();
-    message.delete()
+    message.delete({ timeout:0});
 
-    const fetched = await message.channel.fetchMessages({
+    const fetched = await message.channel.messages.fetch({
         limit: clearNumber
     }).catch();
     if (fetched.size <= 1) return;

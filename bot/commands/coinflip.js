@@ -48,7 +48,7 @@ module.exports.run = async (bot, message, args) => {
                 match = `**You guessed ${a} correctly and earned 2x of your bet balance**`
             } else match = "**You guessed wrong and lost your bet amount**";
 
-            embed = new Discord.RichEmbed()
+            embed = new Discord.MessageEmbed()
 
                 .setTitle("**Coin Flip**")
                 .addField("Result", `**${a}** \n ${match}`)

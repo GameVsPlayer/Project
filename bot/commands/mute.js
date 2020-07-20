@@ -7,7 +7,7 @@ module.exports.run = async (bot, message, args) => {
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return errors.noPerms("MANAGE_MESSAGES").catch();
     if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) return message.reply("I do not have the permission to perform that action");
-    let toMute = message.mentions.members.first() || message.guild.members.get(args[0]);
+    let toMute = message.mentions.members.first() || message.guild.members.fetch(args[0]);
     if (!toMute) {
         return message.channel.send("You did not  specify a user").catch();
     }
@@ -28,13 +28,13 @@ module.exports.run = async (bot, message, args) => {
     let role = message.guild.roles.find((r) => r.name === "Karen Muted");
     if (!role) {
         try {
-            role = await message.guild.createRole({
+            role = await message.guild.roles.create({
                 name: "Karen Muted",
                 color: "#000000",
                 permissions: []
             }).catch();
             message.guild.channels.forEach(async (channel, id) => {
-                await channel.overwritePermissions(role, {
+                await channel.createOverwrite(role, {
                     SEND_MESSAGES: false,
                     ADD_REACTIONS: false
                 });
@@ -57,7 +57,7 @@ module.exports.run = async (bot, message, args) => {
         message.channel.send("Muted that user!").catch();
     });
 
-    await toMute.addRole(role).catch();
+    await toMute.roles.add(role).catch();
 }
 module.exports.help = {
     name: "mute"

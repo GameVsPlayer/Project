@@ -5,12 +5,12 @@ module.exports.run = async (bot, message, args) => {
     if (!rUser) {
         return message.channel.send("Couldn't find user.")
             .then((message) => {
-                message.delete(5000).catch();
+                message.delete({ timeout:5000}).catch();
             });
     }
     let reason = args.join(" ").slice(22);
 
-    let reportEmbed = new Discord.RichEmbed()
+    let reportEmbed = new Discord.MessageEmbed()
         .setDescription("Reports")
         .setColor(`${bot.config.color}`)
         .addField("Reported User", `${rUser} with ID: ${rUser.id}`)
@@ -23,7 +23,7 @@ module.exports.run = async (bot, message, args) => {
     if (!reportsChannel) {
         return message.channel.send("Couldn't find reports channel.")
             .then((message) => {
-                message.delete(5000).catch();
+                message.delete({ timeout:5000}).catch();
             });
     }
 

@@ -1,5 +1,5 @@
 const active = new Map();
-const YTDL = require("ytdl-core");
+const YTDL = require("ytdl-core-discord");
 const path = require("path");
 const jimp = require("jimp");
 const fs = require("fs");
@@ -92,7 +92,7 @@ module.exports.run = async (bot, message) => {
                     }).catch((e) => bot.logger.error(e));
                     if (2 >= l) return;
                     else if (!sendMessages) {
-                        let levelUpEmbed = new Discord.RichEmbed()
+                        let levelUpEmbed = new Discord.MessageEmbed()
                             .setTitle("Level Up!")
                             .setDescription(`${message.author} You have send ${(i)} Messages, so you leveled up! You are now level ${l + 1}!`);
                         message.channel.send(levelUpEmbed).catch((e) => bot.logger.error(e));
@@ -194,7 +194,7 @@ module.exports.run = async (bot, message) => {
             var guildID = bot.guilds.find("id", args[0])
 
             if (guildID === null) return;
-            guildID.leave().catch();
+            guildID.leave().catch(e => console.log(e));
             mainCommand = true;
             return message.channel.send(`Sucessfully left ${args[0]}`);
 
@@ -225,8 +225,8 @@ module.exports.run = async (bot, message) => {
                     type: "PLAYING"
                 });
                 message.channel.send("Bot is now in maintenance").then((message) => {
-                    message.delete(1000)
-                }).then(message.delete().catch((O_o) => {}));
+                    message.delete({ timeout:1000}).catch();
+                }).then(message.delete({timeout:0}).catch((O_o) => {}));
             } else return;
 
         }
@@ -234,8 +234,8 @@ module.exports.run = async (bot, message) => {
             if (message.author.id === (bot.config.ownerID)) {
                 indexActivity = 1;
                 message.channel.send("Bot is no longer in maintenance").then((message) => {
-                    message.delete(1000)
-                }).then(message.delete().catch((O_o) => {}));
+                    message.delete({ timeout:1000}).catch();
+                }).then(message.delete({ timeout:1000}).catch((O_o) => {}));
             } else return;
 
         }
@@ -244,7 +244,7 @@ module.exports.run = async (bot, message) => {
             mainCommand = true;
             if (sendMessages) return;
 
-            if (!message.member.voiceChannel) return message.reply("Please connect to a voice channel first!").catch();
+            if (!message.member.voice.channel) return message.reply("Please connect to a voice channel first!").catch();
 
             if (!args[0]) return message.reply("Please input something").catch();
 
@@ -281,7 +281,7 @@ module.exports.run = async (bot, message) => {
                         const videoIndex = parseInt(response.first().content);
                         var video = await youtube.getVideoByID(videos[videoIndex - 1].id);
                     } catch (err) {
-                        message.channel.fetchMessage(global.songsMessage)
+                        message.channel.messages.fetch(global.songsMessage)
                             .then((msg) => msg.delete());
 
                         if (!sendMessages) return message.channel.send("I couldnt not obtain any search results.");
@@ -290,7 +290,7 @@ module.exports.run = async (bot, message) => {
                     }
                     videoURL = `https://www.youtube.com/watch?v=${video.id}`;
                     let validate = await YTDL.validateURL(videoURL)
-                    message.channel.fetchMessage(global.songsMessage)
+                    message.channel.messages.fetch(global.songsMessage)
                         .then((msg) => msg.delete());
                     if (sendMessages) return;
                     if (!validate) return message.channel.send("No Song could be found").catch()
@@ -300,7 +300,7 @@ module.exports.run = async (bot, message) => {
 
             if (!YTDL.validateURL(videoURL)) return;
 
-            if (!message.member.voiceChannel) {
+            if (!message.member.voice.channel) {
                 if (sendMessages) return;
                 return message.reply("You must be in a voicechannel").catch()
             }
@@ -321,7 +321,7 @@ module.exports.run = async (bot, message) => {
             if (sendMessages) return;
             else message.channel.send(`Added ${message.author}`);
             if (message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-                message.delete().catch();
+                message.delete({ timeout:0}).catch();
             }
             if (!message.guild.me.hasPermission("CONNECT")) {
                 server.queue = [];
@@ -329,8 +329,8 @@ module.exports.run = async (bot, message) => {
                 return message.channel.send("I dont have the connect permission").catch()
             }
 
-            if (!message.guild.voiceConnection) {
-                message.member.voiceChannel.join().catch((err) => message.channel.send(`Something went wrong ${err}`)).then((connection) => {
+            if (!message.guild.me.voice.connection) {
+                message.member.voice.channel.join().catch((err) => message.channel.send(`Something went wrong ${err}`)).then((connection) => {
 
                     play(connection, message, bot).catch(err => {
                             if (sendMessages) return;
@@ -349,23 +349,23 @@ module.exports.run = async (bot, message) => {
         if (message.content.startsWith(prefix + "skip")) {
             mainCommand = 1;
             var server = servers[message.guild.id];
-            if (!message.member.voiceChannel) {
+            if (!message.member.voice.channel) {
                 if (sendMessages) return;
                 return message.reply("You must be in a voicechannel").catch()
                     .catch((e) => bot.logger.error(e));
 
             }
-            if (message.member.voiceChannelID != message.guild.me.voiceChannelID) {
+            if (message.member.voice.channelID != message.guild.me.voice.channelID) {
                 if (sendMessages) return;
                 message.reply("You are not in the same voicechannel as me!").catch();
             }
 
 
-            if (!message.guild.voiceConnection)
+            if (!message.guild.voice.connection)
                 if (sendMessages) return;
                 else return message.reply("There is no music playing!").catch();
             if (!server.dispatcher) return;
-            server.dispatcher.end().catch((err) => {
+            server.dispatcher.destroy().catch((err) => {
                 if (!sendMessages) message.channel.send(`Something went wrong: ${err}`)
             });
             if (sendMessages) return;
@@ -379,7 +379,7 @@ module.exports.run = async (bot, message) => {
             mainCommand = 1;
             var server = servers[message.guild.id];
             server.queue = [];
-            if (message.guild.voiceConnection) message.guild.voiceConnection.disconnect();
+            if (message.guild.voice.connection) message.guild.voice.connection.disconnect();
 
             return;
         }
@@ -401,7 +401,7 @@ module.exports.run = async (bot, message) => {
 
             }
             if (sendEmbeds) return message.channel.send("I dont have the permission to send embeds")
-            let queueEmbed = new Discord.RichEmbed()
+            let queueEmbed = new Discord.MessageEmbed()
 
                 .setTitle(`First ${i - 1} Songs of the queue and the current Song`)
                 .setColor(bot.config.color)
@@ -426,7 +426,10 @@ module.exports.run = async (bot, message) => {
             server.volume = messageArray[1];
             server.dispatcher.setVolumeLogarithmic(messageArray[1] / 5)
             if (sendMessages) return;
-            else return message.channel.send(`The Volume was changed to ${Math.floor(messageArray[1])}`)
+            //else return message.channel.send(`The Volume was changed to ${Math.floor(messageArray[1])}`)
+            server.dispatcher.on('volumeChange', (oldVolume, newVolume) => {
+                message.channel.send(`Volume changed from ${oldVolume} to ${newVolume}.`);
+            });
 
         }
     }
@@ -454,7 +457,7 @@ module.exports.run = async (bot, message) => {
     } else if (!sendMessages) {
         message.channel.send("That is no valid command!")
             .then((message) => {
-                message.delete(1000).catch()
+                message.delete({ timeout:1000}).catch();
             })
     } else return;
 
@@ -466,28 +469,39 @@ module.exports.help = {
 
 
 async function play(connection, message, bot) {
-
-
     var server = servers[message.guild.id];
-
+    
     if (server.queue.length < 0) return;
     if (!message.guild.me.hasPermission("SPEAK")) {
         server.queue = [];
-        if (message.guild.voiceConnection) message.guild.voiceConnection.disconnect();
+        if (message.guild.voice.connection) message.guild.voice.connection.disconnect();
         if (!message.guild.me.hasPermission("SEND_MESSAGES")) return;
         return message.channel.send("I dont have the speak permission");
+
     }
-    server.dispatcher = await connection.playStream(YTDL(server.queue[0], {
-        filter: "opus",
-        liveBuffer: 60000
-    }), {
-        bitrate: 192000
-    });
-    server.dispatcher.on("error", bot.logger.error);
     let info = await YTDL.getInfo(server.queue[0]).catch();
+
+
+    const stream = () => {
+        if (info.livestream) {
+            const format = YTDL.chooseFormat(info.formats, { quality: [128,127,120,96,95,94,93] });
+            return format.url;
+        } else return YTDL.downloadFromInfo(info, { filter: 'audioonly', type: 'opus' });
+    }
+
+
+
+
+    //let stream = YTDL(server.queue[0], {filter: "audioonly", liveBuffer: 60000 });
+    server.dispatcher = connection.play(stream());
+
+
+
+    server.dispatcher.on("error", bot.logger.error);
+    
     if (!message.guild.me.hasPermission("SEND_MESSAGES")) return;
 
-    let nowPlaying = new Discord.RichEmbed()
+    let nowPlaying = new Discord.MessageEmbed()
 
         .setTitle("Now Playing")
         .setColor(bot.config.color)
@@ -499,7 +513,7 @@ async function play(connection, message, bot) {
 
 
 
-    server.dispatcher.on("end", async () => {
+    server.dispatcher.on("finish", async () => {
         await server.queue.shift();
         await server.requester.shift();
         if (server.queue[0]) play(connection, message, bot).catch((err) => message.channel.send(`Something went wrong ${err}`));
@@ -534,12 +548,12 @@ async function captcha(message) { // Source https://github.com/y21/discordcaptch
     _image.resize(300, 300) // default max embeded size
 
     var verifyAuthor = message.author;
-    var toVerify = message.guild.members.get(message.author.id)
+    var toVerify = message.guild.members.fetch(message.author.id)
 
 
 
 
-    message.author.send(new Discord.RichEmbed()
+    message.author.send(new Discord.MessageEmbed()
         .setTitle("Verification")
         .setDescription(`${message.guild.name}is protected by DiscordCaptcha`)
         .addField("Instructions", `In a few seconds an image will be sent to you which includes a number. Please send verify <captcha> into the channel ${message.channel.name} (${message.channel})`)

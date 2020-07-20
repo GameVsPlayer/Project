@@ -7,8 +7,8 @@ module.exports.run = async (bot, message, args) => {
         return message.channel.send("I dont have the permission to send embeds");
     }
     var time = moment(bot.user.createdAt)
-    let bicon = bot.user.displayAvatarURL;
-    let botembed = new Discord.RichEmbed()
+    let bicon = bot.user.avatarURL({ format: 'png', dynamic: true, size: 1024 });
+    let botembed = new Discord.MessageEmbed()
         .setTitle("**Bot Information**")
         .setColor(bot.config.color)
         .setThumbnail(bicon)

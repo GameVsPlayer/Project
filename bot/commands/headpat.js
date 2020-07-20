@@ -31,7 +31,7 @@ module.exports.run = async (bot, message, args) => {
 
     let username = match.bestMatch.target;
 
-    let member = message.guild.members.get(indexes[members.indexOf(username)]);
+    let member = message.guild.members.fetch(indexes[members.indexOf(username)]);
 
     let hpUser = message.guild.member(message.mentions.users.first()) || member;
 
@@ -60,7 +60,7 @@ module.exports.run = async (bot, message, args) => {
     })
 
     var gif = Math.floor(Math.random() * (hpURL.length - 1) + 1);
-    let headpatEmbed = new Discord.RichEmbed()
+    let headpatEmbed = new Discord.MessageEmbed()
         .setColor(bot.config.color)
         .addField("Headpats", `${hpUser} has been headpatted by ${message.member}`)
         .addField("Number of Headpats that they have received", headpat.amount)

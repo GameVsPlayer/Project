@@ -4,11 +4,11 @@ const moment = require("moment-timezone");
 
 module.exports.run = async (bot, message, args) => {
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
-    let sicon = message.guild.iconURL;
+    let sicon = message.guild.iconURL({ format: 'png', dynamic: true, size: 1024 });
 
     var time = moment(message.guild.createdAt)
 
-    let serverembed = new Discord.RichEmbed()
+    let serverembed = new Discord.MessageEmbed()
         .setTitle("**Server Information**")
         .setColor(bot.config.color)
         .setThumbnail(sicon)

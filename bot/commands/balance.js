@@ -14,7 +14,7 @@ module.exports.run = async (bot, message, args) => {
 
     let username = match.bestMatch.target;
 
-    let member = message.guild.members.get(indexes[members.indexOf(username)]);
+    let member = message.guild.members.fetch(indexes[members.indexOf(username)]);
 
     let user = message.guild.member(message.mentions.users.first()) || member;
 
@@ -33,7 +33,7 @@ module.exports.run = async (bot, message, args) => {
     let balance = await bot.db.moneyDB.findOne({
         userid: user.id
     });
-    embed = new Discord.RichEmbed()
+    embed = new Discord.MessageEmbed()
         .setTitle("Balance")
         .setDescription(`<@${user.id}> has ${balance.balance}$`)
         .setColor(bot.config.color);

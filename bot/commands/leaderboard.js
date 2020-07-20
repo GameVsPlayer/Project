@@ -7,7 +7,7 @@ module.exports.run = async (bot, message, args) => {
     let index = 0;
     let names = [];
     for (i = 0; i < a.length; i++) {
-        let gotID = await bot.fetchUser(a[i].userid).catch(err => {});
+        let gotID = await bot.users.fetch(a[i].userid).catch(err => {});
         if (gotID === undefined) {
             names.push({
                 name: 'unknown',

@@ -27,7 +27,7 @@ module.exports.run = async (bot, message, args) => {
 
             let username = match.bestMatch.target;
 
-            memberA = message.guild.members.get(indexes[members.indexOf(username)]);
+            memberA = message.guild.members.fetch(indexes[members.indexOf(username)]);
         }
     } else {
         memberA = message.author;
@@ -37,9 +37,9 @@ module.exports.run = async (bot, message, args) => {
 
     memberA = memberA || global.autocomplete || message.author;
     if (!memberA) return message.reply("No user found.").catch((err) => bot.logger.error(err));
-    memberA = await message.guild.members.get(memberA.id || memberA);
+    memberA = await message.guild.members.fetch(memberA.id || memberA);
 
-    avatarURL = `https://cdn.discordapp.com/avatars/${memberA.user.id}/${memberA.user.avatar}`;
+    avatarURL = memberA.user.avatarURL({ format: 'png', dynamic: true, size: 1024 });
     const gMember = message.guild.member(memberA);
     let statusIcon;
     try {
@@ -50,30 +50,30 @@ module.exports.run = async (bot, message, args) => {
         if (memberA.presence.status == "online") statusIcon = "[Online]";
         if (memberA.presence.status == "idle") statusIcon = "[Idle]";
         if (memberA.presence.status == "dnd") statusIcon = "[DnD]";
-        if (memberA.presence.game !== null)
-            if (memberA.presence.game.url !== null) statusIcon = "[Streaming]";
+        if (memberA.presence.activities !== null)
+            if (memberA.presence.activities.url !== null) statusIcon = "[Streaming]";
         if (statusIcon === null) statusIcon = "[Offline]";
-        if (memberA.presence.game !== undefined && statusIcon == "[Streaming]" && memberA.presence.game.timestamps !== null && memberA.presence.game.url !== null) game = {
-            name: `Title: ${memberA.presence.game.name} \n streaming at ${memberA.presence.game.url}`,
+        if (memberA.presence.activities !== undefined && statusIcon == "[Streaming]" && memberA.presence.activities.timestamps !== null && memberA.presence.activities.url !== null) game = {
+            name: `Title: ${memberA.presence.activities.name} \n streaming at ${memberA.presence.activities.url}`,
             time: ""
         }
-        else if (memberA.presence.game !== undefined && statusIcon == "[Streaming]" && memberA.presence.game.url !== null) game = {
-            name: `Title: ${memberA.presence.game.name} \n streaming at ${memberA.presence.game.url}`,
+        else if (memberA.presence.activities !== undefined && statusIcon == "[Streaming]" && memberA.presence.activities.url !== null) game = {
+            name: `Title: ${memberA.presence.activities.name} \n streaming at ${memberA.presence.activities.url}`,
             time: ""
         }
-        else if (memberA.presence.game !== undefined && memberA.presence.game.timestamps !== null && memberA.presence.game.timestamps.start !== null && memberA.presence.game.name == "Spotify") game = {
-            name: memberA.presence.game.name,
-            songName: memberA.presence.game.details,
-            playlist: memberA.presence.game.assets.largeText,
-            artist: memberA.presence.game.state,
-            time: moment(memberA.presence.game.timestamps.start).fromNow()
+        else if (memberA.presence.activities !== undefined && memberA.presence.activities.timestamps !== null && memberA.presence.activities.timestamps.start !== null && memberA.presence.activities.name == "Spotify") game = {
+            name: memberA.presence.activities.name,
+            songName: memberA.presence.activities.details,
+            playlist: memberA.presence.activities.assets.largeText,
+            artist: memberA.presence.activities.state,
+            time: moment(memberA.presence.activities.timestamps.start).fromNow()
         }
-        else if (memberA.presence.game !== undefined && memberA.presence.game.timestamps !== undefined && memberA.presence.game.timestamps.start !== null) game = {
-            name: memberA.presence.game.name,
-            time: moment(memberA.presence.game.timestamps.start).fromNow()
+        else if (memberA.presence.activities !== undefined && memberA.presence.activities.timestamps !== undefined && memberA.presence.activities.timestamps.start !== null) game = {
+            name: memberA.presence.activities.name,
+            time: moment(memberA.presence.activities.timestamps.start).fromNow()
         }
-        else if (memberA.presence.game !== undefined) game = {
-            name: memberA.presence.game.name,
+        else if (memberA.presence.activities !== undefined) game = {
+            name: memberA.presence.activities.name,
             time: ""
         }
         else game = {
@@ -83,17 +83,17 @@ module.exports.run = async (bot, message, args) => {
 
 
         if (game.name.length > 0 && game.time.length > 0 && game.name !== "Spotify") var gameF = `${game.name} playing Since ${game.time}`;
-        else if (game.name == "Spotify" && memberA.presence.game.assets.largeImage.startsWith("spotify:")) var gameF = `${game.name} playing ${game.songName} \n by ${game.artist} \n in playlist ${game.playlist}`;
+        else if (game.name == "Spotify" && memberA.presence.activities.assets.largeImage.startsWith("spotify:")) var gameF = `${game.name} playing ${game.songName} \n by ${game.artist} \n in playlist ${game.playlist}`;
         else if (game.name.length > 0 && gameF === null) var gameF = `${game.name}`;
         else var gameF = "Nothing playing right now";
 
 
     } catch (e) {}
 
-    if (gameF == undefined) gameF = memberA.presence.game;
+    if (gameF == undefined) gameF = memberA.presence.activities;
 
     if (memberA.roles == undefined) {
-        var fetched = message.guild.members.get(memberA.id);
+        var fetched = message.guild.members.fetch(memberA.id);
         memberA.roles = fetched.roles;
     }
     var rolesName = Array.from(memberA.roles);
@@ -118,7 +118,7 @@ module.exports.run = async (bot, message, args) => {
     shortUrl.shorten(`${avatarURL}?size=2048`, function (avatarLink, err) {
 
         if (err) return bot.logger.info(err);
-        let embed = new Discord.RichEmbed()
+        let embed = new Discord.MessageEmbed()
 
             .setDescription(`**${memberA}'s Info**`)
             .addField("Avatar url", avatarLink, true)

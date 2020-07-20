@@ -45,7 +45,7 @@ module.exports.run = async (bot, message, args) => {
                     match = "Match"
                 } else match = "No match";
 
-                embed = new Discord.RichEmbed()
+                embed = new Discord.MessageEmbed()
 
                     .setTitle("**Slots**")
                     .addField("Rolls", a + " " + b + " " + c)
