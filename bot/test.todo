@@ -1,6 +1,7 @@
 COMPLETE Fix YT Search 
-TODO Test everything
+COMPLETE Test everything
 COMPLETE FIX Avatar
 COMPLETE FIX Balance
 COMPLETE FIX Botinfo
-TODO REENABLE CUSTOM PREDFIXEDS VIA CLOUD
+COMPLETE reenable changing prefix + saving it to the cloud
+TODO collection creation if collection is missing for database

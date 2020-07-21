@@ -1,5 +1,4 @@
 const Discord = require("discord.js");
-const sm = require("string-similarity");
 
 let hugURL = [
     "https://i.imgur.com/RNPzj5c.gif",

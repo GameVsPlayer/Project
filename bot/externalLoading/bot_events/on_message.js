@@ -8,8 +8,8 @@ const moment = require("moment-timezone");
 
 let servers = {};
 
-module.exports.run = async (bot, message) => {
-
+module.exports.run = async (bot, message, prefix) => {
+    
     if (Number.isNaN(bot.stats.userMessages)) {
         reload(bot);
         bot.stats.userMessages = 0;
@@ -19,9 +19,9 @@ module.exports.run = async (bot, message) => {
     if (!message) return;
 
     if (message.author.bot) return;
-
+    console.log(prefix)
     if (message.channel.type === "dm") {
-        bot.logger.info(bot.config.prefix);
+        
         if (!message.content.startsWith(`${bot.config.prefix}todo`)) return;
         if (message.author.id !== bot.config.ownerID) return;
         let dmFile = bot.commands.get("todo");
@@ -64,8 +64,6 @@ module.exports.run = async (bot, message) => {
                 let l = xp.level;
                 let i = xp.messageCount;
 
-
-
                 await bot.db.xpDB.findOneAndUpdate({
                     userid: message.author.id
                 }, {
@@ -97,8 +95,6 @@ module.exports.run = async (bot, message) => {
         });
 
     }
-
-    let prefix = process.env.prefix;
 
     if (!message.content.startsWith(prefix)) return;
     //if(message.content.startsWith(prefix + "a")) captcha(message).catch(); mainCommand = 1;
@@ -407,7 +403,7 @@ module.exports.run = async (bot, message) => {
         message.channel.send("That is no valid command!")
             .then((message) => {
                 message.delete({
-                    timeout: 1000
+                    timeout: 5000
                 }).catch();
             })
     } else return;

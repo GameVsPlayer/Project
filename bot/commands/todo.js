@@ -1,6 +1,6 @@
 let objectIDCheck = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i
 module.exports.run = async (bot, message, args) => {
-    if (message.channel.type != "dm") return
+    if (message.author.id !== bot.config.ownerID) return
     message.content = message.content.split(" ");
 
     let sliced = message.content.slice(1);

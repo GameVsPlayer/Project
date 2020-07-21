@@ -28,6 +28,7 @@ mongoClient.connect(async (err) => {
     bot.db.xpDB = bot.db.collection("xp");
     bot.db.moneyDB = bot.db.collection("money");
     bot.db.todoDB = bot.db.collection("todo");
+    bot.db.prefixes = bot.db.collection("prefix");
     dbLoad = true;
 });
 
@@ -262,9 +263,23 @@ bot.on("message", async message => {
     if (loggedIN === 0) return;
     if (dbLoad === false) return;
 
-    if (message.channel.type !== "dm") {
+    let prefix = process.env.prefix;
+    if (message.channel.type === "dm") return
+        if (await bot.db.prefixes.findOne({
+            guildID: message.guild.id
+        }) === null) {
+        const data = {
+            guildID: message.guild.id,
+            prefix: prefix
+        }
+        await bot.db.prefixes.insertOne(data);
+        }
+        prefix = await bot.db.prefixes.findOne({
+            guildID: message.guild.id
+        })
+        prefix = prefix.prefix;
 
-        let prefix = process.env.prefix;
+        if(!message.content.startsWith(prefix)) return;
 
         if (message.content.startsWith(`${prefix}reloadwebsite`)) {
             if (message.author.id === botconfig.ownerID) {
@@ -282,12 +297,10 @@ bot.on("message", async message => {
             } else return;
         }
 
-    }
-
     let eventLoader = bot.events.get("message");
 
     if (eventLoader === undefined) return;
-    eventLoader.run(bot, message) //.catch(err => bot.logger.info("Event loading Error  " + err));
+    eventLoader.run(bot, message, prefix) //.catch(err => bot.logger.info("Event loading Error  " + err));
 
 });
 // -----------------------------------------------------------------
