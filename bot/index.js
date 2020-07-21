@@ -97,13 +97,10 @@ bot.on("ready", async () => {
 
     bot.serverList.sort((a, b) => b.MemberCount - a.MemberCount);
 
-
-
     ////////////////
 
     reloadEvents();
     /////////
-
 
     bot.logger.info(`${bot.user.username} is online!`);
 
@@ -122,22 +119,23 @@ bot.on("ready", async () => {
     var curActivity = 1;
     let notification = false;
 
-
     setInterval(async () => {
         //97947067
         //
-        let fet = await fetch('https://decapi.me/twitch/uptime/gamevsplayer',  {timeout: 5000}).catch();
-        if(!fet) {
+        let fet = await fetch('https://decapi.me/twitch/uptime/gamevsplayer', {
+            timeout: 5000
+        }).catch();
+        if (!fet) {
             notification = false;
             return activityLoop();
         }
-        
+
         fet = await fet.text().catch()
-        if(fet.includes('offline')) {
+        if (fet.includes('offline')) {
             notification = false;
             return activityLoop();
         }
-        
+
         let twitchStatus = await fetch(`https://api.twitch.tv/helix/streams?user_id=97947067`, {
             method: 'GET',
             headers: {
@@ -145,15 +143,14 @@ bot.on("ready", async () => {
                 "Authorization": `Bearer ${bot.config.TwitchAuth}`
             },
             timeout: 5000
-            
+
         }).catch((err) => bot.logger.error(err));
         twitchStatus = await twitchStatus.json();
-       
-        if(twitchStatus.data === undefined) {
+
+        if (twitchStatus.data === undefined) {
             notification = false;
             return activityLoop();
         }
-
 
         if (twitchStatus.data[0] !== undefined) {
             if (twitchStatus.data[0].type === 'live') {
@@ -164,7 +161,7 @@ bot.on("ready", async () => {
                         "Authorization": `Bearer ${bot.config.TwitchAuth}`
                     },
                     timeout: 5000
-                },);
+                }, );
                 twitchGame = await twitchGame.json();
                 bot.user.setActivity(`${twitchGame.data[0].name} on Twitch!`, {
                     url: `https://twitch.tv/${twitchStatus.data[0].user_name}`,
@@ -220,7 +217,6 @@ bot.on("ready", async () => {
         };
     };
 
-
     bot.setInterval(() => {
         for (let i in bot.mutes) {
             let time = bot.mutes[i].time;
@@ -257,14 +253,7 @@ bot.on("ready", async () => {
         }
 
     }, 50);
-
-
-
-
 });
-
-
-
 
 bot.on("message", async message => {
     //bot.logger.info(blackListed)
@@ -299,11 +288,6 @@ bot.on("message", async message => {
 
     if (eventLoader === undefined) return;
     eventLoader.run(bot, message) //.catch(err => bot.logger.info("Event loading Error  " + err));
-
-
-
-
-
 
 });
 // -----------------------------------------------------------------
@@ -345,7 +329,7 @@ bot.on("error", (err) => bot.logger.error(err));
 if (botconfig.botToken === "") return bot.logger.error("Bot token not set")
 
 bot.login(botconfig.botToken)
-    //.catch((e) => bot.logger.info(e));
+//.catch((e) => bot.logger.info(e));
 
 var loggedIN = 1;
 //return;
@@ -367,14 +351,7 @@ bot.on('shardError', error => {
     bot.logger.error('A websocket connection encountered an error:', error);
 });
 
-
-
-
-
-
 websiteReload();
-
-
 
 function websiteReload() {
 

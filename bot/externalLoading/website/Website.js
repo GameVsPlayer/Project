@@ -27,8 +27,8 @@ module.exports.run = async (bot) => {
     setInterval(() => {
         pushData = {
             stats: {
-                users: bot.users.size,
-                servers: bot.guilds.size,
+                users: bot.users.cache.size,
+                servers: bot.guilds.cache.size,
                 cpuUsage: bot.stats.usage.cpuUsage,
                 uptime: bot.fullUptime,
                 usage: bot.usage,

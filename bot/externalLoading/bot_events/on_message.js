@@ -5,7 +5,7 @@ const jimp = require("jimp");
 const fs = require("fs");
 const Discord = require("discord.js");
 const moment = require("moment-timezone");
-const { string } = require("mathjs");
+
 let servers = {};
 
 module.exports.run = async (bot, message) => {
@@ -15,7 +15,6 @@ module.exports.run = async (bot, message) => {
         bot.stats.userMessages = 0;
         bot.stats.botCommands = 0;
     }
-
 
     if (!message) return;
 
@@ -28,7 +27,6 @@ module.exports.run = async (bot, message) => {
         let dmFile = bot.commands.get("todo");
 
         if (dmFile) dmFile.run(bot, message).catch(err => bot.logger.info("Todo Error  " + err));
-
     }
 
     if (!message.guild) return
@@ -36,7 +34,6 @@ module.exports.run = async (bot, message) => {
     bot.stats.userMessages++;
 
     var mainCommand = 0;
-
 
     let messageArray = message.content.split(" ");
 
@@ -47,8 +44,6 @@ module.exports.run = async (bot, message) => {
     bot.sendMessages = (!message.guild.me.hasPermission("SEND_MESSAGES"))
 
     let sendEmbeds = (!message.guild.me.hasPermission("EMBED_LINKS"))
-
-
 
     { //XP
         let xp = await bot.db.xpDB.findOne({
@@ -170,8 +165,6 @@ module.exports.run = async (bot, message) => {
             await reload(bot);
             return message.reply("Successfully reloaded!");
         }
-
-
         if (message.content.startsWith(prefix + "customActivity") && message.author.id == bot.config.ownerID) {
             if (args[0] == undefined) return message.channel.send("hmm")
             var customType = args[0]
@@ -188,7 +181,6 @@ module.exports.run = async (bot, message) => {
             mainCommand = true;
         }
 
-
         if (message.content.startsWith(prefix + "leave") && message.author.id == bot.config.ownerID) {
             if (args[0] === undefined) return;
             var guildID = bot.guilds.find("id", args[0])
@@ -197,7 +189,6 @@ module.exports.run = async (bot, message) => {
             guildID.leave().catch(e => console.log(e));
             mainCommand = true;
             return message.channel.send(`Sucessfully left ${args[0]}`);
-
         }
         if (mainCommand === true) return;
 
@@ -207,8 +198,6 @@ module.exports.run = async (bot, message) => {
         if (message.content.startsWith(prefix + "global_messages") && message && !bot.sendMessages && messagesGlobal !== 0 && uptimeMin !== 0) {
             return message.channel.send(`${messagesGlobal} Messages have been send globaly since the bot last restarted thats ${messagesGlobal / uptimeMin} Messages per minute!`)
         }
-
-
 
         var cmdcheckargs = /[a-z]/i;
         var slicedPrefix = message.content.slice(prefix.length)
@@ -225,8 +214,12 @@ module.exports.run = async (bot, message) => {
                     type: "PLAYING"
                 });
                 message.channel.send("Bot is now in maintenance").then((message) => {
-                    message.delete({ timeout:1000}).catch();
-                }).then(message.delete({timeout:0}).catch((O_o) => {}));
+                    message.delete({
+                        timeout: 1000
+                    }).catch();
+                }).then(message.delete({
+                    timeout: 0
+                }).catch((O_o) => {}));
             } else return;
 
         }
@@ -234,8 +227,12 @@ module.exports.run = async (bot, message) => {
             if (message.author.id === (bot.config.ownerID)) {
                 indexActivity = 1;
                 message.channel.send("Bot is no longer in maintenance").then((message) => {
-                    message.delete({ timeout:1000}).catch();
-                }).then(message.delete({ timeout:1000}).catch((O_o) => {}));
+                    message.delete({
+                        timeout: 1000
+                    }).catch();
+                }).then(message.delete({
+                    timeout: 1000
+                }).catch((O_o) => {}));
             } else return;
 
         }
@@ -252,13 +249,12 @@ module.exports.run = async (bot, message) => {
 
             let videoURL = "";
             if (validate) {
-               videoURL = args.join(" ");  
-            }
-            else {
+                videoURL = args.join(" ");
+            } else {
                 videoURL = await YTSearch(args, bot, message);
             }
-      
-            if(typeof videoURL != "string" ) return
+
+            if (typeof videoURL != "string") return
 
             if (!YTDL.validateURL(videoURL)) return;
 
@@ -281,7 +277,9 @@ module.exports.run = async (bot, message) => {
             if (bot.sendMessages) return;
             else message.channel.send(`Added ${message.author}`);
             if (message.guild.me.hasPermission("MANAGE_MESSAGES")) {
-                message.delete({ timeout:0}).catch();
+                message.delete({
+                    timeout: 0
+                }).catch();
             }
             if (!message.guild.me.hasPermission("CONNECT")) {
                 server.queue = [];
@@ -320,15 +318,12 @@ module.exports.run = async (bot, message) => {
                 if (bot.sendMessages) return;
                 else return message.reply("There is no music playing!").catch();
             if (!server.dispatcher) return;
-            server.dispatcher.destroy().catch((err) => {
-                if (!bot.sendMessages) message.channel.send(`Something went wrong: ${err}`)
-            });
+            server.dispatcher.end();
             if (bot.sendMessages) return;
             return message.channel.send(`${message.author} skipped the song!`)
                 .catch((e) => bot.logger.error(e));
 
         }
-
 
         if (message.content.startsWith(prefix + "end")) {
             mainCommand = 1;
@@ -338,7 +333,6 @@ module.exports.run = async (bot, message) => {
 
             return;
         }
-
 
         if (message.content.startsWith(prefix + "queue")) {
             mainCommand = 1;
@@ -351,14 +345,14 @@ module.exports.run = async (bot, message) => {
             var songsArray = [];
             for (i = 0; i < server.queue.length && i < 5; i++) {
                 let songInfo = await YTDL.getInfo(server.queue[i]);
-                songsArray.push(`[${i}]. ${songInfo.title} Requested by: ${server.requester[i]} \n`)
+                songsArray.push(`[${i + 1}]. ${songInfo.title} Requested by: ${server.requester[i]} \n`)
                 var songsArray5 = songsArray.slice(0, 4);
 
             }
             if (sendEmbeds) return message.channel.send("I dont have the permission to send embeds")
             let queueEmbed = new Discord.MessageEmbed()
 
-                .setTitle(`First ${i - 1} Songs of the queue and the current Song`)
+                .setTitle(`First ${i } Songs of the queue and the current Song`)
                 .setColor(bot.config.color)
                 .setDescription(songsArray5)
 
@@ -366,29 +360,29 @@ module.exports.run = async (bot, message) => {
 
         }
         if (message.content.startsWith(prefix + "volume")) {
+            mainCommand = 1;
             var server = servers[message.guild.id];
-            if (bot.sendMessages) null;
+            if (bot.sendMessages) return;
             else if (!server) return message.channel.send("There is nothing playing right now");
             mainCommand = true;
-            if (bot.sendMessages) null;
+            if (bot.sendMessages) return;
             else if (!server.dispatcher) return message.channel.send("There is no music playing right now");
-            if (bot.sendMessages) null;
-            else if (!messageArray[1]) return message.channel.send(`The current volume is ${server.dispatcher.volume}`);
-            if (Number.isNaN(messageArray[1])) return message.channel.send("That is not a number!");
-            Math.floor(messageArray[1]);
-            if (messageArray[1] > 10) return message.channel.send("Please specify a value between 0 and 10")
+            if (bot.sendMessages) return;
+            else if (!args[0]) return message.channel.send(`The current volume is ${(server.dispatcher.volume * 100).toFixed(0)}%`);
+            if (Number.isNaN(args[0])) return message.channel.send("That is not a number!");
+            Math.floor(args[0]);
+            if (args[0] > 100 || args[0] < 0) return message.channel.send("Please specify a value between 0 and 100")
 
-            server.volume = messageArray[1];
-            server.dispatcher.setVolumeLogarithmic(messageArray[1] / 5)
+            server.volume = args[0];
+            server.dispatcher.setVolume(args[0] / 100)
             if (bot.sendMessages) return;
             //else return message.channel.send(`The Volume was changed to ${Math.floor(messageArray[1])}`)
             server.dispatcher.on('volumeChange', (oldVolume, newVolume) => {
-                message.channel.send(`Volume changed from ${oldVolume} to ${newVolume}.`);
+                message.channel.send(`Volume changed from ${(oldVolume * 100).toFixed(0)}% to ${(newVolume * 100)}%.`);
             });
 
         }
     }
-
 
     if (mainCommand) {
         return;
@@ -412,7 +406,9 @@ module.exports.run = async (bot, message) => {
     } else if (!bot.sendMessages) {
         message.channel.send("That is no valid command!")
             .then((message) => {
-                message.delete({ timeout:1000}).catch();
+                message.delete({
+                    timeout: 1000
+                }).catch();
             })
     } else return;
 
@@ -421,39 +417,34 @@ module.exports.help = {
     name: "message"
 };
 
-
-
 async function play(connection, message, bot) {
     var server = servers[message.guild.id];
-    
+
     if (server.queue.length < 0) return;
     if (!message.guild.me.hasPermission("SPEAK")) {
         server.queue = [];
         if (message.guild.voice.connection) message.guild.voice.connection.disconnect();
         if (!message.guild.me.hasPermission("SEND_MESSAGES")) return;
         return message.channel.send("I dont have the speak permission");
-
     }
     let info = await YTDL.getInfo(server.queue[0]).catch();
 
-
     const stream = () => {
         if (info.livestream) {
-            const format = YTDL.chooseFormat(info.formats, { quality: [128,127,120,96,95,94,93] });
+            const format = YTDL.chooseFormat(info.formats, {
+                quality: [128, 127, 120, 96, 95, 94, 93]
+            });
             return format.url;
-        } else return YTDL.downloadFromInfo(info, { filter: 'audioonly', type: 'opus' });
+        } else return YTDL.downloadFromInfo(info, {
+            filter: 'audioonly'
+        });
     }
-
-
-
 
     //let stream = YTDL(server.queue[0], {filter: "audioonly", liveBuffer: 60000 });
     server.dispatcher = connection.play(stream());
 
-
-
     server.dispatcher.on("error", bot.logger.error);
-    
+
     if (!message.guild.me.hasPermission("SEND_MESSAGES")) return;
 
     let nowPlaying = new Discord.MessageEmbed()
@@ -465,8 +456,6 @@ async function play(connection, message, bot) {
     if (!message.guild.me.hasPermission("SEND_MESSAGES")) return;
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I don\'t have the permission to send embeds");
     else message.channel.send(nowPlaying);
-
-
 
     server.dispatcher.on("finish", async () => {
         await server.queue.shift();
@@ -578,7 +567,7 @@ function reload(bot) {
 }
 async function YTSearch(search, bot, message) {
     let videos = await bot.youtube.searchVideos(search.join(" "), 10).catch();
-    let video,response;
+    let video, response;
     let index = 0;
     let requesterID = message.author.id;
     if (bot.sendMessages) return;
@@ -589,27 +578,36 @@ ${videos.map((videos2) => `${++index} ${videos2.title}`).join('\n')}
 Please provide a value to select one of the search results ranging from 1-${videos.length}.
 `).then((message) => global.songsMessage = message)
         .then(global.songsID = message.channel.id);
-            await message.channel.awaitMessages((message2) => message2.content > 0 && message2.content < 11 && message.author.id == requesterID, {
-                max: 1,
-                time: 10000,
-                errors: ['time']
-            }).then(match => response = match)
-            .catch(err =>{
+    await message.channel.awaitMessages((message2) => message2.content > 0 && message2.content < 11 && message.author.id == requesterID, {
+            max: 1,
+            time: 10000,
+            errors: ['time']
+        }).then(match => response = match)
+        .catch(err => {
             message.channel.messages.fetch(global.songsMessage).catch()
-                .then((msg) => msg.delete({timeout: 0})).catch();
-            if (!bot.sendMessages) return message.channel.send("No or invalid value entered, cancelling video selection").then((msg) => {msg.delete({timeout: 5000}).catch().then(
-                message.channel.messages.fetch(global.songsMessage)
-            .then((msg) => msg.delete({timeout: 0})
-            ))})
+                .then((msg) => msg.delete({
+                    timeout: 0
+                })).catch();
+            if (!bot.sendMessages) return message.channel.send("No or invalid value entered, cancelling video selection").then((msg) => {
+                msg.delete({
+                    timeout: 5000
+                }).catch().then(
+                    message.channel.messages.fetch(global.songsMessage)
+                    .then((msg) => msg.delete({
+                        timeout: 0
+                    })))
+            })
             else return;
         })
-        if(response) {
+    if (response) {
         const videoIndex = parseInt(response.first().content);
         video = await bot.youtube.getVideoByID(videos[videoIndex - 1].id);
-    videoURL = `https://www.youtube.com/watch?v=${video.id}`;
-    let validate = YTDL.validateURL(videoURL);
-    message.channel.messages.fetch(global.songsMessage)
-        .then((msg) => msg.delete({timeout: 0}));
-    if(validate) return videoURL;
+        videoURL = `https://www.youtube.com/watch?v=${video.id}`;
+        let validate = YTDL.validateURL(videoURL);
+        message.channel.messages.fetch(global.songsMessage)
+            .then((msg) => msg.delete({
+                timeout: 0
+            }));
+        if (validate) return videoURL;
     }
 }
