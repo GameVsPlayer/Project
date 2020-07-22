@@ -19,16 +19,38 @@ const mongoClient = new MongoClient(uri, {
 let dbLoad = false;
 
 mongoClient.connect(async (err) => {
+    let colNames = ["hugs","pats","kiss","xp","money","todo","prefix"];
     if (err) bot.logger.error(err);
-    bot.logger.info("Connected to database");
+
+    bot.logger.info(`Connected to database`);
+
+    let availableCollections = [];
     bot.db = mongoClient.db("datastorage");
-    bot.db.hugsDB = bot.db.collection("hugs");
-    bot.db.patsDB = bot.db.collection("pats");
-    bot.db.kissDB = bot.db.collection("kiss");
-    bot.db.xpDB = bot.db.collection("xp");
-    bot.db.moneyDB = bot.db.collection("money");
-    bot.db.todoDB = bot.db.collection("todo");
-    bot.db.prefixes = bot.db.collection("prefix");
+    function dbList() {
+        return new Promise(function(resolve, reject) {
+        bot.db.listCollections().toArray(function(err, collInfos) {
+        if(err) reject(err);
+        collInfos.forEach(collection => {
+            availableCollections.push(collection.name)
+        })
+        resolve(availableCollections)
+    });
+    })}
+    availableCollections = await dbList();
+    if(!availableCollections) availableCollections = [];
+    colNames.forEach(colName => {
+    if(!availableCollections.includes(colName)) {
+        bot.db.createCollection(colName);
+         bot.logger.info(`Created the missing collection ${colName}`);
+    }
+    })
+    bot.db.hugsDB = await bot.db.collection("hugs");
+    bot.db.patsDB = await bot.db.collection("pats");
+    bot.db.kissDB = await bot.db.collection("kiss");
+    bot.db.xpDB = await bot.db.collection("xp");
+    bot.db.moneyDB = await bot.db.collection("money");
+    bot.db.todoDB = await bot.db.collection("todo");
+    bot.db.prefixes = await bot.db.collection("prefix");
     dbLoad = true;
 });
 
@@ -49,6 +71,7 @@ bot.blackListedUsers = require("./datastorage/blackListedUsers.json");
 bot.logger = logger;
 var loggedIN = 0;
 const YouTube = require("simple-youtube-api");
+const { cos } = require('mathjs');
 
 require('events').EventEmitter.defaultMaxListeners = 20;
 bot.extra = require('./externalLoading/extra');

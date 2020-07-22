@@ -4,7 +4,7 @@ COMPLETE FIX Avatar
 COMPLETE FIX Balance
 COMPLETE FIX Botinfo
 COMPLETE reenable changing prefix + saving it to the cloud
-TODO collection creation if collection is missing for database
+COMPLETE collection creation if collection is missing for database
 COMPLETE Pause / resume player
 TODO make pause and resume  show playback time and song info 
 TODO add song info command
