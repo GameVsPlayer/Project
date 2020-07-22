@@ -378,6 +378,24 @@ module.exports.run = async (bot, message, prefix) => {
             });
 
         }
+        if (message.content.startsWith(prefix + "pause")) {
+            mainCommand = 1;
+            var server = servers[message.guild.id];
+            if (bot.sendMessages) return;
+            else if (!server) return message.channel.send("There is nothing playing right now");
+            if (bot.sendMessages) return;
+            else if (!server.dispatcher) return message.channel.send("There is nothing playing right now");
+            mainCommand = true;
+            if(server.dispatcher.paused === false) {
+                message.channel.send(`Playback paused by <@${message.author.id}>!`);
+                return server.dispatcher.pause(true);
+            }
+            else {
+                message.channel.send(`Playback resumed by <@${message.author.id}>!`);
+                return server.dispatcher.resume();
+            }
+            
+        }
     }
 
     if (mainCommand) {

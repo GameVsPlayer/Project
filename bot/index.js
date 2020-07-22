@@ -264,7 +264,10 @@ bot.on("message", async message => {
     if (dbLoad === false) return;
 
     let prefix = process.env.prefix;
+
+    
     if (message.channel.type === "dm") return
+    if(process.env.Testing === false || process.env.Testing === undefined || process.env.Testing === "") {
         if (await bot.db.prefixes.findOne({
             guildID: message.guild.id
         }) === null) {
@@ -277,8 +280,9 @@ bot.on("message", async message => {
         prefix = await bot.db.prefixes.findOne({
             guildID: message.guild.id
         })
-        prefix = prefix.prefix;
-
+        // prefix = prefix.prefix;
+    }
+    
         if(!message.content.startsWith(prefix)) return;
 
         if (message.content.startsWith(`${prefix}reloadwebsite`)) {
