@@ -128,5 +128,5 @@ app.get('/serverStats/', (req, res) => {
 
 
 let listener = app.listen(process.env.backendPort || 1026, function () {
-    bot.logger.info('Backend running on port ' + listener.address().port);
+    console.log('Backend running on port ' + listener.address().port);
 });
