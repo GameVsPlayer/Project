@@ -18,6 +18,7 @@ const mongoClient = new MongoClient(uri, {
 });
 let dbLoad = false;
 
+
 mongoClient.connect(async (err) => {
     let colNames = ["hugs","pats","kiss","xp","money","todo","prefix"];
     if (err) bot.logger.error(err);
@@ -71,15 +72,10 @@ bot.blackListedUsers = require("./datastorage/blackListedUsers.json");
 bot.logger = logger;
 var loggedIN = 0;
 const YouTube = require("simple-youtube-api");
-const { cos } = require('mathjs');
 
 require('events').EventEmitter.defaultMaxListeners = 20;
 bot.extra = require('./externalLoading/extra');
 bot.config = botconfig;
-
-bot.version = '0.54';
-bot.lastUpdate = '28/09/2019';
-bot.changes = "live integration to show when I am streaming and sending a ping";
 
 bot.youtube = new YouTube(bot.config.googleAPI);
 
@@ -290,7 +286,7 @@ bot.on("message", async message => {
 
     
     if (message.channel.type === "dm") return
-    if(process.env.Testing === false || process.env.Testing === undefined || process.env.Testing === "") {
+    if(process.env.Testing === false | process.env.Testing === undefined | process.env.Testing === "") {
         if (await bot.db.prefixes.findOne({
             guildID: message.guild.id
         }) === null) {
@@ -303,9 +299,9 @@ bot.on("message", async message => {
         prefix = await bot.db.prefixes.findOne({
             guildID: message.guild.id
         })
-        // prefix = prefix.prefix;
+        prefix = prefix.prefix;
     }
-    
+
         if(!message.content.startsWith(prefix)) return;
 
         if (message.content.startsWith(`${prefix}reloadwebsite`)) {
@@ -390,8 +386,15 @@ bot.on('warn', (warn) => bot.logger.warn(warn));
 bot.on('shardError', error => {
     bot.logger.error('A websocket connection encountered an error:', error);
 });
+let webTimer = setInterval(() => {
+    if(dbLoad === false) return;
+    else {
+        websiteReload();
+        clearInterval(webTimer);
+    }
 
-websiteReload();
+},10000)
+
 
 function websiteReload() {
 
