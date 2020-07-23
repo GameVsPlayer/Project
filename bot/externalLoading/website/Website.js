@@ -9,6 +9,7 @@ module.exports.run = async (bot) => {
     let find = bot.db.todoDB.find();
     setTimeout(async () => {
         find.each(function (err, item) {
+            if(err) return bot.logger.error(err);
             if (item === null) return;
             dbData.push(item);
             todos.data = dbData;
