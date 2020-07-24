@@ -185,19 +185,19 @@ function calEZ(ar, od, cs, hp) {
         ar: 0
     });
     else data.push({
-        ar: ar / 2
+        ar: (ar / 2).toFixed(2)
     });
     if (od === 0) data.push({
         od: 0
     });
     else data.push({
-        od: od / 2
+        od: (od / 2).toFixed(2)
     });
     if (cs === 0) data.push({
         cs: 0
     });
     else data.push({
-        cs: cs / 2
+        cs: (cs / 2).toFixed(2)
     });
     if (hp === 0) data.push({
         hp: 0
@@ -217,7 +217,7 @@ function calHR(ar, od, cs, hp) {
         ar: 10
     });
     else data.push({
-        ar: ar * 1.4
+        ar: (ar * 1.4).toFixed(2)
     });
     if (od === 0) data.push({
         od: 0
@@ -226,7 +226,7 @@ function calHR(ar, od, cs, hp) {
         od: 10
     });
     else data.push({
-        od: od * 1.4
+        od: (od * 1.4).toFixed(2)
     });
     if (cs === 0) data.push({
         cs: 0
@@ -235,7 +235,7 @@ function calHR(ar, od, cs, hp) {
         cs: 10
     });
     else data.push({
-        cs: cs * 1.3
+        cs: (cs * 1.3).toFixed(2)
     });
     if (hp === 0) data.push({
         hp: 0
