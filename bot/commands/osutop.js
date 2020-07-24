@@ -199,7 +199,7 @@ function calEZ(ar, od, cs, hp) {
         hp: 0
     });
     else data.push({
-        hp: hp / 2
+        hp: (hp / 2).toFixed(2)
     });
     return data;
 }
@@ -240,7 +240,7 @@ function calHR(ar, od, cs, hp) {
         hp: 10
     });
     else data.push({
-        hp: hp * 1.4
+        hp: (hp * 1.4).toFixed(2)
     });
     return data;
 }
