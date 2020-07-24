@@ -119,11 +119,11 @@ module.exports.run = async (bot, message, args) => {
             `Score: ${apiData[0].score}\n` +
             `Combo: ${apiData[0].maxcombo}x/${Map[0].max_combo}x ${apiData[0].count300}/${apiData[0].count100}/${apiData[0].count50}/${apiData[0].countmiss}\n` +
             `Mapper: [${Map[0].creator}](https://osu.ppy.sh/users/${Map[0].creator_id})\n` +
-            `BPM: ${bpm}(${Map[0].bpm}\n` +
+            `BPM: ${bpm}${bpm == Map[0].bpm ? '' : '('+ Map[0].bpm + ')'} \n` +
             `Play set at ${apiData[0].date} ${apiData[0].replay_available === '0' ? 'No replay available' : `Replay available [here](https://osu.ppy.sh/scores/osu/${apiData[0].score_id}/download)`}\n` +
-            `**AR** ${ar} **OD** ${od} **CS** ${cs} **HP** ${hp}`)
+            `**AR** ${ar}${ar == Map[0].diff_approach ? '' : '('+ Map[0].diff_approach + ')'} **OD** ${od}${od == Map[0].diff_overall ? '' : '('+ Map[0].diff_overall + ')'} **CS** ${cs}${cs == Map[0].diff_size ? '' : '('+ Map[0].diff_size + ')'} **HP** ${hp}${hp == Map[0].diff_drain ? '' : '('+ Map[0].diff_drain + ')'}`)
         .setThumbnail(`https://s.ppy.sh/a/${player.user_id}`)
-
+        
     message.channel.send(osuEmbed).catch();
 
 }
