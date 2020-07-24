@@ -282,11 +282,15 @@ bot.on("message", async message => {
     if (loggedIN === 0) return;
     if (dbLoad === false) return;
 
-    let prefix = process.env.prefix;
+    let prefix = bot.config.prefix;
 
     
     if (message.channel.type === "dm") return
-    if(process.env.Testing === false | process.env.Testing === undefined | process.env.Testing === "") {
+
+    if(bot.config.Testing === true) {
+        if(message.author.id !== bot.config.ownerID) return;
+    }
+    if(bot.config.Testing === false | bot.config.Testing === undefined | bot.config.Testing === "") {
         if (await bot.db.prefixes.findOne({
             guildID: message.guild.id
         }) === null) {
@@ -300,7 +304,7 @@ bot.on("message", async message => {
             guildID: message.guild.id
         })
         prefix = prefix.prefix;
-    }
+        }
 
         if(!message.content.startsWith(prefix)) return;
 
