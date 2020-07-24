@@ -142,9 +142,10 @@ bot.on("ready", async () => {
     setInterval(async () => {
         //97947067
         //
+        try {
         let fet = await fetch('https://decapi.me/twitch/uptime/gamevsplayer', {
             timeout: 5000
-        }).catch();
+        })
         if (!fet) {
             notification = false;
             return activityLoop();
@@ -155,6 +156,10 @@ bot.on("ready", async () => {
             notification = false;
             return activityLoop();
         }
+    }catch(error) {
+            bot.logger.error(error);
+        };
+        
 
         let twitchStatus = await fetch(`https://api.twitch.tv/helix/streams?user_id=97947067`, {
             method: 'GET',
