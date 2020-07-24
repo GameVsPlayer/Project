@@ -90,7 +90,6 @@ module.exports.run = async (bot, message, args) => {
         cs = parseFloat(Map[0].diff_size);
         hp = parseFloat(Map[0].diff_drain);
     }
-    console.log(od + "PRE")
     let bpm;
     if (Mod.includes("DT") || Mod.includes("NC")) {
         bpm = Map[0].bpm * 1.5;
@@ -106,7 +105,6 @@ module.exports.run = async (bot, message, args) => {
     } else {
         bpm = Map[0].bpm;
     }
-    console.log(od + "POST")
 
     let divider = (parseInt(apiData[0].count300) * 300) + (parseInt(apiData[0].count100) * 100) + (parseInt(apiData[0].count50) * 50);
     let divisor = (parseInt(apiData[0].count300) + parseInt(apiData[0].count100) + parseInt(apiData[0].count50) + parseInt(apiData[0].countmiss)) * 300;
