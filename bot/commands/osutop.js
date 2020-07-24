@@ -21,20 +21,20 @@ module.exports.run = async (bot, message, args) => {
         if (number & 1 << 0) mod_list.push('NF')
         if (number & 1 << 1) {
             mod_list.push('EZ')
-            diffMods = diffMods + 1 << 1;
+            diffMods = diffMods + (1 << 1);
         }
         if (number & 1 << 3) mod_list.push('HD')
         if (number & 1 << 4) {
             mod_list.push('HR')
-            diffMods = diffMods + 1 << 4;
+            diffMods = diffMods + (1 << 4);
         }
         if (number & 1 << 5) mod_list.push('SD')
         if (number & 1 << 9) {
             mod_list.push('NC')
-            diffMods = diffMods + 1 << 6;
+            diffMods = diffMods + (1 << 6);
         } else if (number & 1 << 6) {
             mod_list.push('DT')
-            diffMods = diffMods + 1 << 6;
+            diffMods = diffMods + (1 << 6);
         }
         if (number & 1 << 7) mod_list.push('RX')
         if (number & 1 << 8) {
@@ -90,7 +90,7 @@ module.exports.run = async (bot, message, args) => {
         cs = parseFloat(Map[0].diff_size);
         hp = parseFloat(Map[0].diff_drain);
     }
-
+    console.log(od + "PRE")
     let bpm;
     if (Mod.includes("DT") || Mod.includes("NC")) {
         bpm = Map[0].bpm * 1.5;
@@ -106,6 +106,7 @@ module.exports.run = async (bot, message, args) => {
     } else {
         bpm = Map[0].bpm;
     }
+    console.log(od + "POST")
 
     let divider = (parseInt(apiData[0].count300) * 300) + (parseInt(apiData[0].count100) * 100) + (parseInt(apiData[0].count50) * 50);
     let divisor = (parseInt(apiData[0].count300) + parseInt(apiData[0].count100) + parseInt(apiData[0].count50) + parseInt(apiData[0].countmiss)) * 300;
@@ -167,12 +168,17 @@ function calARHT(ar) {
 }
 
 function calODHT(od) {
-    return ((79.5 - ((79.5 - od * 6) * 4 / 3)) / 6).toFixed(2);
+    od = 79.5 - od * 6
+    od = od * (3/2)
+    od = (79.5 - od) / 6
+    return od.toFixed(2);
 }
 
-
 function calODDT(od) {
-    return ((79.5 - ((79.5 - od * 6) * 3 / 4)) / 6).toFixed(2);
+    od = 79.5 - od * 6
+    od = od * (2/3)
+    od = (79.5 - od) / 6
+    return od.toFixed(2);
 }
 
 function calEZ(ar, od, cs, hp) {
