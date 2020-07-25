@@ -1,6 +1,12 @@
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
+const util = require('util');
+const fs = require("fs");
+const path = require("path");
+const { exec} = require('child_process');
 
+
+const streamPipeline = util.promisify(require('stream').pipeline);
 // Numbers for the calculation of DT/HT AR/OD taken from Zexous AR/OD Calculator https://osu.ppy.sh/community/forums/topics/651535
 module.exports.run = async (bot, message, args) => {
     if (bot.config.osuAPI == "") return bot.logger.info("osu API Key not set")
@@ -10,6 +16,24 @@ module.exports.run = async (bot, message, args) => {
     let Mod, ar, od, cs, hp;
     let score = await fetch(`https://osu.ppy.sh/api/get_user_best?u=${usernameRequst}&k=${bot.config.osuAPI}`);
     apiData = await score.json();
+    if (!fs.existsSync(path.join(__dirname, `/../maps`))) {
+        fs.mkdirSync(path.join(__dirname, `/../maps`))
+    }
+    for (map in apiData) {
+        map = apiData[map].beatmap_id;
+        if (!fs.existsSync(path.join(__dirname, `/../maps/${map}.osu`))) {
+            await (async () => {
+                const response = await fetch(`https://osu.ppy.sh/osu/${map}`);
+
+                if ((response.statusText).toLowerCase() === 'ok') {
+                    return streamPipeline(response.body, fs.createWriteStream(path.join(__dirname, `/../maps/${map}.osu`)));
+                }
+
+                throw new Error(`unexpected response ${response.statusText}`);
+            })();
+        }
+    }
+
 
     function numToMod(num) {
         if (num === null) return ['', 0];
@@ -59,7 +83,6 @@ module.exports.run = async (bot, message, args) => {
     }
     let Mods = numToMod(apiData[0].enabled_mods);
     Mod = Mods[0].join(", ");
-
     function fetchBeatmap(id, mods) {
         return new Promise(function (resolve, reject) {
             fetch(`https://osu.ppy.sh/api/get_beatmaps?b=${id}&k=${bot.config.osuAPI}&mods=${mods}`).then(res => res.json()).then(json => resolve(json));
@@ -109,12 +132,41 @@ module.exports.run = async (bot, message, args) => {
     let divider = (parseInt(apiData[0].count300) * 300) + (parseInt(apiData[0].count100) * 100) + (parseInt(apiData[0].count50) * 50);
     let divisor = (parseInt(apiData[0].count300) + parseInt(apiData[0].count100) + parseInt(apiData[0].count50) + parseInt(apiData[0].countmiss)) * 300;
     let acc = ((divider / divisor) * 100).toFixed(2);
+    let dotnet = '';
+    for(mod in Mods[0]) {
+        dotnet = dotnet + `-m ${Mods[0][mod]} `;
+    }
+    
+    let bm = (path.join(__dirname, `/../maps/${apiData[0].beatmap_id}.osu`));
 
-
+    function replaceAll(str) {
+        str = str.replace(new RegExp(', ', 'g'), '');
+        str.replace(new RegExp('NC', 'g'), 'DT');
+        str = '+' + str;
+        return str;
+    }
+    let playStats = {
+        mods: replaceAll(Mod),
+        combo: apiData[0].maxcombo,
+        misses: apiData[0].countmiss,
+        count100: apiData[0].count100,
+        count300: apiData[0].count300,
+        count50: apiData[0].count50
+    }
+    let pp;
+    await new Promise((resolve,reject) => {
+    let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate osu ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${dotnet} -c ${playStats.combo}`, (error, stdout) => {
+        if(error) return bot.logger.error(error)
+        let stdoutL = stdout.split('\n'); 
+        stdout = stdoutL[14].substring(stdoutL[14].indexOf(":")+ 2)
+        pp = parseFloat(stdout).toFixed(2);
+        resolve();
+    });
+    })
     osuEmbed = new Discord.MessageEmbed()
         .setAuthor(`${player.username}'s Top Play`, `https://b.ppy.sh/thumb/${Map[0].beatmapset_id}.jpg`)
         .setDescription(`${Map[0].title} [${Map[0].version}](https://osu.ppy.sh/b/${Map[0].beatmap_id}) + ${Mod} [${parseFloat(Map[0].difficultyrating).toFixed(2)}★] \n` +
-            `${apiData[0].rank} Rank ${acc}% ${apiData[0].pp}PP\n` +
+            `${apiData[0].rank} Rank ${acc}% ${pp}PP\n` +
             `Score: ${apiData[0].score}\n` +
             `Combo: ${apiData[0].maxcombo}x/${Map[0].max_combo}x ${apiData[0].count300}/${apiData[0].count100}/${apiData[0].count50}/${apiData[0].countmiss}\n` +
             `Mapper: [${Map[0].creator}](https://osu.ppy.sh/users/${Map[0].creator_id})\n` +
@@ -122,7 +174,7 @@ module.exports.run = async (bot, message, args) => {
             `Play set at ${apiData[0].date} ${apiData[0].replay_available === '0' ? 'No replay available' : `Replay available [here](https://osu.ppy.sh/scores/osu/${apiData[0].score_id}/download)`}\n` +
             `**AR** ${ar}${ar == Map[0].diff_approach ? '' : '('+ Map[0].diff_approach + ')'} **OD** ${od}${od == Map[0].diff_overall ? '' : '('+ Map[0].diff_overall + ')'} **CS** ${cs}${cs == Map[0].diff_size ? '' : '('+ Map[0].diff_size + ')'} **HP** ${hp}${hp == Map[0].diff_drain ? '' : '('+ Map[0].diff_drain + ')'}`)
         .setThumbnail(`https://s.ppy.sh/a/${player.user_id}`)
-        
+
     message.channel.send(osuEmbed).catch();
 
 }
@@ -167,14 +219,14 @@ function calARHT(ar) {
 
 function calODHT(od) {
     od = 79.5 - od * 6
-    od = od * (3/2)
+    od = od * (3 / 2)
     od = (79.5 - od) / 6
     return od.toFixed(2);
 }
 
 function calODDT(od) {
     od = 79.5 - od * 6
-    od = od * (2/3)
+    od = od * (2 / 3)
     od = (79.5 - od) / 6
     return od.toFixed(2);
 }

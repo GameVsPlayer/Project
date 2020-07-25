@@ -2,8 +2,9 @@ const path = require('path');
 require('dotenv').config({
     path: path.join(__dirname, '/.env')
 });
+var AdmZip = require('adm-zip');
 const logger = require('./logger');
-
+const request = require("request");
 const botconfig = process.env;
 const Discord = require("discord.js");
 const moment = require("moment-timezone");
@@ -17,33 +18,71 @@ const mongoClient = new MongoClient(uri, {
     useUnifiedTopology: true
 });
 let dbLoad = false;
+if (!fs.existsSync(path.join(__dirname, `/temp/`))) {
+    fs.mkdirSync(path.join(__dirname, `/temp/`));
+}
+if (!fs.existsSync(path.join(__dirname, `/temp/Calculator.zip`))) {
+    console.log("Download for PP Calculator Started!");
+    let file = fs.createWriteStream(path.join(__dirname, `/temp/Calculator.zip`));
+    const start = new Date();
+    new Promise((resolve, reject) => {
+        let stream = request({
+                uri: "https://www.dropbox.com/s/vtncf35gpdh9gtj/Calculator.zip?dl=1"
+            }).pipe(file)
+            .on('finish', () => {
+                console.log(`Downloaded PP Calculator in ${(new Date() - start) / 1000} Seconds`);
+                file.emit('close');
+                resolve();
+            })
+            .on('error', (error) => {
+                reject(error)
+            })
+    }).catch(error => {
+        console.log(`Something happened: ${error}`);
+    })
+};
+
+if (!fs.existsSync(path.join(__dirname, `/PP`))) {
+    fs.mkdirSync(path.join(__dirname, `/PP/`));
+}
+if (!fs.existsSync(path.join(__dirname, `/PP/PerformanceCalculator.dll`))) {
+    console.log("Extraction Start!");
+    new Promise((resolve, reject) => {
+        let zip = new AdmZip(path.join(__dirname, `/temp/Calculator.zip`));
+        zip.extractAllTo(path.join(__dirname, `/PP`));
+        resolve();
+        console.log("Extraction complete!");
+    })
+};
 
 
 mongoClient.connect(async (err) => {
-    let colNames = ["hugs","pats","kiss","xp","money","todo","prefix"];
+    let colNames = ["hugs", "pats", "kiss", "xp", "money", "todo", "prefix"];
     if (err) bot.logger.error(err);
 
     bot.logger.info(`Connected to database`);
 
     let availableCollections = [];
     bot.db = mongoClient.db("datastorage");
+
     function dbList() {
-        return new Promise(function(resolve, reject) {
-        bot.db.listCollections().toArray(function(err, collInfos) {
-        if(err) reject(err);
-        collInfos.forEach(collection => {
-            availableCollections.push(collection.name)
+        return new Promise(function (resolve, reject) {
+            bot.db.listCollections().toArray(function (err, collInfos) {
+                if (err) reject(err);
+                collInfos.forEach(collection => {
+                    availableCollections.push(collection.name)
+                })
+                resolve(availableCollections)
+            });
         })
-        resolve(availableCollections)
-    });
-    })}
-    availableCollections = await dbList();
-    if(!availableCollections) availableCollections = [];
-    colNames.forEach(colName => {
-    if(!availableCollections.includes(colName)) {
-        bot.db.createCollection(colName);
-         bot.logger.info(`Created the missing collection ${colName}`);
     }
+    availableCollections = await dbList();
+    if (!availableCollections) availableCollections = [];
+    colNames.forEach(colName => {
+        if (!availableCollections.includes(colName)) {
+            bot.db.createCollection(colName);
+            bot.logger.info(`Created the missing collection ${colName}`);
+        }
     })
     bot.db.hugsDB = await bot.db.collection("hugs");
     bot.db.patsDB = await bot.db.collection("pats");
@@ -143,23 +182,23 @@ bot.on("ready", async () => {
         //97947067
         //
         try {
-        let fet = await fetch('https://decapi.me/twitch/uptime/gamevsplayer', {
-            timeout: 5000
-        })
-        if (!fet) {
-            notification = false;
-            return activityLoop();
-        }
+            let fet = await fetch('https://decapi.me/twitch/uptime/gamevsplayer', {
+                timeout: 5000
+            })
+            if (!fet) {
+                notification = false;
+                return activityLoop();
+            }
 
-        fet = await fet.text().catch()
-        if (fet.includes('offline')) {
-            notification = false;
-            return activityLoop();
-        }
-    }catch(error) {
+            fet = await fet.text().catch()
+            if (fet.includes('offline')) {
+                notification = false;
+                return activityLoop();
+            }
+        } catch (error) {
             bot.logger.error(error);
         };
-        
+
 
         let twitchStatus = await fetch(`https://api.twitch.tv/helix/streams?user_id=97947067`, {
             method: 'GET',
@@ -289,45 +328,45 @@ bot.on("message", async message => {
 
     let prefix = bot.config.prefix;
 
-    
+
     if (message.channel.type === "dm") return
 
-    if(bot.config.Testing === true) {
-        if(message.author.id !== bot.config.ownerID) return;
+    if (bot.config.Testing === true) {
+        if (message.author.id !== bot.config.ownerID) return;
     }
-    if(bot.config.Testing === false | bot.config.Testing === undefined | bot.config.Testing === "") {
+    if (bot.config.Testing === false | bot.config.Testing === undefined | bot.config.Testing === "") {
         if (await bot.db.prefixes.findOne({
-            guildID: message.guild.id
-        }) === null) {
-        const data = {
-            guildID: message.guild.id,
-            prefix: prefix
-        }
-        await bot.db.prefixes.insertOne(data);
+                guildID: message.guild.id
+            }) === null) {
+            const data = {
+                guildID: message.guild.id,
+                prefix: prefix
+            }
+            await bot.db.prefixes.insertOne(data);
         }
         prefix = await bot.db.prefixes.findOne({
             guildID: message.guild.id
         })
         prefix = prefix.prefix;
-        }
+    }
 
-        if(!message.content.startsWith(prefix)) return;
+    if (!message.content.startsWith(prefix)) return;
 
-        if (message.content.startsWith(`${prefix}reloadwebsite`)) {
-            if (message.author.id === botconfig.ownerID) {
-                message.channel.send("Reloaded website").catch();
-                websiteReload();
-                return;
+    if (message.content.startsWith(`${prefix}reloadwebsite`)) {
+        if (message.author.id === botconfig.ownerID) {
+            message.channel.send("Reloaded website").catch();
+            websiteReload();
+            return;
 
-            } else return;
-        } else if (message.content.startsWith(`${prefix}reloadEvents`)) {
-            if (message.author.id === botconfig.ownerID) {
-                message.channel.send("Reloaded Events").catch();
-                reloadEvents();
-                return;
+        } else return;
+    } else if (message.content.startsWith(`${prefix}reloadEvents`)) {
+        if (message.author.id === botconfig.ownerID) {
+            message.channel.send("Reloaded Events").catch();
+            reloadEvents();
+            return;
 
-            } else return;
-        }
+        } else return;
+    }
 
     let eventLoader = bot.events.get("message");
 
@@ -396,13 +435,13 @@ bot.on('shardError', error => {
     bot.logger.error('A websocket connection encountered an error:', error);
 });
 let webTimer = setInterval(() => {
-    if(dbLoad === false) return;
+    if (dbLoad === false) return;
     else {
         websiteReload();
         clearInterval(webTimer);
     }
 
-},10000)
+}, 10000)
 
 
 function websiteReload() {
