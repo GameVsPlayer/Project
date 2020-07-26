@@ -6,7 +6,7 @@ module.exports.run = async (bot, message, args) => {
     if (!message.member.hasPermission("MANAGE_SERVER")) return errors.noPerms(message, "MANAGE_SERVER").catch();
     let prefix;
     await new Promise(function(resolve,reject) {
-        await bot.extra.getPrefix(bot, message.guild, function(prefixCB) {
+        bot.extra.getPrefix(bot, message.guild, function(prefixCB) {
         prefix = prefixCB;
         resolve();
     });

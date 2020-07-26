@@ -15,26 +15,26 @@ module.exports.run = async (bot, message, args) => {
     usernameRequst = args.join(" ");
     let Mod, cs, hp;
 
-    let score = await fetch(`https://osu.ppy.sh/api/get_user_best?u=${usernameRequst}&k=${bot.config.osuAPI}`).catch(e => bot.logger.error(e));  
+    let score = await fetch(`https://osu.ppy.sh/api/get_user_best?u=${usernameRequst}&k=${bot.config.osuAPI}`).catch(e => bot.logger.error(e));
     apiData = await score.json();
     if (!fs.existsSync(path.join(__dirname, `/../maps`))) {
         fs.mkdirSync(path.join(__dirname, `/../maps`))
     }
-
-    for (map in apiData) {
-        await new Promise(function (resolve, reject) {
+    await new Promise(async function (resolve, reject) {
+        for (map in apiData) {
             map = apiData[map].beatmap_id;
-            if (!fs.existsSync(path.join(__dirname, `/../maps/${map}.osu`))) {
-                fetch(`https://osu.ppy.sh/osu/${map}`).then(res => res.text()).then(res => fs.writeFileSync(path.join(__dirname, `/../maps/${map}.osu`), res, 'utf8'));
-                resolve();
-            } else {
-                resolve()
-            }
-        })
-    }
+            if (!fs.existsSync(path.join(__dirname, `/../maps/${map}.osu`)))
+                await fetch(`https://osu.ppy.sh/osu/${map}`).then(res => res.text()).then(res => fs.writeFileSync(path.join(__dirname, `/../maps/${map}.osu`), res, 'utf8'));
+        }
+        setTimeout(() => {
+            resolve()
+        }, 1000)
+
+    });
+
     let bm = path.join(__dirname, `/../maps/${apiData[0].beatmap_id}.osu`);
     let Map = {};
-    await new Promise((resolve, reject) => {
+    await new Promise(async (resolve, reject) => {
         let child = exec(`dotnet ${path.join(__dirname + "/../PP/MapInfo.dll")} ${bm}`, (error, stdout) => {
             if (error) return bot.logger.error(error)
             let stdoutL = stdout.split('\n');
@@ -156,7 +156,7 @@ module.exports.run = async (bot, message, args) => {
     }
     let pp;
     let mapPlay;
-    await new Promise((resolve, reject) => {
+    await new Promise(async (resolve, reject) => {
         let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate osu ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${dotnet}-c ${playStats.combo}`, (error, stdout) => {
             if (error) return bot.logger.error(error)
             let stdoutL = stdout.split('\n');
@@ -176,7 +176,7 @@ module.exports.run = async (bot, message, args) => {
 
     })
     let sr;
-    await new Promise((resolve, reject) => {
+    await new Promise(async (resolve, reject) => {
         let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet}`, (error, stdout) => {
             if (error) return bot.logger.error(error)
             let stdoutL = stdout.split('\n');
