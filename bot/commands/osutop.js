@@ -169,7 +169,7 @@ module.exports.run = async (bot, message, args) => {
             mapPlay[2] = mapPlay[2].split(" ")[0];
             mapPlay[14] = parseFloat(mapPlay[14]).toFixed(2);
             mapPlay[1] = parseFloat(mapPlay[1]).toFixed(2);
-            mapPlay[11] = parseFloat(mapPlay[1]).toFixed(2);
+            mapPlay[11] = parseFloat(mapPlay[11]).toFixed(2);
 
             resolve()
         });
