@@ -4,25 +4,23 @@ const errors = require("../utils/errors.js");
 module.exports.run = async (bot, message, args) => {
 
     if (!message.member.hasPermission("MANAGE_SERVER")) return errors.noPerms(message, "MANAGE_SERVER").catch();
-    let prefixes = await bot.db.prefixes.findOne({
-        guildID: message.guild.id
-    })
-    if (!args[0] || args[0 === "help"]) return message.reply(`Usage: ${prefixes.prefix}prefix <The prefix you want to set for the server>`).catch();
+    let prefix;
+    await new Promise(function(resolve,reject) {
+        await bot.extra.getPrefix(bot, message.guild, function(prefixCB) {
+        prefix = prefixCB;
+        resolve();
+    });
+    });
 
-    let oldPrefix = prefixes.prefix;
+    if (!args[0] || args[0 === "help"]) return message.reply(`Usage: ${prefix}prefix <The prefix you want to set for the server>`).catch();
 
-    await bot.db.prefixes.findOneAndUpdate({
-        guildID: message.guild.id
-    }, {
-        "$set": {
-            prefix: args[0].toString()
-        }
+    await bot.extra.setPrefix(bot, message.guild, args[0], function(prefixCB) {
     });
 
     let Embed = new Discord.MessageEmbed()
         .setColor(bot.config.color)
         .setTitle("Prefix changed!")
-        .setDescription(`Set from ${oldPrefix}  to ${args[0]}`);
+        .setDescription(`Set from ${prefix} to ${args[0]}`);
 
     message.channel.send(Embed).catch();
 

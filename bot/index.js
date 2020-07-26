@@ -17,6 +17,8 @@ const mongoClient = new MongoClient(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
+const redis = require('redis');
+
 let dbLoad = false;
 if (!fs.existsSync(path.join(__dirname, `/temp/`))) {
     fs.mkdirSync(path.join(__dirname, `/temp/`));
@@ -117,9 +119,17 @@ bot.extra = require('./externalLoading/extra');
 bot.config = botconfig;
 
 bot.youtube = new YouTube(bot.config.googleAPI);
+bot.redis = redis.createClient();
+
+bot.redis.on('connect', () => {
+    bot.logger.info("Connected to redis database!");
+})
 
 /*bot.on("shardReconnecting", , id => console.log(`Shard with ID ${id} reconnected.`));*/
-
+bot.redis.on("error", function(error) {
+    bot.logger.error(error);
+  });
+  
 setInterval(() => {
     let duration = moment.duration(bot.uptime)
     bot.duration = {
@@ -325,29 +335,21 @@ bot.on("message", async message => {
     // ------------------------------------------------------------------
     if (loggedIN === 0) return;
     if (dbLoad === false) return;
-
     let prefix = bot.config.prefix;
 
-
     if (message.channel.type === "dm") return
-
-    if (bot.config.Testing === true) {
+    if (bot.config.Testing) {
         if (message.author.id !== bot.config.ownerID) return;
     }
-    if (bot.config.Testing === false | bot.config.Testing === undefined | bot.config.Testing === "") {
-        if (await bot.db.prefixes.findOne({
-                guildID: message.guild.id
-            }) === null) {
-            const data = {
-                guildID: message.guild.id,
-                prefix: prefix
-            }
-            await bot.db.prefixes.insertOne(data);
-        }
-        prefix = await bot.db.prefixes.findOne({
-            guildID: message.guild.id
-        })
-        prefix = prefix.prefix;
+    else {
+        await new Promise(function(resolve,reject) {
+        await bot.extra.getPrefix(bot, message.guild, function(prefixCB) {
+        console.log(prefix);
+        prefix.prefix = prefixCB;
+        resolve();
+    });
+    })
+        
     }
 
     if (!message.content.startsWith(prefix)) return;
