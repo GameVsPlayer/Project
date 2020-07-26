@@ -181,8 +181,16 @@ module.exports.run = async (bot, message, args) => {
             if (error) return bot.logger.error(error)
             let stdoutL = stdout.split('\n');
             sr = stdoutL[5];
-            sr = sr.split(new RegExp(/│|�/g))[2];
-            sr = sr.substring(sr.indexOf(" ") + 7);
+            let win = RegExp('�');
+            let linux = RegExp('');
+            if(win.test(sr)) {
+                sr = sr.split('�')[2];
+                sr = sr.substring(sr.indexOf(" ") + 7);
+            }
+            if(linux.test(sr)) {
+                sr = sr.split('│')[2];
+                sr = sr.substring(sr.indexOf(" ") + 6);
+            }
             parseFloat(sr).toFixed(2);
             resolve()
         });
