@@ -344,7 +344,6 @@ bot.on("message", async message => {
     else {
         await new Promise(function(resolve,reject) {
         await bot.extra.getPrefix(bot, message.guild, function(prefixCB) {
-        console.log(prefix);
         prefix.prefix = prefixCB;
         resolve();
     });

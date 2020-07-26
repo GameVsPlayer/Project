@@ -19,7 +19,6 @@ module.exports.run = async (bot, message, prefix) => {
     if (!message) return;
 
     if (message.author.bot) return;
-    console.log(prefix)
     if (message.channel.type === "dm") {
         
         if (!message.content.startsWith(`${bot.config.prefix}todo`)) return;
