@@ -53,7 +53,7 @@ module.exports.run = async (bot, message, args) => {
             Map.creator = stdoutL[8];
             Map.artist = stdoutL[9];
             Map.version = stdoutL[10];
-            Map.bpm = stdoutL[11];
+            Map.bpm = parseFloat(stdoutL[11]).toFixed(2);
             Map.divisor = stdoutL[12];
             resolve()
         });
@@ -175,10 +175,23 @@ module.exports.run = async (bot, message, args) => {
         });
 
     })
+    let sr;
+    await new Promise((resolve, reject) => {
+        let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet}`, (error, stdout) => {
+            if (error) return bot.logger.error(error)
+            let stdoutL = stdout.split('\n');
+            sr = stdoutL[5];
+            sr = sr.split("�")[2];
+            sr = sr.substring(sr.indexOf(" ") + 7);
+            parseFloat(sr).toFixed(2);
+            resolve()
+        });
+
+    })
 
     osuEmbed = new Discord.MessageEmbed()
         .setAuthor(`${player.username}'s Top Play`, `https://b.ppy.sh/thumb/${Map.beatmapset_id}.jpg`)
-        .setDescription(`${Map.title} [${Map.version}](https://osu.ppy.sh/b/${Map.beatmap_id}) + ${Mod} [${parseFloat(Map.difficultyrating).toFixed(2)}★] \n` +
+        .setDescription(`${Map.title} [${Map.version}](https://osu.ppy.sh/b/${Map.beatmap_id}) + ${Mod} [${parseFloat(sr).toFixed(2)}★] \n` +
             `${apiData[0].rank} Rank ${mapPlay[1]}% ${mapPlay[14]}PP\n` +
             `Score: ${apiData[0].score}\n` +
             `Combo: ${mapPlay[2]}x/${mapPlay[13]}x ${apiData[0].count300}/${apiData[0].count100}/${apiData[0].count50}/${apiData[0].countmiss}\n` +
