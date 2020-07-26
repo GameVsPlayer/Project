@@ -37,6 +37,7 @@
     "mongodb": "^3.5.9",
     "node-fetch": "^2.6.0",
     "os-utils": "0.0.14",
+    "osu-json": "^0.9.1",
     "parse-ms": "^2.1.0",
     "parse-url": "^5.0.1",
     "ping-monitor": "^0.5.0",

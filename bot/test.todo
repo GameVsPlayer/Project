@@ -10,5 +10,6 @@ TODO make pause and resume show playback time and song info
 TODO add song info command
 NEARCOMPLETE add osu pp stuff
 COMPLETE top play
+TODO add SR calculation + conditional if fc PP
 
 TODO god help me pls create pp calculator / try to use official one

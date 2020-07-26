@@ -1,39 +1,64 @@
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
-const util = require('util');
 const fs = require("fs");
 const path = require("path");
-const { exec} = require('child_process');
+const {
+    exec
+} = require('child_process');
 
 
-const streamPipeline = util.promisify(require('stream').pipeline);
 // Numbers for the calculation of DT/HT AR/OD taken from Zexous AR/OD Calculator https://osu.ppy.sh/community/forums/topics/651535
 module.exports.run = async (bot, message, args) => {
     if (bot.config.osuAPI == "") return bot.logger.info("osu API Key not set")
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
     if (!args[0]) return message.channel.send("No user specified").catch();
     usernameRequst = args.join(" ");
-    let Mod, ar, od, cs, hp;
-    let score = await fetch(`https://osu.ppy.sh/api/get_user_best?u=${usernameRequst}&k=${bot.config.osuAPI}`);
+    let Mod, cs, hp;
+
+    let score = await fetch(`https://osu.ppy.sh/api/get_user_best?u=${usernameRequst}&k=${bot.config.osuAPI}`).catch(e => bot.logger.error(e));
     apiData = await score.json();
     if (!fs.existsSync(path.join(__dirname, `/../maps`))) {
         fs.mkdirSync(path.join(__dirname, `/../maps`))
     }
+
     for (map in apiData) {
-        map = apiData[map].beatmap_id;
-        if (!fs.existsSync(path.join(__dirname, `/../maps/${map}.osu`))) {
-            await (async () => {
-                const response = await fetch(`https://osu.ppy.sh/osu/${map}`);
-
-                if ((response.statusText).toLowerCase() === 'ok') {
-                    return streamPipeline(response.body, fs.createWriteStream(path.join(__dirname, `/../maps/${map}.osu`)));
-                }
-
-                throw new Error(`unexpected response ${response.statusText}`);
-            })();
-        }
+        await new Promise(function (resolve, reject) {
+            map = apiData[map].beatmap_id;
+            if (!fs.existsSync(path.join(__dirname, `/../maps/${map}.osu`))) {
+                fetch(`https://osu.ppy.sh/osu/${map}`).then(res => res.text()).then(res => fs.writeFileSync(path.join(__dirname, `/../maps/${map}.osu`), res, 'utf8'));
+                resolve();
+            } else {
+                resolve()
+            }
+        })
     }
+    let bm = path.join(__dirname, `/../maps/${apiData[0].beatmap_id}.osu`);
+    let Map = {};
+    await new Promise((resolve, reject) => {
+        let child = exec(`dotnet ${path.join(__dirname + "/../PP/MapInfo.dll")} ${bm}`, (error, stdout) => {
+            if (error) return bot.logger.error(error)
+            let stdoutL = stdout.split('\n');
 
+            for (info in stdoutL) {
+                stdoutL[info] = stdoutL[info].substring(stdoutL[info].indexOf(" ") + 1)
+                stdoutL[info] = stdoutL[info].replace(/(\r\n|\n|\r)/gm, "");
+            }
+            Map.diff_size = stdoutL[1];
+            Map.diff_drain = stdoutL[2];
+            Map.diff_approach = stdoutL[3];
+            Map.diff_overall = stdoutL[4];
+            Map.beatmap_id = stdoutL[5];
+            Map.beatmapset_id = stdoutL[6];
+            Map.title = stdoutL[7];
+            Map.creator = stdoutL[8];
+            Map.artist = stdoutL[9];
+            Map.version = stdoutL[10];
+            Map.bpm = stdoutL[11];
+            Map.divisor = stdoutL[12];
+            resolve()
+        });
+
+    })
 
     function numToMod(num) {
         if (num === null) return ['', 0];
@@ -83,61 +108,37 @@ module.exports.run = async (bot, message, args) => {
     }
     let Mods = numToMod(apiData[0].enabled_mods);
     Mod = Mods[0].join(", ");
-    function fetchBeatmap(id, mods) {
-        return new Promise(function (resolve, reject) {
-            fetch(`https://osu.ppy.sh/api/get_beatmaps?b=${id}&k=${bot.config.osuAPI}&mods=${mods}`).then(res => res.json()).then(json => resolve(json));
-        });
-    }
 
-    let player = await fetch(`https://osu.ppy.sh/api/get_user?u=${usernameRequst}&k=${bot.config.osuAPI}`);
+    let player = await fetch(`https://osu.ppy.sh/api/get_user?u=${usernameRequst}&k=${bot.config.osuAPI}`).catch(e => bot.logger.errro(e));
     player = await player.json();
     player = player[0];
 
-    let Map = await fetchBeatmap(apiData[0].beatmap_id, Mods[1]);
-
     if (Mod.includes("HR")) {
-        let data = calHR(parseFloat(Map[0].diff_approach), parseFloat(Map[0].diff_overall), parseFloat(Map[0].diff_size), parseFloat(Map[0].diff_drain))
-        ar = parseFloat(data[0].ar);
-        od = parseFloat(data[1].od);
-        cs = parseFloat(data[2].cs);
-        hp = parseFloat(data[3].hp);
+        let data = calHR(parseFloat(Map.diff_size), parseFloat(Map.diff_drain))
+        cs = parseFloat(data[0].cs);
+        hp = parseFloat(data[1].hp);
     } else if (Mod.includes("EZ")) {
-        let data = calEZ(parseFloat(Map[0].diff_approach), parseFloat(Map[0].diff_overall), parseFloat(Map[0].diff_size), parseFloat(Map[0].diff_drain))
-        ar = parseFloat(data[0].ar);
-        od = parseFloat(data[1].od);
-        cs = parseFloat(data[2].cs);
-        hp = parseFloat(data[3].hp);
+        let data = calEZ(parseFloat(Map.diff_size), parseFloat(Map.diff_drain))
+        cs = parseFloat(data[0].cs);
+        hp = parseFloat(data[1].hp);
     } else {
-        ar = parseFloat(Map[0].diff_approach);
-        od = parseFloat(Map[0].diff_overall);
-        cs = parseFloat(Map[0].diff_size);
-        hp = parseFloat(Map[0].diff_drain);
+        cs = parseFloat(Map.diff_size);
+        hp = parseFloat(Map.diff_drain);
     }
+
     let bpm;
     if (Mod.includes("DT") || Mod.includes("NC")) {
-        bpm = Map[0].bpm * 1.5;
-        let data = calDT(parseFloat(ar), parseFloat(od));
-
-        ar = parseFloat(data[0].ar);
-        od = parseFloat(data[1].od);
+        bpm = Map.bpm * 1.5;
     } else if (Mod.includes("HT")) {
-        bpm = Map[0].bpm / 1.5;
-        let data = calHT(parseFloat(ar), parseFloat(od));
-        ar = parseFloat(data[0].ar);
-        od = parseFloat(data[1].od);
+        bpm = Map.bpm / 1.5;
     } else {
-        bpm = Map[0].bpm;
+        bpm = Map.bpm;
     }
 
-    let divider = (parseInt(apiData[0].count300) * 300) + (parseInt(apiData[0].count100) * 100) + (parseInt(apiData[0].count50) * 50);
-    let divisor = (parseInt(apiData[0].count300) + parseInt(apiData[0].count100) + parseInt(apiData[0].count50) + parseInt(apiData[0].countmiss)) * 300;
-    let acc = ((divider / divisor) * 100).toFixed(2);
     let dotnet = '';
-    for(mod in Mods[0]) {
+    for (mod in Mods[0]) {
         dotnet = dotnet + `-m ${Mods[0][mod]} `;
     }
-    
-    let bm = (path.join(__dirname, `/../maps/${apiData[0].beatmap_id}.osu`));
 
     function replaceAll(str) {
         str = str.replace(new RegExp(', ', 'g'), '');
@@ -154,25 +155,36 @@ module.exports.run = async (bot, message, args) => {
         count50: apiData[0].count50
     }
     let pp;
-    await new Promise((resolve,reject) => {
-    let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate osu ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${dotnet} -c ${playStats.combo}`, (error, stdout) => {
-        if(error) return bot.logger.error(error)
-        let stdoutL = stdout.split('\n'); 
-        stdout = stdoutL[14].substring(stdoutL[14].indexOf(":")+ 2)
-        pp = parseFloat(stdout).toFixed(2);
-        resolve();
-    });
+    let mapPlay;
+    await new Promise((resolve, reject) => {
+        let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate osu ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${dotnet}-c ${playStats.combo}`, (error, stdout) => {
+            if (error) return bot.logger.error(error)
+            let stdoutL = stdout.split('\n');
+
+            for (info in stdoutL) {
+                stdoutL[info] = stdoutL[info].substring(stdoutL[info].indexOf(":") + 2);
+                stdoutL[info] = stdoutL[info].replace(/(\r\n|\n|\r)/gm, "");
+            }
+            mapPlay = stdoutL;
+            mapPlay[2] = mapPlay[2].split(" ")[0];
+            mapPlay[14] = parseFloat(mapPlay[14]).toFixed(2);
+            mapPlay[1] = parseFloat(mapPlay[1]).toFixed(2);
+
+            resolve()
+        });
+
     })
+
     osuEmbed = new Discord.MessageEmbed()
-        .setAuthor(`${player.username}'s Top Play`, `https://b.ppy.sh/thumb/${Map[0].beatmapset_id}.jpg`)
-        .setDescription(`${Map[0].title} [${Map[0].version}](https://osu.ppy.sh/b/${Map[0].beatmap_id}) + ${Mod} [${parseFloat(Map[0].difficultyrating).toFixed(2)}★] \n` +
-            `${apiData[0].rank} Rank ${acc}% ${pp}PP\n` +
+        .setAuthor(`${player.username}'s Top Play`, `https://b.ppy.sh/thumb/${Map.beatmapset_id}.jpg`)
+        .setDescription(`${Map.title} [${Map.version}](https://osu.ppy.sh/b/${Map.beatmap_id}) + ${Mod} [${parseFloat(Map.difficultyrating).toFixed(2)}★] \n` +
+            `${apiData[0].rank} Rank ${mapPlay[1]}% ${mapPlay[14]}PP\n` +
             `Score: ${apiData[0].score}\n` +
-            `Combo: ${apiData[0].maxcombo}x/${Map[0].max_combo}x ${apiData[0].count300}/${apiData[0].count100}/${apiData[0].count50}/${apiData[0].countmiss}\n` +
-            `Mapper: [${Map[0].creator}](https://osu.ppy.sh/users/${Map[0].creator_id})\n` +
-            `BPM: ${bpm}${bpm == Map[0].bpm ? '' : '('+ Map[0].bpm + ')'} \n` +
+            `Combo: ${mapPlay[2]}x/${mapPlay[13]}x ${apiData[0].count300}/${apiData[0].count100}/${apiData[0].count50}/${apiData[0].countmiss}\n` +
+            `Mapper: ${Map.creator}\n` +
+            `BPM: ${bpm}${bpm == Map.bpm ? '' : '('+ Map.bpm + ')'} Divisor 1/${Map.divisor}\n` +
             `Play set at ${apiData[0].date} ${apiData[0].replay_available === '0' ? 'No replay available' : `Replay available [here](https://osu.ppy.sh/scores/osu/${apiData[0].score_id}/download)`}\n` +
-            `**AR** ${ar}${ar == Map[0].diff_approach ? '' : '('+ Map[0].diff_approach + ')'} **OD** ${od}${od == Map[0].diff_overall ? '' : '('+ Map[0].diff_overall + ')'} **CS** ${cs}${cs == Map[0].diff_size ? '' : '('+ Map[0].diff_size + ')'} **HP** ${hp}${hp == Map[0].diff_drain ? '' : '('+ Map[0].diff_drain + ')'}`)
+            `**AR** ${mapPlay[12]}${mapPlay[12] == Map.diff_approach ? '' : '('+ Map.diff_approach + ')'} **OD** ${mapPlay[11]}${mapPlay[11] == Map.diff_overall ? '' : '('+ Map.diff_overall + ')'} **CS** ${cs}${cs == Map.diff_size ? '' : '('+ Map.diff_size + ')'} **HP** ${hp}${hp == Map.diff_drain ? '' : '('+ Map.diff_drain + ')'}`)
         .setThumbnail(`https://s.ppy.sh/a/${player.user_id}`)
 
     message.channel.send(osuEmbed).catch();
@@ -183,68 +195,8 @@ module.exports.help = {
     alias: "ot"
 }
 
-
-
-function calARDT(ar) {
-    let ms;
-    if (ar <= 5) {
-        ms = 1800 - 120 * ar;
-    } else {
-        ms = 1200 - 150 * (ar - 5);
-    }
-    ms = ms * (2 / 3);
-    if (1800 - ms <= 600) {
-        ms = (1800 - ms) / 120;
-    } else {
-        ms = 5 + (1200 - ms) / 150;
-    }
-    return ms.toFixed(2)
-}
-
-function calARHT(ar) {
-    let ms;
-    if (ar <= 5) {
-        ms = 1800 - 120 * ar;
-    } else {
-        ms = 1200 - 150 * (ar - 5);
-    }
-    ms = ms * (4 / 3);
-    if (1800 - ms <= 600) {
-        ms = (1800 - ms) / 120;
-    } else {
-        ms = 5 + (1200 - ms) / 150;
-    }
-    return ms.toFixed(2)
-}
-
-function calODHT(od) {
-    od = 79.5 - od * 6
-    od = od * (3 / 2)
-    od = (79.5 - od) / 6
-    return od.toFixed(2);
-}
-
-function calODDT(od) {
-    od = 79.5 - od * 6
-    od = od * (2 / 3)
-    od = (79.5 - od) / 6
-    return od.toFixed(2);
-}
-
-function calEZ(ar, od, cs, hp) {
+function calEZ(cs, hp) {
     let data = []
-    if (ar === 0) data.push({
-        ar: 0
-    });
-    else data.push({
-        ar: (ar / 2).toFixed(2)
-    });
-    if (od === 0) data.push({
-        od: 0
-    });
-    else data.push({
-        od: (od / 2).toFixed(2)
-    });
     if (cs === 0) data.push({
         cs: 0
     });
@@ -260,26 +212,8 @@ function calEZ(ar, od, cs, hp) {
     return data;
 }
 
-function calHR(ar, od, cs, hp) {
+function calHR(cs, hp) {
     let data = []
-    if (ar === 0) data.push({
-        ar: 0
-    });
-    else if (ar * 1.4 > 10) data.push({
-        ar: 10
-    });
-    else data.push({
-        ar: (ar * 1.4).toFixed(2)
-    });
-    if (od === 0) data.push({
-        od: 0
-    });
-    else if (od * 1.4 > 10) data.push({
-        od: 10
-    });
-    else data.push({
-        od: (od * 1.4).toFixed(2)
-    });
     if (cs === 0) data.push({
         cs: 0
     });
@@ -301,40 +235,25 @@ function calHR(ar, od, cs, hp) {
     return data;
 }
 
-function calHT(ar, od) {
-    let data = []
-    if (ar === 0) data.push({
-        ar: 0
-    });
-    else data.push({
-        ar: calARHT(ar)
-    });
-    if (arod === 0) data.push({
-        od: 0
-    });
-    else data.push({
-        od: calODHT(od)
-    });
-    return data;
+function mode(array) {
+    if (array.length == 0)
+        return null;
+    var modeMap = {};
+    var maxEl = array[0],
+        maxCount = 1;
+    for (var i = 0; i < array.length; i++) {
+        var el = array[i];
+        if (modeMap[el] == null)
+            modeMap[el] = 1;
+        else
+            modeMap[el]++;
+        if (modeMap[el] > maxCount) {
+            maxEl = el;
+            maxCount = modeMap[el];
+        }
+    }
+    return maxEl;
 }
-
-function calDT(ar, od) {
-    let data = []
-    if (ar === 0) data.push({
-        ar: 0
-    });
-    else data.push({
-        ar: calARDT(ar)
-    });
-    if (od === 0) data.push({
-        od: 0
-    });
-    else data.push({
-        od: calODDT(od)
-    });
-    return data;
-}
-
 // let apiData = [{
 //     beatmap_id: '129891',
 //     score_id: '2177560145',
