@@ -15,7 +15,7 @@ module.exports.run = async (bot, message, args) => {
     usernameRequst = args.join(" ");
     let Mod, cs, hp;
 
-    let score = await fetch(`https://osu.ppy.sh/api/get_user_best?u=${usernameRequst}&k=${bot.config.osuAPI}`).catch(e => bot.logger.error(e));
+    let score = await fetch(`https://osu.ppy.sh/api/get_user_best?u=${usernameRequst}&k=${bot.config.osuAPI}`).catch(e => bot.logger.error(e));  
     apiData = await score.json();
     if (!fs.existsSync(path.join(__dirname, `/../maps`))) {
         fs.mkdirSync(path.join(__dirname, `/../maps`))
@@ -109,7 +109,7 @@ module.exports.run = async (bot, message, args) => {
     let Mods = numToMod(apiData[0].enabled_mods);
     Mod = Mods[0].join(", ");
 
-    let player = await fetch(`https://osu.ppy.sh/api/get_user?u=${usernameRequst}&k=${bot.config.osuAPI}`).catch(e => bot.logger.errro(e));
+    let player = await fetch(`https://osu.ppy.sh/api/get_user?u=${usernameRequst}&k=${bot.config.osuAPI}`).catch(e => bot.logger.error(e));
     player = await player.json();
     player = player[0];
 

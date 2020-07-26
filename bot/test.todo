@@ -11,5 +11,5 @@ TODO add song info command
 NEARCOMPLETE add osu pp stuff
 COMPLETE top play
 TODO add SR calculation + conditional if fc PP
-
-TODO god help me pls create pp calculator / try to use official one
+TODO Add radis caching for prefix
+COMPLETE create pp calculator / try to use official one
