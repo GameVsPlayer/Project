@@ -188,7 +188,7 @@ module.exports.run = async (bot, message, args) => {
                 sr = sr.substring(sr.indexOf(" ") + 7);
             }
             if(linux.test(sr)) {
-                sr = sr.split('│')[2];
+                sr = sr.split('│')[1];
                 sr = sr.substring(sr.indexOf(" ") + 6);
             }
             parseFloat(sr).toFixed(2);
