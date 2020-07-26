@@ -177,23 +177,25 @@ module.exports.run = async (bot, message, args) => {
     })
     let sr;
     await new Promise(async (resolve, reject) => {
-        let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet}`, (error, stdout) => {
-            if (error) return bot.logger.error(error)
+        let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet}`, function  (error, stdout) {
+if (error) return bot.logger.error(error)
             let stdoutL = stdout.split('\n');
             sr = stdoutL[5];
             let win = RegExp('�');
             let linux = RegExp('');
             if(win.test(sr)) {
                 sr = sr.split('�')[2];
-                sr = sr.substring(sr.indexOf(" ") + 7);
+                sr = sr.replace(/\ /g,"");
             }
-            if(linux.test(sr)) {
+            else if(linux.test(sr)) {
                 sr = sr.split('│')[1];
-                sr = sr.substring(sr.indexOf(" ") + 6);
+                console.log(sr);
+                sr = sr.replace(/\ /g,"");
+                console.log(sr);
             }
             parseFloat(sr).toFixed(2);
             resolve()
-        });
+});
 
     })
 
