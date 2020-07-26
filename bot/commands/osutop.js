@@ -189,9 +189,7 @@ if (error) return bot.logger.error(error)
             }
             else if(linux.test(sr)) {
                 sr = sr.split('│')[1];
-                console.log(sr);
                 sr = sr.replace(/\ /g,"");
-                console.log(sr);
             }
             parseFloat(sr).toFixed(2);
             resolve()
