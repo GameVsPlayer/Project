@@ -25,6 +25,8 @@ module.exports.run = async (bot, message, args) => {
             map = apiData[map].beatmap_id;
             if (!fs.existsSync(path.join(__dirname, `/../maps/${map}.osu`)))
                 await fetch(`https://osu.ppy.sh/osu/${map}`).then(res => res.text()).then(res => fs.writeFileSync(path.join(__dirname, `/../maps/${map}.osu`), res, 'utf8'));
+            if (!fs.existsSync(path.join(__dirname, `/../maps/${map}.osu`)))
+                await fetch(`https://osu.ppy.sh/osu/${map}`).then(res => res.text()).then(res => fs.writeFileSync(path.join(__dirname, `/../maps/${map}.osu`), res, 'utf8'));
         }
         setTimeout(() => {
             resolve()
@@ -170,6 +172,7 @@ module.exports.run = async (bot, message, args) => {
             mapPlay[14] = parseFloat(mapPlay[14]).toFixed(2);
             mapPlay[1] = parseFloat(mapPlay[1]).toFixed(2);
             mapPlay[11] = parseFloat(mapPlay[11]).toFixed(2);
+            mapPlay[12] = parseFloat(mapPlay[12]).toFixed(2);
 
             resolve()
         });
@@ -177,23 +180,22 @@ module.exports.run = async (bot, message, args) => {
     })
     let sr;
     await new Promise(async (resolve, reject) => {
-        let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet}`, function  (error, stdout) {
-if (error) return bot.logger.error(error)
+        let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet}`, function (error, stdout) {
+            if (error) return bot.logger.error(error)
             let stdoutL = stdout.split('\n');
             sr = stdoutL[5];
             let win = RegExp('�');
             let linux = RegExp('');
-            if(win.test(sr)) {
+            if (win.test(sr)) {
                 sr = sr.split('�')[2];
-                sr = sr.replace(/\ /g,"");
-            }
-            else if(linux.test(sr)) {
+                sr = sr.replace(/\ /g, "");
+            } else if (linux.test(sr)) {
                 sr = sr.split('│')[1];
-                sr = sr.replace(/\ /g,"");
+                sr = sr.replace(/\ /g, "");
             }
             parseFloat(sr).toFixed(2);
             resolve()
-});
+        });
 
     })
 
