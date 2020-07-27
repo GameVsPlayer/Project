@@ -413,7 +413,7 @@ module.exports.run = async (bot, message, prefix) => {
 
     if (commandfile) {
         commandfile.run(bot, message, args, ops).catch((err) => {
-            let DisErr = err.replace(/<a\b[^>]*>(.*?)<\/a>/i,"");
+            let DisErr = err.toString().replace(/<a\b[^>]*>(.*?)<\/a>/i,"");
             message.channel.send(`Error ${DisErr}`);
             bot.logger.info(`Command Error: ${commandfile.help.name} ${err}`);
         });
