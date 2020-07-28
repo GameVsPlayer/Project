@@ -281,7 +281,7 @@ module.exports = {
         },
         recent: async function (bot, user, gamemode, attempt) {
             if (!attempt) attempt = 0;
-            else attempt = attempt - 1;
+            else attempt = parseInt(attempt) - 1;
             if (gamemode === "osu") gamemode = 0;
             else if (gamemode === "taiko") gamemode = 1;
             else if (gamemode === "ctb") gamemode = 2;
@@ -292,6 +292,7 @@ module.exports = {
             let tryC = 0;
             let lastID = res[attempt].beatmap_id;
             for (i in res) {
+                i = parseInt(i) + parseInt(attempt);
                 if (!res[i + attempt]) continue
                 if (res[i + attempt].beatmap_id === lastID) tryC++;
                 else continue;

@@ -8,7 +8,7 @@ module.exports.run = async (bot, message, args) => {
     usernameRequst = args.join(" ");
     let Mod, cs, hp;
 
-    let APIData = await bot.extra.osu.recent(bot, usernameRequst, "osu", 0);
+    let APIData = await bot.extra.osu.recent(bot, usernameRequst, "osu", 1);
     if (APIData === "no plays") return message.channel.send(`${usernameRequst} does not have any recent plays`);
     await bot.extra.osu.dlMap({
         APIData
@@ -69,7 +69,7 @@ module.exports.run = async (bot, message, args) => {
             `Combo: ${mapPlay.combo}x/${mapPlay.maxCombo}x ${APIData.count300}/${APIData.count100}/${APIData.count50}/${APIData.countmiss}\n` +
             `Mapper: ${Map.creator}\n` +
             `BPM: ${bpm}${bpm == Map.bpm ? '' : '('+ Map.bpm + ')'} Divisor 1/${Map.divisor}\n` +
-            `Play set at ${APIData.date} ${APIData.replay_available === '0' ? 'No replay available' : `Replay available [here](https://osu.ppy.sh/scores/osu/${APIData.score_id}/download)`}\n` +
+            `Play set at ${APIData.date}\n` +
             `**AR** ${mapPlay.ar}${mapPlay.ar == Map.diff_approach ? '' : '('+ Map.diff_approach + ')'} **OD** ${mapPlay.od}${mapPlay.od == Map.diff_overall ? '' : '('+ Map.diff_overall + ')'} **CS** ${cs}${cs == Map.diff_size ? '' : '('+ Map.diff_size + ')'} **HP** ${hp}${hp == Map.diff_drain ? '' : '('+ Map.diff_drain + ')'}`)
         .setThumbnail(`https://s.ppy.sh/a/${player.user_id}`)
 
