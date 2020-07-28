@@ -42,6 +42,7 @@ module.exports.run = async (bot, message, args) => {
 
 
     let APIData = await bot.extra.osu.recent(bot, usernameRequst, gamemode, 1);
+
     if (APIData === "no plays") return message.channel.send(`${usernameRequst} does not have any recent plays in ${gamemode}`);
     await bot.extra.osu.dlMap({
         APIData
