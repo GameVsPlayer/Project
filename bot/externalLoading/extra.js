@@ -346,7 +346,7 @@ module.exports = {
             } catch {}
         },
         getDbUser: function (bot, message, callback) {
-            db = bot.db.prefixes;
+            db = bot.db.osuName;
             redis = bot.redis;
             redis.get(message.author.id + ".osuname", function (err, reply) {
                 if (err) return callback(err);
@@ -361,9 +361,13 @@ module.exports = {
                         else {
                             redis.set(message.author.id + ".osuname", JSON.stringify({
                                 userID: doc.userID,
-                                gameID: doc.gameID
+                                gameID: doc.gameID,
+                                gamemode: doc.gamemode
                             }), function () {
-                                return callback(doc.gameID);
+                                return callback({
+                                    gameID: doc.gameID,
+                                    gamemode: doc.gamemode
+                                });
                             })
                         };
 
@@ -371,32 +375,35 @@ module.exports = {
                 }
             });
         },
-        setUser: function (bot, message, gameID) {
+        setUser: async function (bot, message, gameID, gamemode) {
             db = bot.db.osuName;
             redis = bot.redis;
+            let user;
 
-            if (db.find({
-                    'userid': {
-                        "$in": message.author.id
-                    }
-                }).length > 0) {
-                db.findOneAndUpdate({
+            user = await db.findOne({
+                userID: message.author.id
+            })
+            if (user !== null) {
+                await db.findOneAndUpdate({
                     userID: message.author.id
                 }, {
                     "$set": {
-                        gameID: gameID
+                        gameID: gameID,
+                        gamemode: gamemode
                     }
                 });
             } else {
                 let data = {
                     userID: message.author.id,
-                    gameID: gameID
+                    gameID: gameID,
+                    gamemode: gamemode
                 }
-                db.insertOne(data);
+                await db.insertOne(data);
             }
             redis.set(message.author.id + ".osuname", JSON.stringify({
                 userID: message.author.id,
-                gameID: gameID
+                gameID: gameID,
+                gamemode: gamemode
             }), function () {
                 return;
             });

@@ -50,7 +50,10 @@ module.exports.run = async (bot, message, args) => {
         await new Promise(function (resolve, reject) {
             bot.extra.osu.getDbUser(bot, message, function (name) {
                 if (name === null) usernameRequest = '';
-                else usernameRequest = name.gameID;
+                else {
+                    usernameRequest = name.gameID;
+                    if (!gamemode) gamemode = name.gamemode
+                }
                 resolve();
             });
 

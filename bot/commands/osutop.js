@@ -38,6 +38,7 @@ module.exports.run = async (bot, message, args) => {
         else
             gamemode = "osu"
     }
+    if (!gamemode) gamemode = "osu";
     if (!isNaN(parseInt(args[0]))) {
         position = args[0];
     } else if (!isNaN(parseInt(args[1]))) {
@@ -49,7 +50,10 @@ module.exports.run = async (bot, message, args) => {
         await new Promise(function (resolve, reject) {
             bot.extra.osu.getDbUser(bot, message, function (name) {
                 if (name === null) usernameRequest = '';
-                else usernameRequest = name.gameID;
+                else {
+                    usernameRequest = name.gameID;
+                    if (!gamemode) gamemode = name.gamemode;
+                }
                 resolve();
             });
 
