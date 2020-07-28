@@ -59,7 +59,6 @@ if (!fs.existsSync(path.join(__dirname, `/temp/Calculator.zip`))) {
 
 
 mongoClient.connect(async (err) => {
-    let colNames = ["hugs", "pats", "kiss", "xp", "money", "todo", "prefix"];
     if (err) bot.logger.error(err);
 
     bot.logger.info(`Connected to database`);
@@ -67,25 +66,6 @@ mongoClient.connect(async (err) => {
     let availableCollections = [];
     bot.db = mongoClient.db("datastorage");
 
-    function dbList() {
-        return new Promise(function (resolve, reject) {
-            bot.db.listCollections().toArray(function (err, collInfos) {
-                if (err) reject(err);
-                collInfos.forEach(collection => {
-                    availableCollections.push(collection.name)
-                })
-                resolve(availableCollections)
-            });
-        })
-    }
-    availableCollections = await dbList();
-    if (!availableCollections) availableCollections = [];
-    colNames.forEach(colName => {
-        if (!availableCollections.includes(colName)) {
-            bot.db.createCollection(colName);
-            bot.logger.info(`Created the missing collection ${colName}`);
-        }
-    })
     bot.db.hugsDB = await bot.db.collection("hugs");
     bot.db.patsDB = await bot.db.collection("pats");
     bot.db.kissDB = await bot.db.collection("kiss");
@@ -93,6 +73,7 @@ mongoClient.connect(async (err) => {
     bot.db.moneyDB = await bot.db.collection("money");
     bot.db.todoDB = await bot.db.collection("todo");
     bot.db.prefixes = await bot.db.collection("prefix");
+    bot.db.osuName = await bot.db.collection("osuName");
     dbLoad = true;
 });
 
@@ -126,10 +107,10 @@ bot.redis.on('connect', () => {
 })
 
 /*bot.on("shardReconnecting", , id => console.log(`Shard with ID ${id} reconnected.`));*/
-bot.redis.on("error", function(error) {
+bot.redis.on("error", function (error) {
     bot.logger.error(error);
-  });
-  
+});
+
 setInterval(() => {
     let duration = moment.duration(bot.uptime)
     bot.duration = {
@@ -340,15 +321,14 @@ bot.on("message", async message => {
     if (message.channel.type === "dm") return
     if (bot.config.Testing) {
         if (message.author.id !== bot.config.ownerID) return;
-    }
-    else {
-        await new Promise(function(resolve,reject) {
-        bot.extra.getPrefix(bot, message.guild, function(prefixCB) {
-        prefix.prefix = prefixCB;
-        resolve();
-    });
-    })
-        
+    } else {
+        await new Promise(function (resolve, reject) {
+            bot.extra.getPrefix(bot, message.guild, function (prefixCB) {
+                prefix = prefixCB;
+                resolve();
+            });
+        })
+
     }
 
     if (!message.content.startsWith(prefix)) return;

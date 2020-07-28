@@ -47,10 +47,10 @@ module.exports = {
     getPrefix: function (bot, guild, callback) {
         db = bot.db.prefixes;
         redis = bot.redis;
-        redis.hgetall(guild.id + ".prefix", function (err, reply) {
+        redis.get(guild.id + ".prefix", function (err, reply) {
             if (err) callback(err);
             else if (reply) {
-                callback(JSON.parse(reply));
+                callback(reply);
             } else {
                 db.findOne({
                     guildID: guild.id
@@ -344,6 +344,62 @@ module.exports = {
                 play.try = tryC;
                 return play;
             } catch {}
+        },
+        getDbUser: function (bot, message, callback) {
+            db = bot.db.prefixes;
+            redis = bot.redis;
+            redis.get(message.author.id + ".osuname", function (err, reply) {
+                if (err) return callback(err);
+                else if (reply) {
+                    callback(JSON.parse(reply));
+                } else {
+                    db.findOne({
+                        userID: message.author.id
+                    }, function (err, doc) {
+                        if (err) callback(err);
+                        else if (!doc) return callback(null);
+                        else {
+                            redis.set(message.author.id + ".osuname", JSON.stringify({
+                                userID: doc.userID,
+                                gameID: doc.gameID
+                            }), function () {
+                                return callback(doc.gameID);
+                            })
+                        };
+
+                    });
+                }
+            });
+        },
+        setUser: function (bot, message, gameID) {
+            db = bot.db.osuName;
+            redis = bot.redis;
+
+            if (db.find({
+                    'userid': {
+                        "$in": message.author.id
+                    }
+                }).length > 0) {
+                db.findOneAndUpdate({
+                    userID: message.author.id
+                }, {
+                    "$set": {
+                        gameID: gameID
+                    }
+                });
+            } else {
+                let data = {
+                    userID: message.author.id,
+                    gameID: gameID
+                }
+                db.insertOne(data);
+            }
+            redis.set(message.author.id + ".osuname", JSON.stringify({
+                userID: message.author.id,
+                gameID: gameID
+            }), function () {
+                return;
+            });
         }
     }
 }

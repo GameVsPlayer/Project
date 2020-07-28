@@ -4,31 +4,29 @@ const path = require("path");
 module.exports.run = async (bot, message, args) => {
     if (bot.config.osuAPI == "") return bot.logger.info("osu API Key not set")
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
-    if (!args[0]) return message.channel.send("No user specified").catch();
-    usernameRequst = [];
-    let Mod, cs, hp, position;
 
-    let gamemode;
+    usernameRequest = [];
+    let Mod, cs, hp, position, gamemode, prefix;
 
     let start = false;
     for (i in args) {
         if (args[i].startsWith('"') || args[i].startsWith("'")) {
             start = true
-            usernameRequst.push(args[i]);
+            usernameRequest.push(args[i]);
             start = false;
         } else if ((args[i].endsWith('"') || args[i].endsWith("'")) && start === false) {
-            usernameRequst.push(args[i])
+            usernameRequest.push(args[i])
             break;
         } else {
-            usernameRequst.push(args[i]);
+            usernameRequest.push(args[i]);
             break;
         }
     }
 
-    let argsShift = usernameRequst.length;
-    usernameRequst = usernameRequst.join(" ");
-    usernameRequst = usernameRequst.replace(/'/g, '')
-    usernameRequst = usernameRequst.replace(/"/g, "")
+    let argsShift = usernameRequest.length;
+    usernameRequest = usernameRequest.join(" ");
+    usernameRequest = usernameRequest.replace(/'/g, '')
+    usernameRequest = usernameRequest.replace(/"/g, "")
     if (args[argsShift]) args = args.slice(argsShift);
     for (i in args) {
         if (args[i].includes("-t"))
@@ -46,13 +44,32 @@ module.exports.run = async (bot, message, args) => {
         position = args[1];
     } else position = 1;
 
-    console.log(position);
-    let APIData = await bot.extra.osu.userBest(bot, usernameRequst, gamemode);
+
+    if (usernameRequest.length < 3) {
+        await new Promise(function (resolve, reject) {
+            bot.extra.osu.getDbUser(bot, message, function (name) {
+                if (name === null) usernameRequest = '';
+                else usernameRequest = name.gameID;
+                resolve();
+            });
+
+        })
+    }
+    await new Promise(function (resolve, reject) {
+        bot.extra.getPrefix(bot, message.guild, function (prefixCB) {
+            prefix = prefixCB;
+            resolve();
+        });
+
+    })
+
+    if (usernameRequest.length < 3) return message.channel.send(`You must first set a user with ${prefix}os "username"`);
+
+    let APIData = await bot.extra.osu.userBest(bot, usernameRequest, gamemode);
     await bot.extra.osu.dlMap(APIData);
 
+    if (APIData.length < 1) return message.channel.send("No user or scores found");
     APIData = APIData[parseInt(position) - 1];
-
-
 
     let bm = path.join(__dirname, `/../maps/${APIData.beatmap_id}.osu`);
 
@@ -61,7 +78,7 @@ module.exports.run = async (bot, message, args) => {
     let Mods = bot.extra.osu.enum2Mods(APIData.enabled_mods);
     Mod = Mods[0].join(", ");
 
-    let player = await bot.extra.osu.player(bot, usernameRequst, gamemode);
+    let player = await bot.extra.osu.player(bot, usernameRequest, gamemode);
 
     let modStat = await bot.extra.osu.calcCSHP(Mod, Map)
     cs = modStat[0];

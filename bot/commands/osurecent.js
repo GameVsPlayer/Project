@@ -46,12 +46,31 @@ module.exports.run = async (bot, message, args) => {
     } else position = 1;
 
 
+    if (usernameRequest.length < 3) {
+        await new Promise(function (resolve, reject) {
+            bot.extra.osu.getDbUser(bot, message, function (name) {
+                if (name === null) usernameRequest = '';
+                else usernameRequest = name.gameID;
+                resolve();
+            });
+
+        })
+    }
+    await new Promise(function (resolve, reject) {
+        bot.extra.getPrefix(bot, message.guild, function (prefixCB) {
+            prefix = prefixCB;
+            resolve();
+        });
+
+    })
+
+    if (usernameRequest.length < 3) return message.channel.send(`You must first set a user with ${prefix}os "username"`);
+
+
     let APIData = await bot.extra.osu.recent(bot, usernameRequst, gamemode, position);
 
     if (APIData === "no plays") return message.channel.send(`${usernameRequst} does not have any recent plays in ${gamemode}`);
-    await bot.extra.osu.dlMap({
-        APIData
-    });
+    await bot.extra.osu.dlMap(APIData);
 
     let bm = path.join(__dirname, `/../maps/${APIData.beatmap_id}.osu`);
 
