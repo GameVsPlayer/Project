@@ -9,9 +9,9 @@ module.exports.run = async (bot, message, args) => {
     let Mod, cs, hp;
 
     let apiData = await bot.extra.osu.userBest(bot,usernameRequst, "osu");
-    await bot.extra.osu.dlMap(apiData,"osu");
+    await bot.extra.osu.dlMap(apiData);
 
-    let bm = path.join(__dirname, `/../maps/osu/${apiData[0].beatmap_id}.osu`);
+    let bm = path.join(__dirname, `/../maps/${apiData[0].beatmap_id}.osu`);
 
     let Map = await bot.extra.osu.mapInfo(bm);
 
