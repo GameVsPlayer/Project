@@ -336,8 +336,8 @@ module.exports = {
                 let lastID = res[attempt].beatmap_id;
                 for (i in res) {
                     i = parseInt(i) + parseInt(attempt);
-                    if (!res[i + attempt]) break
-                    if (res[i + attempt].beatmap_id === lastID) tryC++;
+                    if (!res[i]) break
+                    if (res[i].beatmap_id === lastID) tryC++;
                     else continue;
                 }
                 let play = res[attempt];

@@ -6,7 +6,7 @@ module.exports.run = async (bot, message, args) => {
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
     if (!args[0]) return message.channel.send("No user specified").catch();
     usernameRequst = [];
-    let Mod, cs, hp;
+    let Mod, cs, hp, attempt;
     let gamemode;
 
     let start = false;
@@ -39,9 +39,14 @@ module.exports.run = async (bot, message, args) => {
         else
             gamemode = "osu"
     }
+    if (!isNaN(parseInt(args[0]))) {
+        position = args[0];
+    } else if (!isNaN(parseInt(args[1]))) {
+        position = args[1];
+    } else position = 1;
 
 
-    let APIData = await bot.extra.osu.recent(bot, usernameRequst, gamemode, 1);
+    let APIData = await bot.extra.osu.recent(bot, usernameRequst, gamemode, position);
 
     if (APIData === "no plays") return message.channel.send(`${usernameRequst} does not have any recent plays in ${gamemode}`);
     await bot.extra.osu.dlMap({
