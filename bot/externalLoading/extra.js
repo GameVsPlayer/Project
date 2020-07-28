@@ -94,64 +94,95 @@ module.exports = {
         calcPP: async function (bot, bm, playStats, mods, gamemode) {
             let PP = {}
             await new Promise(async (resolve, reject) => {
-                let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${mods}-c ${playStats.combo}`, (error, stdout) => {
+                let cmd;
+
+                if (gamemode === "osu") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${mods}-c ${playStats.combo}`;
+                else if (gamemode === "mania") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} ${mods}-s ${playStats.score}`;
+                else if (gamemode === "catch") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -D ${playStats.count300} -T ${parseInt(playStats.count100) + parseInt(playStats.count50)} ${mods}-c ${playStats.combo}`;
+                else if (gamemode === "taiko") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count300} ${mods}-c ${playStats.combo}`
+                console.log(cmd);
+                let child = exec(cmd, (error, stdout) => {
                     if (error) return bot.logger.error(error)
                     let stdoutL = stdout.split('\n');
-
                     for (info in stdoutL) {
                         stdoutL[info] = stdoutL[info].substring(stdoutL[info].indexOf(":") + 2);
                         stdoutL[info] = stdoutL[info].replace(/(\r\n|\n|\r)/gm, "");
                     }
-
-                    PP.combo = stdoutL[2].split(" ")[0];
-                    PP.accuracy = parseFloat(stdoutL[1]).toFixed(2);
-                    PP.pp = parseFloat(stdoutL[14]).toFixed(2);
-                    PP.ar = parseFloat(stdoutL[12]).toFixed(2);
-                    PP.od = parseFloat(stdoutL[11]).toFixed(2);
-                    PP.maxCombo = stdoutL[13];
-
+                    if (gamemode === "osu") {
+                        PP.combo = stdoutL[2].split(" ")[0];
+                        PP.accuracy = parseFloat(stdoutL[1]).toFixed(2);
+                        PP.pp = parseFloat(stdoutL[14]).toFixed(2);
+                        PP.ar = parseFloat(stdoutL[12]).toFixed(2);
+                        PP.od = parseFloat(stdoutL[11]).toFixed(2);
+                        PP.maxCombo = stdoutL[13];
+                    } else if (gamemode === "mania") {
+                        {
+                            PP.pp = parseFloat(stdoutL[5]).toFixed(2);
+                        }
+                    } else if (gamemode === "catch") {
+                        {
+                            PP.pp = parseFloat(stdoutL[9]).toFixed(2);
+                            PP.ar = parseFloat(stdoutL[1]).toFixed(2);
+                            PP.combo = stdoutL[2];
+                        }
+                    } else if (gamemode === "taiko") {
+                        {
+                            PP.accuracy = parseFloat(stdoutL[1]).toFixed(2);
+                            PP.pp = parseFloat(stdoutL[9]).toFixed(2);
+                            PP.combo = stdoutL[2];
+                        }
+                    }
                     resolve(PP)
                 });
 
             })
             return PP;
         },
-        calcMap: async function (bot, bm, dotnet) {
-            let sr;
+        calcMap: async function (bot, bm, dotnet, gamemode) {
+            let sr, maxcombo, ar;
+            if (gamemode === "osu") gamemode = 0;
+            else if (gamemode === "taiko") gamemode = 1;
+            else if (gamemode === "catch") gamemode = 2;
+            else if (gamemode === "mania") gamemode = 3;
             await new Promise(async (resolve, reject) => {
-                let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet}`, function (error, stdout) {
+                let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet} -r=${gamemode}`, function (error, stdout) {
                     if (error) return bot.logger.error(error)
                     let stdoutL = stdout.split('\n');
                     sr = stdoutL[5];
                     let win = RegExp('�');
                     let linux = RegExp('');
                     if (win.test(sr)) {
+                        maxcombo = sr.split('│')[3]
+                        ar = sr.split('│')[4]
                         sr = sr.split('�')[2];
                         sr = sr.replace(/\ /g, "");
                     } else if (linux.test(sr)) {
+                        ar = sr.split('│')[4]
+                        maxcombo = sr.split('│')[3]
                         sr = sr.split('│')[1];
                         sr = sr.replace(/\ /g, "");
                     }
                     parseFloat(sr).toFixed(2);
-                    resolve(sr)
+                    resolve(sr, maxcombo, ar)
                 });
 
             })
-            return sr;
+            return [sr, maxcombo, ar];
 
         },
         userBest: async function (bot, player, gamemode) {
             if (gamemode === "osu") gamemode = 0;
             else if (gamemode === "taiko") gamemode = 1;
-            else if (gamemode === "ctb") gamemode = 2;
+            else if (gamemode === "catch") gamemode = 2;
             else if (gamemode === "mania") gamemode = 3;
             let res = await fetch(`https://osu.ppy.sh/api/get_user_best?u=${player}&k=${bot.config.osuAPI}&m=${gamemode}`).catch(e => bot.logger.error(e));
-            return await res.json();
+            res = await res.json();
+            return res;
         },
         player: async function (bot, player, gamemode) {
             if (gamemode === "osu") gamemode = 0;
             else if (gamemode === "taiko") gamemode = 1;
-            else if (gamemode === "ctb") gamemode = 2;
+            else if (gamemode === "catch") gamemode = 2;
             else if (gamemode === "mania") gamemode = 3;
             player = await fetch(`https://osu.ppy.sh/api/get_user?u=${player}&k=${bot.config.osuAPI}&m=${gamemode}`).catch(e => bot.logger.error(e));
             player = await player.json();
@@ -284,7 +315,7 @@ module.exports = {
             else attempt = parseInt(attempt) - 1;
             if (gamemode === "osu") gamemode = 0;
             else if (gamemode === "taiko") gamemode = 1;
-            else if (gamemode === "ctb") gamemode = 2;
+            else if (gamemode === "catch") gamemode = 2;
             else if (gamemode === "mania") gamemode = 3;
             let res = await fetch(`https://osu.ppy.sh/api/get_user_recent?u=${user}&k=${bot.config.osuAPI}&m=${gamemode}`).catch(e => bot.logger.error(e));
             res = await res.json();
@@ -293,7 +324,7 @@ module.exports = {
             let lastID = res[attempt].beatmap_id;
             for (i in res) {
                 i = parseInt(i) + parseInt(attempt);
-                if (!res[i + attempt]) continue
+                if (!res[i + attempt]) break
                 if (res[i + attempt].beatmap_id === lastID) tryC++;
                 else continue;
             }

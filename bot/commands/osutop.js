@@ -5,26 +5,63 @@ module.exports.run = async (bot, message, args) => {
     if (bot.config.osuAPI == "") return bot.logger.info("osu API Key not set")
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
     if (!args[0]) return message.channel.send("No user specified").catch();
-    usernameRequst = args.join(" ");
+    usernameRequst = [];
     let Mod, cs, hp;
 
-    let apiData = await bot.extra.osu.userBest(bot,usernameRequst, "osu");
-    await bot.extra.osu.dlMap(apiData);
+    let gamemode;
 
-    let bm = path.join(__dirname, `/../maps/${apiData[0].beatmap_id}.osu`);
+    let start = false;
+    for (i in args) {
+        if (args[i].startsWith('"') || args[i].startsWith("'")) {
+            start = true
+            usernameRequst.push(args[i]);
+            start = false;
+        } else if ((args[i].endsWith('"') || args[i].endsWith("'")) && start === false) {
+            usernameRequst.push(args[i])
+            break;
+        } else {
+            usernameRequst.push(args[i]);
+            break;
+        }
+    }
+
+    let argsShift = usernameRequst.length;
+    usernameRequst = usernameRequst.join(" ");
+    usernameRequst = usernameRequst.replace(/'/g, '')
+    usernameRequst = usernameRequst.replace(/"/g, "")
+    if (args[argsShift]) args = args.slice(argsShift);
+    for (i in args) {
+        if (args[i].includes("-t"))
+            gamemode = "taiko"
+        else if (args[i].includes("-m"))
+            gamemode = "mania"
+        else if (args[i].includes("-c"))
+            gamemode = "catch"
+        else
+            gamemode = "osu"
+    }
+
+    let APIData = await bot.extra.osu.userBest(bot, usernameRequst, gamemode);
+    APIData = APIData[0];
+
+    await bot.extra.osu.dlMap({
+        APIData
+    });
+
+    let bm = path.join(__dirname, `/../maps/${APIData.beatmap_id}.osu`);
 
     let Map = await bot.extra.osu.mapInfo(bm);
 
-    let Mods = bot.extra.osu.enum2Mods(apiData[0].enabled_mods);
+    let Mods = bot.extra.osu.enum2Mods(APIData.enabled_mods);
     Mod = Mods[0].join(", ");
 
-    let player = await bot.extra.osu.player(bot,usernameRequst,"osu");
+    let player = await bot.extra.osu.player(bot, usernameRequst, gamemode);
 
-    let modStat = await bot.extra.osu.calcCSHP(Mod,Map)
+    let modStat = await bot.extra.osu.calcCSHP(Mod, Map)
     cs = modStat[0];
     hp = modStat[1];
 
-    let bpm = await bot.extra.osu.calcBPM(Mod,Map.bpm);
+    let bpm = await bot.extra.osu.calcBPM(Mod, Map.bpm);
 
     let dotnet = '';
     for (mod in Mods[0]) {
@@ -39,26 +76,46 @@ module.exports.run = async (bot, message, args) => {
     }
     let playStats = {
         mods: replaceAll(Mod),
-        combo: apiData[0].maxcombo,
-        misses: apiData[0].countmiss,
-        count100: apiData[0].count100,
-        count300: apiData[0].count300,
-        count50: apiData[0].count50
+        combo: APIData.maxcombo,
+        misses: APIData.countmiss,
+        count100: APIData.count100,
+        count300: APIData.count300,
+        count50: APIData.count50,
+        score: APIData.score
     }
-    let mapPlay = await bot.extra.osu.calcPP(bot,bm,playStats,dotnet, "osu");
-    
-    let sr = await bot.extra.osu.calcMap(bot,bm,dotnet);
+    let mapPlay = await bot.extra.osu.calcPP(bot, bm, playStats, dotnet, gamemode);
+
+    let sr = await bot.extra.osu.calcMap(bot, bm, dotnet, gamemode);
+    if (gamemode === "catch") {
+        mapPlay.maxCombo = sr[1];
+        mapPlay.ar = sr[2];
+    } else if (gamemode === "taiko") {
+        mapPlay.maxcombo = sr[2]
+    }
+    sr = sr[0];
+    let mapPlayFC = {};
+    if (APIData.perfect !== '1') {
+        await new Promise(async function (resolve, reject) {
+            playStats.misses = 0;
+            playStats.combo = mapPlay.maxCombo;
+            if (gamemode === "mania") playStats.score = 1000000;
+            mapPlayFC = await bot.extra.osu.calcPP(bot, bm, playStats, dotnet, gamemode);
+            resolve();
+        })
+    } else {
+        mapPlay.maxCombo = mapPlay.combo;
+    }
 
     osuEmbed = new Discord.MessageEmbed()
-        .setAuthor(`${player.username}'s Top Play`, `https://b.ppy.sh/thumb/${Map.beatmapset_id}.jpg`)
+        .setAuthor(`${player.username}'s Top Play in ${gamemode}`, `https://b.ppy.sh/thumb/${Map.beatmapset_id}.jpg`)
         .setDescription(`${Map.title} [${Map.version}](https://osu.ppy.sh/b/${Map.beatmap_id}) + ${Mod} [${parseFloat(sr).toFixed(2)}★] \n` +
-            `${apiData[0].rank} Rank ${mapPlay.accuracy}% ${mapPlay.pp}PP\n` +
-            `Score: ${apiData[0].score}\n` +
-            `Combo: ${mapPlay.combo}x/${mapPlay.maxCombo}x ${apiData[0].count300}/${apiData[0].count100}/${apiData[0].count50}/${apiData[0].countmiss}\n` +
+            `${APIData.rank} Rank ${mapPlay.accuracy ==! undefined ? mapPlay.accuracy + "%": ""} ${mapPlay.pp}${mapPlayFC !== undefined & !isNaN(mapPlayFC.pp)? "(" + mapPlayFC.pp +")": ""}PP\n` +
+            `Score: ${APIData.score}\n` +
+            `Combo: ${APIData.maxcombo}${mapPlay.maxCombo !== undefined ? "x/"+ mapPlay.maxCombo +"x": "x"} ${APIData.count300}/${APIData.count100}/${APIData.count50}/${APIData.countmiss}\n` +
             `Mapper: ${Map.creator}\n` +
             `BPM: ${bpm}${bpm == Map.bpm ? '' : '('+ Map.bpm + ')'} Divisor 1/${Map.divisor}\n` +
-            `Play set at ${apiData[0].date} ${apiData[0].replay_available === '0' ? 'No replay available' : `Replay available [here](https://osu.ppy.sh/scores/osu/${apiData[0].score_id}/download)`}\n` +
-            `**AR** ${mapPlay.ar}${mapPlay.ar == Map.diff_approach ? '' : '('+ Map.diff_approach + ')'} **OD** ${mapPlay.od}${mapPlay.od == Map.diff_overall ? '' : '('+ Map.diff_overall + ')'} **CS** ${cs}${cs == Map.diff_size ? '' : '('+ Map.diff_size + ')'} **HP** ${hp}${hp == Map.diff_drain ? '' : '('+ Map.diff_drain + ')'}`)
+            `Play set at ${APIData.date} ${APIData.replay_available === '0' ? 'No replay available' : `Replay available [here](https://osu.ppy.sh/scores/osu/${APIData.score_id}/download)`}\n` +
+            `**AR** ${mapPlay.ar || Map.diff_approach}${mapPlay.ar == Map.diff_approach | mapPlay.ar === undefined ? '' : '('+ Map.diff_approach + ')'} **OD** ${mapPlay.od || Map.diff_overall}${mapPlay.od == Map.diff_overall | mapPlay.od === undefined ? '' : '('+ Map.diff_overall + ')'} **CS** ${cs || Map.diff_size}${cs == Map.diff_size | mapPlay.cs === undefined ? '' : '('+ Map.diff_size + ')'} **HP** ${hp || Map.diff_drain}${hp == Map.diff_drain | mapPlay.hp === undefined ? '' : '('+ Map.diff_drain + ')'}`)
         .setThumbnail(`https://s.ppy.sh/a/${player.user_id}`)
 
     message.channel.send(osuEmbed).catch();
