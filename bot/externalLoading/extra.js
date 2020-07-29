@@ -282,9 +282,9 @@ module.exports = {
         },
         calcBPM: function (Mod, MapBPM) {
             if (Mod.includes("DT") || Mod.includes("NC")) {
-                bpm = MapBPM * 1.5;
+                bpm = parseFloat(MapBPM) * 1.5;
             } else if (Mod.includes("HT")) {
-                bpm = MapBPM / 1.5;
+                bpm = parseFloat(MapBPM) / 1.5;
             } else {
                 bpm = MapBPM;
             }
@@ -340,7 +340,7 @@ module.exports = {
                     if (res[i].beatmap_id === lastID) tryC++;
                     else continue;
                 }
-                let play = res[attempt];
+                let play = res;
                 play.try = tryC;
                 return play;
             } catch {}

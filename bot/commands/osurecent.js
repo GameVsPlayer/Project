@@ -5,29 +5,29 @@ module.exports.run = async (bot, message, args) => {
     if (bot.config.osuAPI == "") return bot.logger.info("osu API Key not set")
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
     if (!args[0]) return message.channel.send("No user specified").catch();
-    usernameRequst = [];
-    let Mod, cs, hp, attempt;
+    let usernameRequest = [];
+    let Mod, cs, hp, position;
     let gamemode;
 
     let start = false;
     for (i in args) {
         if (args[i].startsWith('"') || args[i].startsWith("'")) {
             start = true
-            usernameRequst.push(args[i]);
+            usernameRequest.push(args[i]);
             start = false;
         } else if ((args[i].endsWith('"') || args[i].endsWith("'")) && start === false) {
-            usernameRequst.push(args[i])
+            usernameRequest.push(args[i])
             break;
         } else {
-            usernameRequst.push(args[i]);
+            usernameRequest.push(args[i]);
             break;
         }
     }
 
-    let argsShift = usernameRequst.length;
-    usernameRequst = usernameRequst.join(" ");
-    usernameRequst = usernameRequst.replace(/'/g, '')
-    usernameRequst = usernameRequst.replace(/"/g, "")
+    let argsShift = usernameRequest.length;
+    usernameRequest = usernameRequest.join(" ");
+    usernameRequest = usernameRequest.replace(/'/g, '')
+    usernameRequest = usernameRequest.replace(/"/g, "")
     if (args[argsShift]) args = args.slice(argsShift);
     for (i in args) {
         if (args[i].includes("-t"))
@@ -68,13 +68,14 @@ module.exports.run = async (bot, message, args) => {
     })
 
     if (usernameRequest.length < 3) return message.channel.send(`You must first set a user with ${prefix}os "username"`);
+    let APIData = await bot.extra.osu.recent(bot, usernameRequest, gamemode, position);
+    if (APIData === "no plays") return message.channel.send(`${usernameRequest} does not have any recent plays in ${gamemode}`);
+    await bot.extra.osu.dlMap({
+        APIData
+    });
 
 
-    let APIData = await bot.extra.osu.recent(bot, usernameRequst, gamemode, position);
-
-    if (APIData === "no plays") return message.channel.send(`${usernameRequst} does not have any recent plays in ${gamemode}`);
-    await bot.extra.osu.dlMap(APIData);
-
+    APIData = APIData[parseInt(position) - 1];
     let bm = path.join(__dirname, `/../maps/${APIData.beatmap_id}.osu`);
 
     let Map = await bot.extra.osu.mapInfo(bm);
@@ -82,7 +83,7 @@ module.exports.run = async (bot, message, args) => {
     let Mods = bot.extra.osu.enum2Mods(APIData.enabled_mods);
     Mod = Mods[0].join(", ");
 
-    let player = await bot.extra.osu.player(bot, usernameRequst, gamemode);
+    let player = await bot.extra.osu.player(bot, usernameRequest, gamemode);
 
     let modStat = await bot.extra.osu.calcCSHP(Mod, Map)
     cs = modStat[0];
