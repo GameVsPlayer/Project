@@ -34,7 +34,7 @@
     "libsodium-wrappers": "^0.7.6",
     "mathjs": "^7.1.0",
     "megajs": "^0.17.2",
-    "mocha": "^8.0.1",
+    "mocha": "^8.1.0",
     "moment-timezone": "^0.5.31",
     "mongodb": "^3.5.9",
     "node-fetch": "^2.6.0",
