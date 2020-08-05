@@ -1,7 +1,5 @@
 <template>
-  <div class="commands">
     <Table v-bind:vari="vari" v-bind:titles="titles"></Table>
-  </div>
 </template>
 
 <script>

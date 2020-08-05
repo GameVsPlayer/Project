@@ -1,11 +1,7 @@
 <template>
-<body>
-  <div id="app">
     <router-view />
-    <Navbar error="this.$store.state.error"></Navbar>
-  </div>
+    <Navbar ></Navbar>
   <particles></particles>
-</body>
 </template>
 
 <style lang="scss">
