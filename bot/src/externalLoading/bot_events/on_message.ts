@@ -3,8 +3,7 @@ import YTDL from "ytdl-core-discord";
 import path from "path";
 import jimp from "jimp";
 import fs from "fs";
-import Discord, { Message, VoiceConnection, MessageEmbed, Role, MessageCollector, TextChannel, Channel, GuildChannel } from "discord.js";
-import { contentSecurityPolicy } from "helmet";
+import Discord, { Message, VoiceConnection, MessageEmbed, Role, TextChannel, GuildChannel } from "discord.js";
 import moment from "moment-timezone";
 
 let servers: any = {};

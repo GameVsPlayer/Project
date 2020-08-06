@@ -109,13 +109,15 @@ module.exports = {
                     else if (gamemode === "catch") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -D ${playStats.count300} -T ${parseInt(playStats.count100) + parseInt(playStats.count50)} ${mods}-c ${playStats.combo}`;
                     else if (gamemode === "taiko") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count300} ${mods}-c ${playStats.combo}`
                     else cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${mods}-c ${playStats.combo}`;
+
                     let child = exec(cmd, (error, stdout) => {
-                        if (error) return bot.logger.error(error)
+                        if (error && bot !== null) return bot.logger.error(error)
                         let stdoutL = stdout.split('\n');
                         for (let info in stdoutL) {
                             stdoutL[info] = stdoutL[info].substring(stdoutL[info].indexOf(":") + 2);
                             stdoutL[info] = stdoutL[info].replace(/(\r\n|\n|\r)/gm, "");
                         }
+
                         if (gamemode === "osu") {
                             PP = {
                                 combo: stdoutL[2].split(" ")[0],
@@ -153,8 +155,10 @@ module.exports = {
 
                 })
                 return PP;
-            } catch { }
+            } catch {
+                (e: string) => { throw new Error(e) }
 
+            }
         },
         calcMap: async function (bot: any, bm: string, dotnet: string, gamemode: any) {
             try {
@@ -166,7 +170,7 @@ module.exports = {
                 else gamemode = 0;
                 await new Promise(async (resolve, reject) => {
                     let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet} -r=${gamemode}`, function (error, stdout) {
-                        if (error) return bot.logger.error(error)
+                        if (error && bot !== null) return bot.logger.error(error)
                         let stdoutL = stdout.split('\n');
                         sr = stdoutL[5];
                         let win = RegExp('�');

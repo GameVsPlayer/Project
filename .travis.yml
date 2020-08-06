@@ -23,6 +23,8 @@ install:
   - cd ..
   - cd frontend
   - npm i 
+  - cd ..
+  - sudo npm install -g typescript
   
 script: 
   - cd bot

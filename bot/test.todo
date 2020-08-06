@@ -15,3 +15,4 @@ COMPLETE Add radis caching for prefix
 COMPLETE create pp calculator / try to use official one
 COMPLETE added somewhat working calculation for different gamemodes
 TODO fix ar and od being off even when there is no mod changing them
+TODO complete tests

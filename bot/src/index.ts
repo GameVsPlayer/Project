@@ -2,9 +2,8 @@ import * as path from 'path';
 require('dotenv').config({
     path: path.join(__dirname, '/.env')
 });
-import AdmZip from 'adm-zip';
+
 import * as logger from './logger';
-import request = require("request");
 const botconfig = process.env;
 import Discord = require("discord.js");
 import moment from "moment-timezone";
@@ -20,43 +19,6 @@ const mongoClient = new MongoClient(uri, {
 import * as redis from 'redis';
 
 let dbLoad: Boolean = false;
-if (!fs.existsSync(path.join(__dirname, `/temp/`))) {
-    fs.mkdirSync(path.join(__dirname, `/temp/`));
-}
-if (!fs.existsSync(path.join(__dirname, `/temp/Calculator.zip`))) {
-    console.log("Download for PP Calculator Started!");
-    let file = fs.createWriteStream(path.join(__dirname, `/temp/Calculator.zip`));
-    const start: Number = new Date().getTime();
-    new Promise((resolve, reject) => {
-        let stream = request({
-            uri: "https://www.dropbox.com/s/9is9es6szcxvcm0/Calculator.zip?dl=1"
-        }).pipe(file)
-            .on('finish', () => {
-                console.log(`Downloaded PP Calculator in ${(new Date().getTime() - Number(start)) / 1000} Seconds`);
-                file.emit('close');
-                if (!fs.existsSync(path.join(__dirname, `/PP`))) {
-                    fs.mkdirSync(path.join(__dirname, `/PP/`));
-                }
-                if (!fs.existsSync(path.join(__dirname, `/PP/PerformanceCalculator.dll`))) {
-                    console.log("Extraction Start!");
-                    new Promise((resolve, reject) => {
-                        const start2 = new Date();
-                        let zip = new AdmZip(path.join(__dirname, `/temp/Calculator.zip`));
-                        zip.extractAllTo(path.join(__dirname, `/PP`));
-                        resolve();
-                        console.log(`Extraction complete in ${(new Date().getTime() - Number(start2)) / 1000} Seconds!`);
-                    })
-                };
-                resolve();
-            })
-            .on('error', (error: Error) => {
-                reject(error)
-            })
-    });
-
-};
-
-
 
 mongoClient.connect(async (err: Error) => {
     if (err) bot.logger.error(err);
@@ -170,9 +132,7 @@ bot.on("ready", async () => {
         //97947067
         //
         try {
-            let fet: any = await fetch('https://decapi.me/twitch/uptime/gamevsplayer', {
-                timeout: 5000
-            })
+            let fet: any = await fetch('https://decapi.me/twitch/uptime/gamevsplayer')
             if (!fet) {
                 notification = false;
                 return activityLoop();
@@ -193,8 +153,7 @@ bot.on("ready", async () => {
             headers: {
                 "Client-ID": bot.config.TwitchID,
                 "Authorization": `Bearer ${bot.config.TwitchAuth}`
-            },
-            timeout: 5000
+            }
 
         }).catch((err: Error) => bot.logger.error(err));
         twitchStatus = await twitchStatus.json();
@@ -211,8 +170,7 @@ bot.on("ready", async () => {
                     headers: {
                         "Client-ID": bot.config.TwitchID,
                         "Authorization": `Bearer ${bot.config.TwitchAuth}`
-                    },
-                    timeout: 5000
+                    }
                 });
                 twitchGame = await twitchGame.json();
                 bot.user.setActivity(`${twitchGame.data[0].name} on Twitch!`, {
