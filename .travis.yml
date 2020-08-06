@@ -2,32 +2,32 @@ addons:
   apt:
     packages:
       - update
-      - apt-transport-https
+      apt-transport-https
       - dotnet-sdk-3.1
 branches:
   only:
     - master
 language: node_js
 install:
-  - cd bot
-  - npm i
-  - npm i --only=dev
-  - cd ..
-  - cd backend
-  - npm i 
-  - npm i --only=dev
-  - cd ..
-  - cd frontend
-  - npm i 
+  cd bot
+  npm i
+  npm i --only=dev
+  cd ..
+  cd backend
+  npm i 
+  npm i --only=dev
+  cd ..
+  cd frontend
+  npm i 
   
 script: 
-  - cd bot
-  - tsc
-  - npm run test
-  - cd ..
-  - cd backend
-  - tsc
-  - cd ..
-  - cd frontend
-  - npm run build   
+  cd bot
+  tsc
+  npm run test
+  cd ..
+  cd backend
+  tsc
+  cd ..
+  cd frontend
+  npm run build   
   
