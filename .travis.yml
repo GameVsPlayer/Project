@@ -6,6 +6,7 @@ node_js:
   - '14'
 
 before_install:
+  - sudo apt-get update
   - sudo apt-get install -y gpg
   - wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
   - sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
