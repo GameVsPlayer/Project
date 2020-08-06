@@ -22,18 +22,10 @@ install:
   - npm i 
   - npm i --only=dev
   - cd ..
-  - cd frontend
-  - npm i 
-  - cd ..
+#  - cd frontend
+ # - npm i 
+ # - cd ..
   
 script: 
-  - cd bot
-  - tsc
-  - npm run test
-  - cd ..
-  - cd backend
-  - tsc
-  - cd ..
-  - cd frontend
-  - npm run build   
+  - node travis.js
   
