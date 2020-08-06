@@ -6,7 +6,8 @@ node_js:
   - '14'
 
 before_install:
-  - sudo add-apt-repository universe multiverse
+  - sudo add-apt-repository universe
+  - sudo add-apt-repository multiverse
   - sudo apt-get update 
   - sudo apt-get install -y apt-transport-https
   - sudo apt-get update 
