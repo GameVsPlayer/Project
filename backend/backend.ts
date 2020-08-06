@@ -1,15 +1,15 @@
-const express = require('express');
+import express, { Request, Response } from 'express';
 const app = express();
-const compression = require('compression');
-const fetch = require('node-fetch');
-const helmet = require('helmet');
-const bodyParser = require('body-parser');
+import compression from 'compression';
+import fetch from 'node-fetch';
+import helmet from 'helmet';
+import bodyParser from 'body-parser';
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 
-const path = require('path');
+import path from 'path';
 require('dotenv').config({
     path: path.join(__dirname, '/.env')
 });
@@ -20,10 +20,10 @@ const info = process.env;
 app.use(compression());
 app.use(helmet());
 app.disable('x-powered-by');
-let currentData = '';
+let currentData: any = '';
 
 async function fetchData() {
-    let response = await fetch('http://127.0.0.1:1025/api/').catch(err => {
+    let response = await fetch('http://127.0.0.1:1025/api/').catch((err: Error) => {
         err = null
     });
     if (!response) return;
@@ -35,12 +35,12 @@ setInterval(() => {
     fetchData();
 }, 1000);
 
-function sleep(ms) {
+function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
-app.get('/statsUpdate/', (req, res) => {
+app.get('/statsUpdate/', (req: Request, res: Response) => {
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -58,7 +58,7 @@ app.get('/statsUpdate/', (req, res) => {
 
 });
 
-app.get('/serverUpdate/', async (req, res) => {
+app.get('/serverUpdate/', async (req: Request, res: Response) => {
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -80,7 +80,7 @@ app.get('/serverUpdate/', async (req, res) => {
 
 });
 
-app.get('/todo/', async (req, res) => {
+app.get('/todo/', async (req: Request, res: Response) => {
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -90,11 +90,11 @@ app.get('/todo/', async (req, res) => {
     res.flush();
 });
 
-app.post('/verify/', async (req, res) => {
+app.post('/verify/', async (req: Request, res: Response) => {
     const token = req.body.token;
-    let response = await fetch('https://www.google.com/recaptcha/api/siteverify?secret=' + info.secretKey + "&response=" + token + "&remoteip=" + req.connection.remoteAddress)
+    let response: any = await fetch('https://www.google.com/recaptcha/api/siteverify?secret=' + info.secretKey + "&response=" + token + "&remoteip=" + req.connection.remoteAddress)
     response = await response.json();
-    if (response.score >= 0.5) {
+    if (response.score >= 0.7) {
         res.json({
             status: 'accepted!',
             message: [info.info]
@@ -108,7 +108,7 @@ app.post('/verify/', async (req, res) => {
     return res.end();
 });
 
-app.get('/serverStats/', (req, res) => {
+app.get('/serverStats/', (req: Request, res: Response) => {
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -126,7 +126,7 @@ app.get('/serverStats/', (req, res) => {
 
 });
 
+app.listen(process.env.backendPort || 1026, function () {
 
-let listener = app.listen(process.env.backendPort || 1026, function () {
-    console.log('Backend running on port ' + listener.address().port);
+    console.log(`Backend running on port ${process.env.backendPort || 1026}`);
 });

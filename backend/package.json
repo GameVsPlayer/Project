@@ -13,8 +13,14 @@
     "compression": "^1.7.4",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "helmet": "^3.23.3",
+    "helmet": "^4.0.0",
     "node-fetch": "^2.6.0",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.7.0",
+    "@types/express": "^4.17.7",
+    "@types/helmet": "0.0.47",
+    "@types/node-fetch": "^2.5.7"
   }
 }
