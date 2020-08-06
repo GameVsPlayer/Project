@@ -1,7 +1,9 @@
 <template>
+  <div id="app">
     <router-view />
-    <Navbar ></Navbar>
-  <particles></particles>
+    <Navbar></Navbar>
+    <particles></particles>
+  </div>
 </template>
 
 <style lang="scss">
@@ -72,7 +74,7 @@ export default {
   name: "app",
   components: {
     Navbar,
-    particles
+    particles,
   },
   metaInfo() {
     return {
@@ -80,93 +82,93 @@ export default {
         {
           name: "description",
           content: "This is my small website used for links and my bot",
-          vmid: "description"
+          vmid: "description",
         },
         {
           name: "theme-color",
           content: "#0085f1",
-          vmid: "theme-color"
+          vmid: "theme-color",
         },
         {
           itemprop: "description",
           content: "This is my small website used for links and my bot",
-          vmid: "itemprop:description"
+          vmid: "itemprop:description",
         },
         {
           property: "og:description",
           content: "This is my small website used for links and my bot",
-          vmid: "og:description"
+          vmid: "og:description",
         },
         {
           property: "og:title",
           content: document.title,
-          vmid: "og:title"
+          vmid: "og:title",
         },
         {
           property: "og:url",
           content: "https://gamu.tk" + window.location.pathname,
-          vmid: "og:url"
+          vmid: "og:url",
         },
         {
           property: "og:image",
           content: "https://gamu.tk/assets/android-chrome-512x512.png",
-          vmid: "og:image"
+          vmid: "og:image",
         },
         {
           property: "og:site_name",
           content: "Gamu.tk",
-          vmid: "og:site_name"
+          vmid: "og:site_name",
         },
         {
           property: "og:type",
           content: "website",
-          vmid: "og:type"
+          vmid: "og:type",
         },
         {
           name: "viewport",
-          content: "width=device-width, initial-scale=1.0"
+          content: "width=device-width, initial-scale=1.0",
         },
         {
           name: "Content-Language",
-          content: "en-us"
+          content: "en-us",
         },
         {
-          chartest: "UTF-8"
+          chartest: "UTF-8",
         },
         {
           name: "keywords",
           content:
-            "Programming,Gaming,Streaming,Minecraft,LiveStreaming,custom,entertainment"
+            "Programming,Gaming,Streaming,Minecraft,LiveStreaming,custom,entertainment",
         },
         {
           name: "twitter:title",
-          content: document.title
+          content: document.title,
         },
         {
           name: "twitter:site",
           content: "@GameVsPlayer",
-          vmid: "twitter:site"
+          vmid: "twitter:site",
         },
         {
           name: "twitter:description",
           content: "This is my small website used for links and my bot",
-          vmid: "twitter:description"
+          vmid: "twitter:description",
         },
         {
           name: "twitter:card",
           content: "summary_large_image",
-          vmid: "twitter:card"
+          vmid: "twitter:card",
         },
         {
           name: "twitter:image",
           content: "https://gamu.tk/assets/android-chrome-512x512.png",
-          vmid: "twitter:image"
-        }
-      ]
+          vmid: "twitter:image",
+        },
+      ],
     };
   },
   beforeCreate() {
     this.metaInfo;
-  }
+  },
 };
 </script>
