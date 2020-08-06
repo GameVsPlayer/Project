@@ -11,6 +11,7 @@ arch:
 dotnet: 3.1.0
 before_install:
   - sudo apt-get update
+  - sudo npm install -g typescript
 
 install:
   - cd bot
@@ -24,7 +25,6 @@ install:
   - cd frontend
   - npm i 
   - cd ..
-  - sudo npm install -g typescript
   
 script: 
   - cd bot
