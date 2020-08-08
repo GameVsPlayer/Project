@@ -1,7 +1,8 @@
 branches:
   only:
     - master
-language: csharp
+node_js:
+  - '14.7'
 os: 
   linux 
 arch:
@@ -15,9 +16,13 @@ before_install:
   - npm install -g typescript
   - sudo apt-get install xvfb
   - sudo systemctl start xvfb
+  - wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+  - sudo dpkg -i packages-microsoft-prod.deb
+  - sudo apt-get install apt-transport-https
+  - sudo apt-get update
+  - sudo apt-get install dotnet-hosting-2.0.6
   # - npm install -g @vue/cli
   # - sudo apt-get install chromium-browser
-
 install:
   - cd bot
   - npm i
