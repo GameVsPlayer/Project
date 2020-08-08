@@ -12,20 +12,23 @@ dotnet: 3.1.0
 before_install:
   - sudo apt-get update
   - npm install -g typescript
+  - npm install -g @vue/cli
 
 install:
   - cd bot
   - npm i
   - npm i --only=dev
+  - tsc
   - cd ..
   - cd backend
   - npm i 
   - npm i --only=dev
+  - tsc
   - cd ..
 #  - cd frontend
  # - npm i 
  # - cd ..
   
 script: 
-  - node travis.js
+  - npm run test --prefix bot
   
