@@ -11,7 +11,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     const city2geoAPI = `https://api.opencagedata.com/geocode/v1/json?q=${args.join('%20')}&key=${bot.config.opencagedata}`;
     //bot.logger.info(city2geoAPI);
     const geo = await fetch(city2geoAPI);
-    const goeJSON = await geo.json();
+    const goeJSON: any = await geo.json();
     if (goeJSON.status.code != 200) return message.channel.send(`Something went wrong Error: ${goeJSON.status.message}`);
     if (goeJSON.results.length === 0) return message.channel.send("No results found");
     const locationGeo = goeJSON.results[0].geometry;

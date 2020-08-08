@@ -55,7 +55,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
 
     if (body === undefined) {
 
-        let body2 = await fetch(url2, {
+        let body2: any = await fetch(url2, {
             method: 'GET',
             headers: {
                 "Client-ID": bot.config.TwitchID

@@ -25,10 +25,11 @@ install:
   - npm i --only=dev
   - tsc
   - cd ..
-#  - cd frontend
- # - npm i 
- # - cd ..
+  - cd frontend
+  - npm i 
+  - cd ..
   
 script: 
   - npm run test --prefix bot
+  - npm run build --prefix frontend
   
