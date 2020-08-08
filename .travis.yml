@@ -1,14 +1,13 @@
 branches:
   only:
     - master
-
 os: 
   linux 
 arch:
   arm64 
-language: csharp
-mono: none
-dotnet: 3.1
+dist: 
+  bionic
+language: node_js
 before_install:
   - sudo apt-get update
   - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
@@ -16,11 +15,11 @@ before_install:
   - nvm use 14.7
   - npm install -g npm@latest
   - npm install -g typescript
-  - wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+  - wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
   - sudo dpkg -i packages-microsoft-prod.deb
   - sudo apt-get install apt-transport-https
   - sudo apt-get update
-  - sudo apt-get install dotnet-hosting-2.0.6
+  - sudo apt-get install aspnetcore-runtime-3.1
   # - npm install -g @vue/cli
   # - sudo apt-get install chromium-browser
 install:
@@ -37,7 +36,6 @@ install:
   # - cd frontend
   # - npm i 
   # - cd ..
-  
 script: 
   - npm run test --prefix bot
   # - npm run build --prefix frontend

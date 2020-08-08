@@ -26,7 +26,7 @@ import {
   mdbContainer,
   mdbNavbarBrand,
   mdbNavbarToggler,
-  mdbNavbarNav
+  mdbNavbarNav,
 } from "mdbvue";
 export default {
   name: "Navbar",
@@ -35,14 +35,14 @@ export default {
     mdbNavbarBrand,
     mdbNavbarToggler,
     mdbNavbarNav,
-    mdbContainer
+    mdbContainer,
   },
 
   computed: {
-    error: function() {
-      return this.$store.getters.error;
-    }
-  }
+    error: function () {
+      return this.$store.state.error;
+    },
+  },
 };
 </script>
 <style scoped>

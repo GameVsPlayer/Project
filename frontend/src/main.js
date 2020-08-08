@@ -44,7 +44,7 @@ Vue.config.productionTip = false;
 
 new Vue({
   router,
-  store,
+  store: store,
   render: h => h(App),
   created() {
     const html = document.documentElement // returns the html tag
