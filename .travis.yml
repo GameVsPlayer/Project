@@ -1,18 +1,20 @@
 branches:
   only:
     - master
-language: node_js
-node_js:
-  - '14.7'
+language: csharp
 os: 
   linux 
 arch:
   arm64 
 before_install:
   - sudo apt-get update
+  - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+  - nvm install 14.7
+  - nvm use 14.7
   - npm install -g npm@latest
   - npm install -g typescript
   - sudo apt-get install xvfb
+  - sudo systemctl start xvfb
   - sudo apt-get install curl
   - sudo curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - 
   - sudo apt-add-repository https://packages.microsoft.com/ubuntu/16.04/prod
@@ -20,7 +22,6 @@ before_install:
   - sudo apt-get install dotnet-runtime-3.1
   # - npm install -g @vue/cli
   # - sudo apt-get install chromium-browser
-services: xvfb
 
 install:
   - cd bot
