@@ -12,6 +12,7 @@ dotnet: 3.1.0
 services: xvfb
 before_install:
   - sudo apt-get update
+  - npm install -g npm@latest
   - npm install -g typescript
   # - npm install -g @vue/cli
   # - sudo apt-get install chromium-browser
