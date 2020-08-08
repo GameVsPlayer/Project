@@ -112,6 +112,7 @@ module.exports = {
 
                     let child = exec(cmd, (error, stdout) => {
                         if (error && bot !== null) return bot.logger.error(error)
+                        else if (error) return console.error(error);
                         let stdoutL = stdout.split('\n');
                         for (let info in stdoutL) {
                             stdoutL[info] = stdoutL[info].substring(stdoutL[info].indexOf(":") + 2);
@@ -156,7 +157,7 @@ module.exports = {
                 })
                 return PP;
             } catch {
-                (e: string) => { throw new Error(e) }
+                (e: Error) => { console.error(e) }
 
             }
         },
@@ -171,6 +172,7 @@ module.exports = {
                 await new Promise(async (resolve, reject) => {
                     let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet} -r=${gamemode}`, function (error, stdout) {
                         if (error && bot !== null) return bot.logger.error(error)
+                        else if (error) return console.error(error);
                         let stdoutL = stdout.split('\n');
                         sr = stdoutL[5];
                         let win = RegExp('�');
@@ -192,7 +194,11 @@ module.exports = {
 
                 })
                 return [sr, maxcombo, ar];
-            } catch { }
+            } catch {
+                (e: Error) => {
+                    console.error(e);
+                }
+            }
 
         },
         userBest: async function (bot: any, player: string, gamemode: any) {
@@ -234,7 +240,9 @@ module.exports = {
                     }, 500)
 
                 });
-            } catch { }
+            } catch {
+
+            }
 
         },
         enum2Mods: function (num: any) {
