@@ -14,8 +14,6 @@ before_install:
   - nvm use 14.7
   - npm install -g npm@latest
   - npm install -g typescript
-  - sudo apt-get install xvfb
-  - sudo systemctl start xvfb
   - wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
   - sudo dpkg -i packages-microsoft-prod.deb
   - sudo apt-get install apt-transport-https
