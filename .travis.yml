@@ -22,7 +22,7 @@ install:
   - npm i
   - npm i --only=dev
   - tsc
-  # - cd ..
+ - cd ..
   # - cd backend
   # - npm i 
   # - npm i --only=dev
