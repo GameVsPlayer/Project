@@ -117,6 +117,7 @@ module.exports = {
 
                         PP = { stdoutL }
                         resolve(stdoutL)
+                        return;
                         for (let info in stdoutL) {
                             stdoutL[info] = stdoutL[info].substring(stdoutL[info].indexOf(":"));
                             stdoutL[info] = stdoutL[info].replace(/(\r\n|\n|\r)/gm, "");
