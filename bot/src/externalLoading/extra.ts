@@ -115,13 +115,14 @@ module.exports = {
                         else if (error) return console.error(error);
                         let stdoutL = stdout.split('\n');
                         for (let info in stdoutL) {
-                            stdoutL[info] = stdoutL[info].substring(stdoutL[info].indexOf(":") + 2);
+                            stdoutL[info] = stdoutL[info].substring(stdoutL[info].indexOf(":"));
                             stdoutL[info] = stdoutL[info].replace(/(\r\n|\n|\r)/gm, "");
+                            stdoutL[info] = stdoutL[info].replace(/: /gm, "");
                         }
 
                         if (gamemode === "osu") {
                             PP = {
-                                combo: stdoutL[2].split(" ")[0],
+                                combo: stdoutL[2].split("(")[0],
                                 accuracy: parseFloat(stdoutL[1]).toFixed(2),
                                 pp: parseFloat(stdoutL[14]).toFixed(2),
                                 ar: parseFloat(stdoutL[12]).toFixed(2),
@@ -178,7 +179,8 @@ module.exports = {
                         sr = sr.split("     ");
                         for (let i in sr) {
                             sr[i] = sr[i].substring(0, sr[i].length - 1)
-                            sr[i] = sr[i].replace(/ /g, '')
+                            sr[i] = sr[i].replace(/ /gm, '')
+                            sr[i] = sr[i].replace(/:/gi, '')
                         }
                         let maxcombo = sr[4];
                         let ar = sr[5];
