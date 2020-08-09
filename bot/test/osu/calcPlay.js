@@ -47,6 +47,7 @@ let count = 0,
 describe('osu', function () {
     before(async function () {
         let res = await calcPlay;
+        console.log(res);
         count = parseInt(res.pp);
     })
     it('Test PP Calculator for a Play', function () {

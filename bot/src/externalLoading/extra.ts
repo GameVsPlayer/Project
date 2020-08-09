@@ -114,6 +114,9 @@ module.exports = {
                         if (error && bot !== null) return bot.logger.error(error)
                         else if (error) return console.error(error);
                         let stdoutL = stdout.split('\n');
+
+                        PP = { stdoutL }
+                        resolve(stdoutL)
                         for (let info in stdoutL) {
                             stdoutL[info] = stdoutL[info].substring(stdoutL[info].indexOf(":"));
                             stdoutL[info] = stdoutL[info].replace(/(\r\n|\n|\r)/gm, "");
