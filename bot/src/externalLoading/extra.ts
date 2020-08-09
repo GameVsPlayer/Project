@@ -115,9 +115,6 @@ module.exports = {
                         else if (error) return console.error(error);
                         let stdoutL = stdout.split('\n');
 
-                        PP = [stdoutL, `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${mods}-c ${playStats.combo}`]
-                        resolve(stdoutL)
-                        return;
                         for (let info in stdoutL) {
                             stdoutL[info] = stdoutL[info].substring(stdoutL[info].indexOf(":"));
                             stdoutL[info] = stdoutL[info].replace(/(\r\n|\n|\r)/gm, "");
