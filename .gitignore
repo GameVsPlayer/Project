@@ -19,7 +19,7 @@ yarn-error.log*
 yarn.lock
 .env.local
 .env.*.local
-maps
+bot/built/maps
 osu-tools
 temp
 PP
