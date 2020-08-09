@@ -175,10 +175,15 @@ module.exports = {
                         else if (error) return console.error(error);
                         let stdoutL: any = stdout.split('\n');
                         sr = stdoutL[5];
-                        let maxcombo = sr.split('\u{fffd}')[3];
-                        let ar = sr.split('\u{fffd}')[4];
-                        sr = sr.split('\u{fffd}')[2];
-                        sr = sr.replace(/\ /g, "");
+                        sr = sr.split("     ");
+                        for (let i in sr) {
+                            sr[i] = sr[i].substring(0, sr[i].length - 1)
+                            sr[i] = sr[i].replace(/ /g, '')
+                        }
+                        let maxcombo = sr[4];
+                        let ar = sr[5];
+                        sr = sr[1];
+                        let od = sr[5];
                         parseFloat(sr).toFixed(2);
                         resolve([sr, maxcombo, ar]);
                     });
