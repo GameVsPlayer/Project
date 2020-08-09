@@ -26,15 +26,18 @@ async function dl() {
 
         } else resolve();
     });
-    if (!fs.existsSync(path.join(__dirname, `/PP`))) {
-        fs.mkdirSync(path.join(__dirname, `/PP/`));
+    if (!fs.existsSync(path.join(__dirname, `/built`))) {
+        fs.mkdirSync(path.join(__dirname, `/built/`));
     }
-    if (!fs.existsSync(path.join(__dirname, `/PP/PerformanceCalculator.dll`))) {
+    if (!fs.existsSync(path.join(__dirname, `built/PP`))) {
+        fs.mkdirSync(path.join(__dirname, `built/PP/`));
+    }
+    if (!fs.existsSync(path.join(__dirname, `built/PP/PerformanceCalculator.dll`))) {
         console.log("Extraction Start!");
         new Promise((resolve, reject) => {
             const start2 = new Date();
             let zip = new AdmZip(path.join(__dirname, `/temp/Calculator.zip`));
-            zip.extractAllTo(path.join(__dirname, `/PP`));
+            zip.extractAllTo(path.join(__dirname, `built/PP`));
             resolve();
             console.log(`Extraction complete in ${(new Date().getTime() - Number(start2)) / 1000} Seconds!`);
         })
