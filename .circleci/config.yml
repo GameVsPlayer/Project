@@ -20,4 +20,4 @@ jobs:
       - run: "npm i --prefix backend && npm i --prefix backend --only=dev"
       - run: "tsc -p backend/tsconfig.json"
       - run: 'npm i --prefix frontend'
-      - run: "tsc frontend/tsconfig.json"
+      - run: "npm run build --prefix frontend"
