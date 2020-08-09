@@ -1,0 +1,23 @@
+version: 2.1
+jobs:
+  build:
+    machine:
+      image: ubuntu-1604:202007-01
+    steps:
+      - checkout
+      - run: "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash"
+      - run: "echo 'export NVM_DIR=/opt/circleci/.nvm' >> $BASH_ENV"
+      - run: "echo 'source $NVM_DIR/nvm.sh' >> $BASH_ENV"
+      - run: "nvm install 14.7 && nvm use 14.7"
+      - run: "npm -g install typescript"
+      - run: "wget https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && sudo dpkg -i packages-microsoft-prod.deb"
+      - run: "sudo apt-get update && sudo apt-get install -y apt-transport-https && sudo apt-get update && sudo apt-get install -y dotnet-sdk-3.1"
+      - run: "git clone --depth=50 --branch=master https://github.com/GameVsPlayer/Project.git GameVsPlayer/Project" 
+      - run: "cd GameVsPlayer/Project"
+      - run: "npm i --prefix bot && npm i --prefix bot --only=dev"
+      - run: "tsc -p bot/tsconfig.json"
+      - run: "npm run test --prefix bot"
+      - run: "npm i --prefix backend && npm i --prefix backend --only=dev"
+      - run: "tsc -p backend/tsconfig.json"
+      - run: 'npm i --prefix frontend'
+      - run: "tsc frontend/tsconfig.json"
