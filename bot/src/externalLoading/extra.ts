@@ -173,21 +173,13 @@ module.exports = {
                     let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet} -r=${gamemode}`, function (error, stdout) {
                         if (error && bot !== null) return bot.logger.error(error)
                         else if (error) return console.error(error);
-                        let stdoutL = stdout.split('\n');
+                        let stdoutL: any = stdout.split('\n');
                         sr = stdoutL[5];
-                        let win = RegExp('�');
-                        let linux = RegExp('');
-                        if (win.test(sr)) {
-                            maxcombo = sr.split('│')[3]
-                            ar = sr.split('│')[4]
-                            sr = sr.split('�')[2];
-                            sr = sr.replace(/\ /g, "");
-                        } else if (linux.test(sr)) {
-                            ar = sr.split('│')[4]
-                            maxcombo = sr.split('│')[3]
-                            sr = sr.split('│')[1];
-                            sr = sr.replace(/\ /g, "");
-                        }
+                        let maxcombo: number = sr.split('\u{002502}')[3]
+                        let ar: number = sr.split('\u{002502}')[4]
+                        sr = sr.split('\u{002502}')[2];
+                        sr = sr.replace(/\ /g, "");
+
                         parseFloat(sr).toFixed(2);
                         resolve([sr, maxcombo, ar])
                     });
@@ -197,6 +189,7 @@ module.exports = {
             } catch {
                 (e: Error) => {
                     console.error(e);
+                    console.log(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet} -r=${gamemode}`)
                 }
             }
 

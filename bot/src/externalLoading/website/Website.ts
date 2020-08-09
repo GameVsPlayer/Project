@@ -52,7 +52,7 @@ module.exports.run = async (bot: any) => {
         } else return;
     });
 
-    httpServer.listen(process.env.BotPORT || 1025);
+    httpServer.listen(process.env.BotPORT || 10025);
 };
 
 function ip(req: Request) {

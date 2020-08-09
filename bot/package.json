@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --recursive --timeout 5000",
-    "start": "node index.js",
+    "start": "node built/index.js",
     "postinstall": "node postinstall"
   },
   "keywords": [
@@ -47,7 +47,7 @@
     "redis": "^3.0.2",
     "request": "^2.88.2",
     "serve-favicon": "^2.5.0",
-    "simple-youtube-api": "^6.0.0-beta.1",
+    "simple-youtube-api": "^5.2.1",
     "socket.io": "^2.3.0",
     "string-similarity": "^4.0.2",
     "striptags": "^3.1.1",

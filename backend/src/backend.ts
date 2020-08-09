@@ -23,7 +23,7 @@ app.disable('x-powered-by');
 let currentData: any = '';
 
 async function fetchData() {
-    let response = await fetch('http://127.0.0.1:1025/api/').catch((err: Error) => {
+    let response = await fetch('http://127.0.0.1:10025/api/').catch((err: Error) => {
         err = null
     });
     if (!response) return;
@@ -126,7 +126,7 @@ app.get('/serverStats/', (req: Request, res: Response) => {
 
 });
 
-app.listen(process.env.backendPort || 1026, function () {
+app.listen(process.env.backendPort || 10026, function () {
 
     console.log(`Backend running on port ${process.env.backendPort || 1026}`);
 });
