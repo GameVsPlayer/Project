@@ -175,13 +175,12 @@ module.exports = {
                         else if (error) return console.error(error);
                         let stdoutL: any = stdout.split('\n');
                         sr = stdoutL[5];
-                        let maxcombo: number = sr.split('\u{002502}')[3]
-                        let ar: number = sr.split('\u{002502}')[4]
-                        sr = sr.split('\u{002502}')[2];
+                        let maxcombo = sr.split('\u{fffd}')[3];
+                        let ar = sr.split('\u{fffd}')[4];
+                        sr = sr.split('\u{fffd}')[2];
                         sr = sr.replace(/\ /g, "");
-
                         parseFloat(sr).toFixed(2);
-                        resolve([sr, maxcombo, ar])
+                        resolve([sr, maxcombo, ar]);
                     });
 
                 })

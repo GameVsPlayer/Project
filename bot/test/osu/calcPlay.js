@@ -40,7 +40,6 @@ const calcPlay = require("../../built/externalLoading/extra").osu.calcPP(null, p
 
 const calcMap = require("../../built/externalLoading/extra").osu.calcMap(null, path.join(__dirname + "/maps/1.osu"), dotnet, "osu");
 
-
 let count = 0,
     sr = 0;
 
