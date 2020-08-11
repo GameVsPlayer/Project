@@ -80,7 +80,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     APIData = APIData[parseInt(position) - 1];
     let bm: string = path.join(__dirname, `/../maps/${APIData.beatmap_id}.osu`);
 
-    let Map: any = await bot.extra.osu.mapInfo(bm);
+    let Map: any = await bot.extra.osu.mapInfo(bot, bm);
 
     let Mods: Array<any> = bot.extra.osu.enum2Mods(APIData.enabled_mods);
     Mod = Mods[0].join(", ");
