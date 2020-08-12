@@ -1,7 +1,11 @@
-import { Message, MessageEmbed } from "discord.js";
+import { MessageEmbed, Message } from "discord.js";
 
 import Discord from "discord.js";
 import path from "path";
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+TimeAgo.addLocale(en)
+const timeago = new TimeAgo('en-us');
 module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (bot.config.osuAPI == "") return bot.logger.info("osu API Key not set")
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
@@ -138,7 +142,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
             `Combo: ${APIData.maxcombo}${mapPlay.maxCombo !== undefined ? "x/" + mapPlay.maxCombo + "x" : "x"} ${APIData.count300}/${APIData.count100}/${APIData.count50}/${APIData.countmiss}\n` +
             `Mapper: ${Map.creator}\n` +
             `BPM: ${bpm}${bpm == Map.bpm ? '' : '(' + Map.bpm + ')'} Divisor 1/${Map.divisor}\n` +
-            `Play set at ${APIData.date} ${APIData.replay_available === '0' ? 'No replay available' : `Replay available [here](https://osu.ppy.sh/scores/osu/${APIData.score_id}/download)`}\n` +
+            `Play set at ${timeago.format(new Date(APIData.date))} ${APIData.replay_available === '0' ? 'No replay available' : `Replay available [here](https://osu.ppy.sh/scores/osu/${APIData.score_id}/download)`}\n` +
             `**AR** ${mapPlay.ar} ${checkDifference(mapPlay.ar, Map.diff_approach) ? '' : '(' + Map.diff_approach + ')'} **OD** ${mapPlay.od} ${checkDifference(mapPlay.od, Map.diff_overall) ? '' : '(' + Map.diff_overall + ')'} **CS** ${cs} ${checkDifference(parseFloat(cs), Map.diff_size) ? '' : '(' + Map.diff_size + ')'} **HP** ${hp} ${checkDifference(parseFloat(hp), Map.diff_drain) ? '' : '(' + Map.diff_drain + ')'}`)
         .setThumbnail(`https://s.ppy.sh/a/${player.user_id}`)
 
