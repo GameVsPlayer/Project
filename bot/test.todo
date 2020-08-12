@@ -14,6 +14,8 @@ COMPLETE add SR calculation + conditional if fc PP
 COMPLETE Add radis caching for prefix
 COMPLETE create pp calculator / try to use official one
 COMPLETE added somewhat working calculation for different gamemodes
-TODO fix ar and od being off even when there is no mod changing them
+COMPLETE fix ar and od being off even when there is no mod changing them
 TODO complete tests
-TODO fix broken stuff againn in pp 
+COMPLETE fix broken stuff againn in pp 
+COMPLETE run pp stuff with promise.all
+TODO replace website.ts to use redis instead of a http

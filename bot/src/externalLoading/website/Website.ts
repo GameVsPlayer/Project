@@ -5,7 +5,7 @@ import helmet from 'helmet';
 let dbData: any = [];
 let todos: any = {};
 
-module.exports.run = async (bot: any) => {
+module.exports = async (bot: any) => {
     let find = bot.db.todoDB.find();
     setTimeout(async () => {
         find.each(function (err: Error, item: any) {
@@ -18,7 +18,7 @@ module.exports.run = async (bot: any) => {
     setInterval(async () => {
         dbData = [];
         find.each(function (err: Error, item: any) {
-            if (item === null) return;
+            if (item === null || err) return;
             dbData.push(item);
             todos.data = dbData;
         })
@@ -57,7 +57,4 @@ module.exports.run = async (bot: any) => {
 
 function ip(req: Request) {
     return req.headers['x-real-ip'] || req.connection.remoteAddress;
-};
-module.exports.help = {
-    name: "website"
 };

@@ -25,7 +25,6 @@ mongoClient.connect(async (err: Error) => {
 
     bot.logger.info(`Connected to database`);
 
-    let availableCollections = [];
     bot.db = mongoClient.db("datastorage");
 
     bot.db.hugsDB = await bot.db.collection("hugs");
@@ -42,7 +41,6 @@ mongoClient.connect(async (err: Error) => {
 const bot: any = new Discord.Client();
 
 bot.commands = new Discord.Collection;
-bot.website = new Discord.Collection;
 bot.activities = new Discord.Collection;
 bot.events = new Discord.Collection;
 bot.youtube = new Discord.Collection;
@@ -56,6 +54,7 @@ const YouTube = require("simple-youtube-api");
 
 require('events').EventEmitter.defaultMaxListeners = 20;
 bot.extra = require('./externalLoading/extra');
+bot.website = require('./externalLoading/website/Website');
 bot.config = botconfig;
 
 bot.youtube = new YouTube(bot.config.googleAPI);
@@ -83,6 +82,7 @@ setInterval(() => {
 }, 1000);
 
 bot.on("ready", async () => {
+    if (loggedIN === 0) bot.website(bot);
     loggedIN = 1;
     setInterval(() => {
         osutils.cpuUsage((v: any) => {
@@ -114,7 +114,6 @@ bot.on("ready", async () => {
     bot.logger.info(`${bot.user.username} is online!`);
 
     if (dbLoad === false) await sleep(5000);
-    let i: Number = 0;
 
     await bot.db.xpDB.find({
         messageCount: 1
@@ -278,7 +277,7 @@ bot.on("message", async (message: Discord.Message) => {
     if (bot.config.Testing) {
         if (message.author.id !== bot.config.ownerID) return;
     } else {
-        await new Promise(function (resolve, reject) {
+        await new Promise(function (resolve) {
             bot.extra.getPrefix(bot, message.guild, function (prefixCB: string) {
                 prefix = prefixCB;
                 resolve();
@@ -289,14 +288,7 @@ bot.on("message", async (message: Discord.Message) => {
 
     if (!message.content.startsWith(prefix)) return;
 
-    if (message.content.startsWith(`${prefix}reloadwebsite`)) {
-        if (message.author.id === botconfig.ownerID) {
-            message.channel.send("Reloaded website").catch();
-            websiteReload();
-            return;
-
-        } else return;
-    } else if (message.content.startsWith(`${prefix}reloadEvents`)) {
+    else if (message.content.startsWith(`${prefix}reloadEvents`)) {
         if (message.author.id === botconfig.ownerID) {
             message.channel.send("Reloaded Events").catch();
             reloadEvents();
@@ -324,7 +316,7 @@ bot.on("guildCreate", (guild: Discord.Guild) => {
         }
     })
 
-    let guildJoin = new Discord.MessageEmbed()
+    let guildJoin: Discord.MessageEmbed = new Discord.MessageEmbed()
 
         .setTitle("Karen Joined the Server!")
         .setColor(botconfig.color)
@@ -340,7 +332,7 @@ bot.on("guildCreate", (guild: Discord.Guild) => {
 
 });
 
-bot.on("guildMemberAdd", async (member: any) => {
+bot.on("guildMemberAdd", async (_member: Discord.GuildMember) => {
     if (loggedIN !== 1) return;
 
 });
@@ -371,47 +363,16 @@ bot.on('warn', (warn: Error) => bot.logger.warn(warn));
 bot.on('shardError', (error: Error) => {
     bot.logger.error('A websocket connection encountered an error:', error);
 });
-let webTimer = setInterval(() => {
-    if (dbLoad === false) return;
-    else {
-        websiteReload();
-        clearInterval(webTimer);
-    }
-
-}, 10000)
-
-
-function websiteReload() {
-
-    fs.readdir(__dirname + "/externalLoading/website", (err: Error, files: string[]) => {
-        if (err) bot.logger.info(err);
-        let jsfile = files.filter(f => f.split(".").pop() === "js")
-        if (jsfile.length <= 0) {
-            return;
-        }
-        jsfile.forEach(async (f, i) => {
-            delete require.cache[require.resolve(__dirname + `/externalLoading/website/${f}`)]
-            let probs = require(__dirname + `/externalLoading/website/${f}`);
-            bot.website.set(probs.help.name, probs);
-
-            let websiteLoader = bot.website.get("website");
-
-            setTimeout(() => {
-                websiteLoader.run(bot).catch((err: Error) => bot.logger.error("Website loading Error  " + err));
-            }, 5000);
-        });
-    })
-};
 
 function reloadEvents() {
 
     fs.readdir(__dirname + "/externalLoading/bot_events/", (err: Error, files: string[]) => {
-
+        if (err) bot.logger.error(err);
         let jsfile = files.filter(f => f.split(".").pop() === "js")
         if (jsfile.length <= 0) {
             return;
         }
-        jsfile.forEach((f, i) => {
+        jsfile.forEach((f) => {
             delete require.cache[require.resolve(__dirname + `/externalLoading/bot_events/${f}`)]
             let probs: any = require(__dirname + `/externalLoading/bot_events/${f}`);
             bot.events.set(probs.help.name, probs);

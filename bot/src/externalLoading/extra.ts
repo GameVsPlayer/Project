@@ -11,6 +11,7 @@ import {
     Message
 } from "discord.js";
 
+
 module.exports = {
     autocomplete: async function (bot: any, message: Message, args: string[]) {
         let memberA: any;
@@ -101,16 +102,29 @@ module.exports = {
         calcPP: async function (bot: any, bm: string, playStats: any, mods: string, gamemode: string) {
             try {
                 let PP: any = {};
-                await new Promise(async (resolve, reject) => {
-                    let cmd;
+                await new Promise(async (resolve) => {
+                    let cmd: string;
+                    if (bot !== null && !fs.existsSync(bm)) {
+                        let map: any = bm;
 
+                        map = map.replace(/.osu/gm, '')
+
+                        map = map.split("\\")
+
+                        map = {
+                            beatmap_id: map[map.length - 1]
+                        }
+
+                        await bot.extra.osu.dlMap({ map })
+
+                    }
                     if (gamemode === "osu") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${mods}-c ${playStats.combo}`;
                     else if (gamemode === "mania") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} ${mods}-s ${playStats.score}`;
                     else if (gamemode === "catch") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -D ${playStats.count300} -T ${parseInt(playStats.count100) + parseInt(playStats.count50)} ${mods}-c ${playStats.combo}`;
                     else if (gamemode === "taiko") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count300} ${mods}-c ${playStats.combo}`
                     else cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${mods}-c ${playStats.combo}`;
 
-                    let child = exec(cmd, (error, stdout) => {
+                    exec(cmd, (error, stdout) => {
                         if (error && bot !== null) return bot.logger.error(error)
                         else if (error) return console.error(error);
                         let stdoutL = stdout.split('\n');
@@ -120,6 +134,9 @@ module.exports = {
                             stdoutL[info] = stdoutL[info].replace(/(\r\n|\n|\r)/gm, "");
                             stdoutL[info] = stdoutL[info].replace(/: /gm, "");
                         }
+
+                        if (stdoutL.length < 5 && bot !== null) return bot.logger.error(`${cmd} \n ${stdoutL}`)
+                        else if (stdoutL.length < 5) return console.error(`${cmd} \n ${stdoutL}`)
 
                         if (gamemode === "osu") {
                             PP = {
@@ -171,8 +188,8 @@ module.exports = {
                 else if (gamemode === "catch") gamemode = 2;
                 else if (gamemode === "mania") gamemode = 3;
                 else gamemode = 0;
-                await new Promise(async (resolve, reject) => {
-                    let child = exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet} -r=${gamemode}`, function (error, stdout) {
+                await new Promise(async (resolve) => {
+                    exec(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet} -r=${gamemode}`, function (error, stdout) {
                         if (error && bot !== null) return bot.logger.error(error)
                         else if (error) return console.error(error);
                         let stdoutL: any = stdout.split('\n');
@@ -188,7 +205,7 @@ module.exports = {
                         sr = sr[1];
                         let od = sr[5];
                         parseFloat(sr).toFixed(2);
-                        resolve([sr, maxcombo, ar]);
+                        return resolve([sr, maxcombo, ar, od]);
                     });
 
                 })
@@ -196,9 +213,10 @@ module.exports = {
             } catch {
                 (e: Error) => {
                     console.error(e);
-                    console.log(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet} -r=${gamemode}`)
+                    return console.log(`dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} difficulty ${bm} ${dotnet} -r=${gamemode}`)
                 }
             }
+            return null;
 
         },
         userBest: async function (bot: any, player: string, gamemode: any) {
@@ -224,20 +242,19 @@ module.exports = {
         },
         dlMap: async function (maps: any) {
             try {
-                await new Promise(async function (resolve, reject) {
+                await new Promise(async function (resolve) {
                     if (!fs.existsSync(path.join(__dirname, `/../maps`))) {
                         fs.mkdirSync(path.join(__dirname, `/../maps`))
                     }
                     for (let curMap in maps) {
-                        let map = maps[curMap].beatmap_id | maps;
+                        let map = maps[curMap].beatmap_id;
                         if (!fs.existsSync(path.join(__dirname, `/../maps/${map}.osu`)))
                             await fetch(`https://osu.ppy.sh/osu/${map}`).then((res: any) => res.text()).then((res: any) => fs.writeFileSync(path.join(__dirname, `/../maps/${map}.osu`), res, 'utf8'));
                         if (!fs.existsSync(path.join(__dirname, `/../maps/${map}.osu`)))
                             await fetch(`https://osu.ppy.sh/osu/${map}`).then((res: any) => res.text()).then((res: any) => fs.writeFileSync(path.join(__dirname, `/../maps/${map}.osu`), res, 'utf8'));
                     }
-                    setTimeout(() => {
-                        resolve()
-                    }, 500)
+                    resolve();
+
 
                 });
             } catch {
@@ -321,9 +338,9 @@ module.exports = {
         },
         mapInfo: async function (bot: any, bm: string) {
             let Map: any = {};
-            await new Promise(async (resolve, reject) => {
+            await new Promise(async (resolve) => {
 
-                let child = exec(`dotnet ${path.join(__dirname + "/../PP/MapInfo.dll")} ${bm}`, (error, stdout) => {
+                exec(`dotnet ${path.join(__dirname + "/../PP/MapInfo.dll")} ${bm}`, (error, stdout) => {
                     if (error) return bot.logger.error(error)
                     let stdoutL = stdout.split('\n');
 
@@ -354,6 +371,7 @@ module.exports = {
         recent: async function (bot: any, user: string, gamemode: any, attempt: any) {
             try {
                 if (!attempt) attempt = 0;
+                else if (attempt === 0) attempt = 0;
                 else attempt = parseInt(attempt) - 1;
                 if (gamemode === "osu") gamemode = 0;
                 else if (gamemode === "taiko") gamemode = 1;
@@ -366,9 +384,9 @@ module.exports = {
                 let tryC = 0;
                 let lastID = res[attempt].beatmap_id;
                 for (let i in res) {
-                    i = i + parseInt(attempt);
-                    if (!res[i]) break
-                    if (res[i].beatmap_id === lastID) tryC++;
+                    let n: number = parseInt(i) + parseInt(attempt);
+                    if (!res[n]) break
+                    if (res[n].beatmap_id === lastID) tryC++;
                     else continue;
                 }
                 let play = res;

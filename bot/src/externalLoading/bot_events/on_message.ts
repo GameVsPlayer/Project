@@ -34,13 +34,13 @@ module.exports.run = async (bot: any, message: Message, prefix: string) => {
 
     bot.stats.userMessages++;
 
-    let mainCommand: Boolean = false;
+    let mainCommand: boolean = false;
 
     let messageArray = message.content.split(" ");
 
     let args: any = messageArray.slice(1);
 
-    let indexActivity: Number = 0;
+    let indexActivity: number = 0;
 
     if (message.guild.id == bot.blackListedGuilds || message.author.id == bot.blackListedUsers) return;
 
@@ -191,7 +191,7 @@ module.exports.run = async (bot: any, message: Message, prefix: string) => {
         if (mainCommand === true) return;
         let cName: GuildChannel = message.guild.channels.cache.get(message.channel.id);
 
-        if (message.content.startsWith(prefix)) bot.logger.info(`[${moment().format('D.MM, h:mm a')}][${message.guild.name}][${cName.name}][${message.author.username}${message.content}`);
+        if (message.content.startsWith(prefix)) bot.logger.info(`[${moment().format('D.MM, h:mm a')}][${message.guild.name}][${cName.name}][${message.author.username}]:${message.content}`);
         if (!message.guild.me.hasPermission("SEND_MESSAGES")) return;
         let uptimeMin: number = bot.uptime / 60000;
 
@@ -217,7 +217,7 @@ module.exports.run = async (bot: any, message: Message, prefix: string) => {
                     }).catch();
                 }).then((m: any) => m.delete({
                     timeout: 0
-                }).catch((O_o: null) => { }));
+                }).catch((_O_o: null) => { }));
             } else return;
 
         }
@@ -230,7 +230,7 @@ module.exports.run = async (bot: any, message: Message, prefix: string) => {
                     }).catch();
                 }).then((m: any) => m.delete({
                     timeout: 1000
-                }).catch((O_o: null) => { }));
+                }).catch((_O_o: null) => { }));
             } else return;
 
         }
@@ -466,7 +466,7 @@ async function play(connection: VoiceConnection, message: Message, bot: any) {
         .setColor(bot.config.color)
         .setDescription(`${info.title} Requested by ${server.requester[0]}`);
 
-    if (!message.guild.me.hasPermission("SEND_MESSAGES")) return;
+    if (!message.guild.me.hasPermission("SEND_MESSAGES")) return null;
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I don\'t have the permission to send embeds");
     else message.channel.send(nowPlaying);
 
@@ -491,7 +491,7 @@ async function captcha(message: Message, bot: any) { // Source https://github.co
     }
 
     if (captchaConfig[message.guild.id].captcha !== true) {
-        return;
+        return null;
     }
 
     let rand = Math.random().toString(36).substr(2, 1);
@@ -552,7 +552,7 @@ function reload(bot: any) {
         if (jsfile.length <= 0) {
             return;
         }
-        jsfile.forEach((f: any, i: any) => {
+        jsfile.forEach((f: string) => {
             delete require.cache[require.resolve(`${path.join(__dirname, '../../commands')}/${f}`)]
             let probs = require(`${path.join(__dirname, '../../commands')}/${f}`);
             bot.commands.set(probs.help.name, probs);
@@ -562,7 +562,7 @@ function reload(bot: any) {
 
     });
     fs.readdir(path.join(__dirname, '../activities/'), (err: Error, files: any) => {
-
+        if (err) return null;
         let jsfile2 = files.filter((f2: any) => f2.split(".").pop() === "js")
         if (jsfile2.length <= 0) {
             return;
@@ -595,6 +595,7 @@ Please provide a value to select one of the search results ranging from 1-${vide
         errors: ['time']
     }).then((match: any) => response = match)
         .catch((err: Error) => {
+            if (err) return message.channel.send("something went wrong");
             message.channel.messages.fetch(songsMessage).catch()
                 .then((msg: any) => msg.delete({
                     timeout: 0

@@ -54,6 +54,7 @@ function getStackInfo(stackIndex: number) {
       stack: stacklist.join('\n')
     }
   }
+  return null;
 }
 // A custom logger interface that wraps winston, making it easy to instrument
 // code and still possible to replace winston in the future.

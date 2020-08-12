@@ -78,23 +78,11 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
 
     let bm = path.join(__dirname, `/../maps/${APIData.beatmap_id}.osu`);
 
-    let Map = await bot.extra.osu.mapInfo(bot, bm);
+    let Map: any = await bot.extra.osu.mapInfo(bot, bm);
 
-    let Mods = bot.extra.osu.enum2Mods(APIData.enabled_mods);
+    let Mods: Array<any> = bot.extra.osu.enum2Mods(APIData.enabled_mods);
     Mod = Mods[0].join(", ");
 
-    let player = await bot.extra.osu.player(bot, usernameRequest, gamemode);
-
-    let modStat = await bot.extra.osu.calcCSHP(Mod, Map)
-    cs = modStat[0];
-    hp = modStat[1];
-
-    let bpm = await bot.extra.osu.calcBPM(Mod, Map.bpm);
-
-    let dotnet = '';
-    for (let mod in Mods[0]) {
-        dotnet = dotnet + `-m ${Mods[0][mod]} `;
-    }
 
     function replaceAll(str: string) {
         str = str.replace(new RegExp(', ', 'g'), '');
@@ -102,6 +90,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
         str = '+' + str;
         return str;
     }
+
     let playStats: any = {
         mods: replaceAll(Mod),
         combo: APIData.maxcombo,
@@ -111,16 +100,23 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
         count50: APIData.count50,
         score: APIData.score
     }
-    let mapPlay = await bot.extra.osu.calcPP(bot, bm, playStats, dotnet, gamemode);
 
-    let sr = await bot.extra.osu.calcMap(bot, bm, dotnet, gamemode);
-    if (gamemode === "catch") {
-        mapPlay.maxCombo = sr[1];
-        mapPlay.ar = sr[2];
-    } else if (gamemode === "taiko") {
-        mapPlay.maxcombo = sr[2]
+    let dotnet = '';
+    for (let mod in Mods[0]) {
+        dotnet = dotnet + `-m ${Mods[0][mod]} `;
     }
-    sr = sr[0];
+
+    let data = await Promise.all([await bot.extra.osu.player(bot, usernameRequest, gamemode), await bot.extra.osu.calcCSHP(Mod, Map), await bot.extra.osu.calcBPM(Mod, Map.bpm), await bot.extra.osu.calcPP(bot, bm, playStats, dotnet, gamemode), await bot.extra.osu.calcMap(bot, bm, dotnet, gamemode)]);
+    // let player = await bot.extra.osu.player(bot, usernameRequest, gamemode);
+
+    let player = data[0]
+    let modStat = data[1];
+    let bpm = data[2];
+    cs = modStat[0];
+    hp = modStat[1];
+    let mapPlay = data[3];
+    let sr = data[4];
+
     let mapPlayFC: any = {};
     if (APIData.perfect !== '1') {
         await new Promise(async function (resolve, reject) {
@@ -143,7 +139,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
             `Mapper: ${Map.creator}\n` +
             `BPM: ${bpm}${bpm == Map.bpm ? '' : '(' + Map.bpm + ')'} Divisor 1/${Map.divisor}\n` +
             `Play set at ${APIData.date} ${APIData.replay_available === '0' ? 'No replay available' : `Replay available [here](https://osu.ppy.sh/scores/osu/${APIData.score_id}/download)`}\n` +
-            `**AR** ${mapPlay.ar || Map.diff_approach}${mapPlay.ar == Map.diff_approach || mapPlay.ar === undefined ? '' : '(' + Map.diff_approach + ')'} **OD** ${mapPlay.od || Map.diff_overall}${mapPlay.od == Map.diff_overall || mapPlay.od === undefined ? '' : '(' + Map.diff_overall + ')'} **CS** ${cs || Map.diff_size}${cs == Map.diff_size || mapPlay.cs === undefined ? '' : '(' + Map.diff_size + ')'} **HP** ${hp || Map.diff_drain}${hp == Map.diff_drain || mapPlay.hp === undefined ? '' : '(' + Map.diff_drain + ')'}`)
+            `**AR** ${mapPlay.ar} ${checkDifference(mapPlay.ar, Map.diff_approach) ? '' : '(' + Map.diff_approach + ')'} **OD** ${mapPlay.od} ${checkDifference(mapPlay.od, Map.diff_overall) ? '' : '(' + Map.diff_overall + ')'} **CS** ${cs} ${checkDifference(parseFloat(cs), Map.diff_size) ? '' : '(' + Map.diff_size + ')'} **HP** ${hp} ${checkDifference(parseFloat(hp), Map.diff_drain) ? '' : '(' + Map.diff_drain + ')'}`)
         .setThumbnail(`https://s.ppy.sh/a/${player.user_id}`)
 
     message.channel.send(osuEmbed).catch();
@@ -152,4 +148,13 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
 module.exports.help = {
     name: "osutop",
     alias: "ot"
+}
+function checkDifference(one: any, two: any) {
+    one = parseFloat(one);
+    two = parseFloat(two);
+    // false if difference else true
+    let num: any = one - two;
+    num = Math.abs(num);
+    if (num > 0.04) return false;
+    else return true;
 }
