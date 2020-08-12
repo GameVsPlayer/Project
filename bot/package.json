@@ -32,7 +32,7 @@
     "helmet": "^4.0.0",
     "integer": "^4.0.0",
     "javascript-time-ago": "^2.0.13",
-    "jimp": "^0.14.1-canary.919.1005.0",
+    "jimp": "^0.16.0",
     "libsodium-wrappers": "^0.7.8",
     "mathjs": "^7.1.0",
     "megajs": "^0.17.2",
