@@ -28,7 +28,7 @@
     "dotenv": "^8.2.0",
     "express": "^5.0.0-alpha.8",
     "ffmpeg-static": "^4.2.6",
-    "googleapis": "^58.0.0",
+    "googleapis": "^59.0.0",
     "helmet": "^4.0.0",
     "integer": "^4.0.0",
     "javascript-time-ago": "^2.0.13",
