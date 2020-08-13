@@ -1,11 +1,8 @@
-import express, { Request, Response } from 'express';
-const app = express();
-const httpServer = require('http').createServer(app);;
-import helmet from 'helmet';
+
 let dbData: any = [];
 let todos: any = {};
 
-module.exports = async (bot: any) => {
+export default function (bot: any) {
     let find = bot.db.todoDB.find();
     setTimeout(async () => {
         find.each(function (err: Error, item: any) {
@@ -23,7 +20,6 @@ module.exports = async (bot: any) => {
             todos.data = dbData;
         })
     }, 60000);
-    app.use(helmet());
     let pushData: any;
     setInterval(() => {
         pushData = {
@@ -42,19 +38,8 @@ module.exports = async (bot: any) => {
                 todos: todos.data
             }
         };
+        bot.redis.set('botdata', JSON.stringify(pushData), () => {
+            return;
+        });
     }, 1000);
-
-    app.get('/api/', (req: Request, res: Response) => {
-        if (ip(req) === '127.0.0.1' || ip(req) === '::1' || ip(req) === '::ffff:127.0.0.1') {
-            res.json(pushData || {
-                error: 'no Data available'
-            });
-        } else return;
-    });
-
-    httpServer.listen(process.env.BotPORT || 10025);
-};
-
-function ip(req: Request) {
-    return req.headers['x-real-ip'] || req.connection.remoteAddress;
-};
+}

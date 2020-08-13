@@ -8,14 +8,23 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
 }));
+import * as Redis from 'redis';
 
 import path from 'path';
 require('dotenv').config({
     path: path.join(__dirname, '/.env')
 });
-
+let redis = Redis.createClient()
 
 const info = process.env;
+
+redis.on('connect', () => {
+    console.info("Connected to redis database!");
+})
+
+redis.on("error", function (error: Error) {
+    console.error(error);
+});
 
 app.use(compression());
 app.use(helmet());
@@ -23,12 +32,12 @@ app.disable('x-powered-by');
 let currentData: any = '';
 
 async function fetchData() {
-    let response = await fetch('http://127.0.0.1:10025/api/').catch((err: Error) => {
-        err = null
-    });
-    if (!response) return;
-    response = await response.json();
-    currentData = response;
+    redis.get('botdata', (err: Error, reply: any) => {
+        if (err) return
+        if (!reply) return;
+        console.log(reply);
+        currentData = JSON.parse(reply);
+    })
 };
 
 setInterval(() => {
@@ -128,5 +137,5 @@ app.get('/serverStats/', (req: Request, res: Response) => {
 
 app.listen(process.env.backendPort || 10026, function () {
 
-    console.log(`Backend running on port ${process.env.backendPort || 1026}`);
+    console.log(`Backend running on port ${process.env.backendPort || 10026}`);
 });

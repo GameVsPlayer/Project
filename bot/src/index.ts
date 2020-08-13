@@ -49,13 +49,15 @@ bot.mutes = require("./datastorage/mutes.json");
 bot.blackListedGuilds = require("./datastorage/blackListedGuilds.json");
 bot.blackListedUsers = require("./datastorage/blackListedUsers.json");
 bot.logger = logger;
-let loggedIN: Number = 0;
+let loggedIN: number = 0;
 const YouTube = require("simple-youtube-api");
 
 require('events').EventEmitter.defaultMaxListeners = 20;
 bot.extra = require('./externalLoading/extra');
-bot.website = require('./externalLoading/website/Website');
 bot.config = botconfig;
+import website from './externalLoading/website/Website';
+
+
 
 bot.youtube = new YouTube(bot.config.googleAPI);
 bot.redis = redis.createClient();
@@ -82,7 +84,7 @@ setInterval(() => {
 }, 1000);
 
 bot.on("ready", async () => {
-    if (loggedIN === 0) bot.website(bot);
+
     loggedIN = 1;
     setInterval(() => {
         osutils.cpuUsage((v: any) => {
@@ -251,6 +253,8 @@ bot.on("ready", async () => {
         }
 
     }, 5000)
+    if (bot.stats.usage === undefined) await sleep(5000);
+    website(bot);
     // makes cmds work on first message
     setInterval(() => {
         if (ran === true) return
