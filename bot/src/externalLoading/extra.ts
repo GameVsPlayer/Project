@@ -118,12 +118,21 @@ module.exports = {
                         await bot.extra.osu.dlMap({ map })
 
                     }
-                    if (gamemode === "osu") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${mods}-c ${playStats.combo}`;
+
+                    function calcAcc(perfect: number, good: number, mehs: number, misses: number) {
+
+                        let a = ((mehs * 50) + (good * 100) + (perfect * 300));
+                        let b = 300 * (misses * 1 + good * 1 + mehs * 1 + perfect * 1)
+
+                        return (a / b) * 100
+
+                    }
+                    if (gamemode === "osu") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -a ${calcAcc(playStats.count300, playStats.count100, playStats.count50, playStats.misses)} ${mods}-c ${playStats.combo}`;
                     else if (gamemode === "mania") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} ${mods}-s ${playStats.score}`;
                     else if (gamemode === "catch") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -D ${playStats.count300} -T ${parseInt(playStats.count100) + parseInt(playStats.count50)} ${mods}-c ${playStats.combo}`;
                     else if (gamemode === "taiko") cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count300} ${mods}-c ${playStats.combo}`
-                    else cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -X ${playStats.misses} -G ${playStats.count100} -M ${playStats.count50} ${mods}-c ${playStats.combo}`;
-
+                    else cmd = `dotnet ${path.join(__dirname + "/../PP/PerformanceCalculator.dll")} simulate ${gamemode} ${bm} -a ${calcAcc(playStats.count300, playStats.count100, playStats.count50, playStats.misses)} ${mods}-c ${playStats.combo}`;
+                    //console.log(cmd);
                     exec(cmd, (error, stdout) => {
                         if (error && bot !== null) return bot.logger.error(error)
                         else if (error) return console.error(error);
