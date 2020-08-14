@@ -32,7 +32,8 @@ let playStats = {
     combo: play.maxcombo,
     count100: play.count100,
     count50: play.count50,
-    misses: play.countmiss
+    misses: play.countmiss,
+    count300: play.count300
 
 }
 
