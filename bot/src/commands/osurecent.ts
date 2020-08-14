@@ -9,7 +9,7 @@ const timeago = new TimeAgo('en-us');
 module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (bot.config.osuAPI == "") return bot.logger.info("osu API Key not set")
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
-    if (!args[0]) return message.channel.send("No user specified").catch();
+
     let usernameRequest: any = [];
     let Mod: string, cs: string, hp: string, position: any, prefix: string;
     let gamemode: string;
