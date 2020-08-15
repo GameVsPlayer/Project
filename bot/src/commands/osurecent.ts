@@ -150,6 +150,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
             `Play set at ${timeago.format(new Date(APIData.date))}\n` +
             `**AR** ${mapPlay.ar} ${checkDifference(mapPlay.ar, Map.diff_approach) ? '' : '(' + Map.diff_approach + ')'} **OD** ${mapPlay.od} ${checkDifference(mapPlay.od, Map.diff_overall) ? '' : '(' + Map.diff_overall + ')'} **CS** ${cs} ${checkDifference(parseFloat(cs), Map.diff_size) ? '' : '(' + Map.diff_size + ')'} **HP** ${hp} ${checkDifference(parseFloat(hp), Map.diff_drain) ? '' : '(' + Map.diff_drain + ')'}`)
         .setThumbnail(`https://s.ppy.sh/a/${player.user_id}`)
+        .setColor(bot.config.color)
 
     message.channel.send(osuEmbed).catch();
 

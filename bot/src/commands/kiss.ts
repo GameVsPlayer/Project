@@ -57,7 +57,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
 
     var gif: number = Math.floor(Math.random() * (kissURL.length - 1) + 1);
     let kissEmbed: MessageEmbed = new Discord.MessageEmbed()
-        .setColor(bot.color)
+        .setColor(bot.config.color)
         .addField("Kisses", `${kissUser} has been kissed by ${message.member}`)
         .addField("Number of kisses that they have received", kiss.amount)
         .setImage(kissURL[gif]);

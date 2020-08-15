@@ -29,7 +29,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (!kReason) kReason = "no reason specified";
     let kickEmbed: MessageEmbed = new Discord.MessageEmbed()
         .setDescription("Kick")
-        .setColor("#FF0000")
+        .setColor(bot.config.color)
         .addField("Kicked User", `${kUser} with ID ${kUser.id}`)
         .addField("Kicked by", `<@${message.author.id}> with ID ${message.author.id}}`)
         .addField("Kicked in", message.channel)

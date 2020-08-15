@@ -128,6 +128,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
             `Their recent activities are \n` +
             `${recentScores}`)
         .setThumbnail(Avatar)
+        .setColor(bot.config.color)
 
     message.channel.send(osuEmbed).catch();
 

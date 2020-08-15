@@ -28,7 +28,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (!bReason) bReason = "no reason specified"
     let banEmbed: MessageEmbed = new Discord.MessageEmbed()
         .setDescription("Ban")
-        .setColor("#FF0000")
+        .setColor(bot.config.color)
         .addField("Banned User", `${bUser} with ID ${bUser.id}`)
         .addField("Banned by", `<@${message.author.id}> with ID ${message.author.id}}`)
         .addField("Banned in", message.channel)

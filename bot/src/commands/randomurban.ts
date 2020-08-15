@@ -13,8 +13,8 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
             .addField("Upvotes", json.thumbs_up, true)
             .addField("Downvotes", json.thumbs_down, true)
             .setURL(json.permalink || "None")
-            .setFooter(`Written by ${json.author}`);
-
+            .setFooter(`Written by ${json.author}`)
+            .setColor(bot.config.color)
         message.channel.send(embed).catch();
     });
 

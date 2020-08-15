@@ -23,7 +23,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     }).then((res: any) => {
 
         let embed: MessageEmbed = new Discord.MessageEmbed()
-
+            .setColor(bot.config.color)
             .setTitle("Translation")
             .addField("Initial language", originalLang, true)
             .addField("Translated language", toTranslateTo, true)

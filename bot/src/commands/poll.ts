@@ -13,7 +13,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (!args[0]) return message.channel.send("Proper Usage: <prefix>poll question").catch();
 
     const embed: MessageEmbed = new Discord.MessageEmbed()
-        .setColor(0xffffff)
+        .setColor(bot.config.color)
         .setFooter("React to vote.")
         .setDescription(args.join(' '))
         .setTitle(`Poll created by ${message.author.username}`);

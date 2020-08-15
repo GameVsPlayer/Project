@@ -25,6 +25,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
         .setTitle("Prefix changed!")
         .setDescription(`Set from ${prefix} to ${args[0]}`);
 
+
     message.channel.send(Embed).catch();
 
 }

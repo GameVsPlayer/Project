@@ -17,7 +17,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
 
         let embed: MessageEmbed = new Discord.MessageEmbed()
             .addField("Avatar", `${memberA}`)
-
+            .setColor(bot.config.color)
             .setImage(`${avatarURLSmall}`)
 
             .setDescription(`**LINK** ${avatarLink}`)
