@@ -38,16 +38,20 @@ let playStats = {
 }
 
 const calcPlay = require("../../built/externalLoading/extra").osu.calcPP(null, path.join(__dirname + "/maps/1.osu"), playStats, dotnet, "osu");
+const mapInfo = require("../../built/externalLoading/extra").osu.mapInfo(null, path.join(__dirname + "/maps/1.osu"));
 
 const calcMap = require("../../built/externalLoading/extra").osu.calcMap(null, path.join(__dirname + "/maps/1.osu"), dotnet, "osu");
 
 let count = 0,
-    sr = 0;
+    sr = 0,
+    name = "",
+    objCount = "";
 
 
 describe('osu', function () {
     before(async function () {
         let res = await calcPlay;
+
         count = parseInt(res.pp);
     })
     it('Test PP Calculator for a Play', function () {
@@ -57,7 +61,21 @@ describe('osu', function () {
             let res = await calcMap;
             sr = parseFloat(res[0]);
         })
+
     it('Test PP Calculator for map Diff', function () {
-        chai.expect(sr).closeTo(7.80, 0.3);
-    })
+            chai.expect(sr).closeTo(7.80, 0.3);
+        }),
+        before(async function () {
+            let res = await mapInfo;
+
+            name = res.title;
+            objCount = res.circle;
+        }),
+        it('Test Mapinfo for name', function () {
+            chai.expect(name).equals('FREEDOM DiVE');
+        }),
+        it('Test Mapinfo for object count', function () {
+            chai.expect(objCount).equals('1983');
+        })
+
 });

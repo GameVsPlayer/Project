@@ -154,12 +154,13 @@ module.exports = {
                                 pp: parseFloat(stdoutL[14]).toFixed(2),
                                 ar: parseFloat(stdoutL[12]).toFixed(2),
                                 od: parseFloat(stdoutL[11]).toFixed(2),
-                                maxCombo: stdoutL[13]
+                                maxCombo: stdoutL[13],
+
                             }
                         } else if (gamemode === "mania") {
                             {
                                 PP = {
-                                    pp: parseFloat(stdoutL[5]).toFixed(2)
+                                    pp: parseFloat(stdoutL[5]).toFixed(2),
                                 };
                             }
                         } else if (gamemode === "catch") {
@@ -167,7 +168,7 @@ module.exports = {
                                 PP = {
                                     pp: parseFloat(stdoutL[9]).toFixed(2),
                                     ar: parseFloat(stdoutL[1]).toFixed(2),
-                                    combo: stdoutL[2]
+                                    combo: stdoutL[2],
                                 };
                             }
                         } else if (gamemode === "taiko") {
@@ -175,7 +176,8 @@ module.exports = {
                                 PP = {
                                     accuracy: parseFloat(stdoutL[1]).toFixed(2),
                                     pp: parseFloat(stdoutL[9]).toFixed(2),
-                                    combo: stdoutL[2]
+                                    combo: stdoutL[2],
+
                                 }
                             }
                         }
@@ -369,7 +371,8 @@ module.exports = {
                         artist: stdoutL[9],
                         version: stdoutL[10],
                         bpm: parseFloat(stdoutL[11]).toFixed(2),
-                        divisor: stdoutL[12]
+                        divisor: stdoutL[12],
+                        circle: stdoutL[13]
                     };
                     resolve(Map)
                 });
