@@ -1,6 +1,6 @@
 Project
 =========
-![](https://circleci.com/gh/GameVsPlayer/Project.svg?style=svg)
+![](https://circleci.com/gh/GameVsPlayer/Project.svg?style=shield)
 
 > ## Installation
   <details>

@@ -138,12 +138,12 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     } else {
         mapPlay.maxCombo = mapPlay.combo;
     }
-    console.log(completetion)
+
     const osuEmbed: MessageEmbed = new Discord.MessageEmbed()
         .setAuthor(`${player.username}'s Recent Play in ${gamemode} Try ${tryC}`, `https://b.ppy.sh/thumb/${Map.beatmapset_id}.jpg`)
         .setDescription(`${Map.title} [${Map.version}](https://osu.ppy.sh/b/${Map.beatmap_id}) + ${Mod} [${parseFloat(sr).toFixed(2)}★] \n` +
             `${APIData.rank} Rank ${mapPlay.accuracy !== undefined ? mapPlay.accuracy + "%" : ""} ${mapPlay.pp}${mapPlayFC.pp !== undefined ? "(" + mapPlayFC.pp + ")" : ""}PP\n` +
-            `Score: ${APIData.score} ${completetion === 100 ? "" : `Completetion: ${completetion}%`}\n` +
+            `Score: ${APIData.score} ${completetion >= 100 ? "" : `Completetion: ${completetion}%`}\n` +
             `Combo: ${APIData.maxcombo}${mapPlay.maxCombo !== undefined ? "x/" + mapPlay.maxCombo + "x" : "x"} ${APIData.count300}/${APIData.count100}/${APIData.count50}/${APIData.countmiss}\n` +
             `Mapper: ${Map.creator}\n` +
             `BPM: ${bpm}${bpm == Map.bpm ? '' : '(' + Map.bpm + ')'} Divisor 1/${Map.divisor}\n` +

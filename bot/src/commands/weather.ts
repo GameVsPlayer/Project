@@ -28,7 +28,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     onehour = onehour.toISOString()
     let newAPI = `https://api.climacell.co/v3/weather/forecast/hourly?lat=${locationGeo.lat}&lon=${locationGeo.lng}&unit_system=si&fields=precipitation,temp,feels_like,dewpoint,humidity,wind_speed,wind_direction,wind_gust,baro_pressure,precipitation,precipitation_type,precipitation_probability,sunrise,sunset,cloud_cover,moon_phase&start_time=now&end_time=${onehour}&apikey=${bot.config.climacell}`
 
-    console.log(newAPI)
+
     let weather: any = await fetch(newAPI, { headers: { 'Content-Type': 'application/json' } });
     weather = await weather.json();
 
@@ -39,7 +39,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
 
     let timezone = await geoTz(locationGeo.lat, locationGeo.lng)
     timezone = timezone[0];
-    console.log(timezone)
+
     weather.sunRise = moment
         .utc(weather.sunrise.value)
         .tz(timezone)
