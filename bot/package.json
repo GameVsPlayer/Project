@@ -27,7 +27,7 @@
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "express": "^5.0.0-alpha.8",
-    "ffmpeg-static": "^4.2.6",
+    "ffmpeg-static": "^4.2.7",
     "geo-tz": "^6.0.0",
     "googleapis": "^59.0.0",
     "helmet": "^4.0.0",
