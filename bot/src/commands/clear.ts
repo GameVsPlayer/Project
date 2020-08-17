@@ -1,6 +1,6 @@
-import { Message, MessageCollector, Channel } from "discord.js";
+import { Message, TextChannel, TextBasedChannelFields } from "discord.js";
 
-module.exports.run = async (bot: any, message: Message, args: string[]) => {
+module.exports.run = async (bot: any, message: any, args: string[]) => {
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
     if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) return message.channel.send("I do not have the 'MANAGE_MESSAGES' permission")
     if (!message.member.hasPermission("MANAGE_MESSAGES")) return message.reply("You dont have the permission to use this command!").catch();
@@ -14,9 +14,9 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
         limit: clearNumber
     }).catch();
     if (fetched.size <= 1) return;
-
-    message.channel.bulkDelete(fetched)
-        .catch((error) => message.channel.send(`Error: ${error}`));
+    let channel: TextChannel = message.channel;
+    channel.bulkDelete(fetched, true)
+        .catch((error: Error) => message.channel.send(`Error: ${error}`));
     message.channel.send(`${fetched.size} messages deleted!`).catch();
 }
 
