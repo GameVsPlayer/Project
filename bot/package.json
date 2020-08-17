@@ -68,7 +68,7 @@
     "@types/javascript-time-ago": "^2.0.1",
     "@types/mongodb": "^3.5.25",
     "@types/node-fetch": "^2.5.7",
-    "@types/os-utils": "0.0.0",
+    "@types/os-utils": "0.0.1",
     "@types/redis": "^2.8.25",
     "@types/request": "^2.48.5",
     "@types/string-similarity": "^3.0.0",
