@@ -18,7 +18,7 @@
     "@discordjs/opus": "^0.3.2",
     "@types/helmet": "0.0.47",
     "@types/ws": "^7.2.6",
-    "@vitalets/google-translate-api": "^3.0.0",
+    "@vitalets/google-translate-api": "^4.0.0",
     "adm-zip": "^0.4.16",
     "bufferutil": "^4.0.1",
     "chai": "^4.2.0",
