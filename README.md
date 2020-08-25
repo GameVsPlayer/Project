@@ -59,7 +59,7 @@ Project
     <li><a href="https://opencagedata.com//">opencagedata api key</a></li>
     <li>mongodb uri</li>
     <li>the default prefix for the bot</li>
-    <li>hex code for the bot</li>
+    <li>hex color code for the bot</li>
     <li><a href="https://osu.ppy.sh/p/api/">TwitchAuth</a></li>
     </details>
     </ul>

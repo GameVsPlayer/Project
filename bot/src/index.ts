@@ -11,8 +11,8 @@ import fs from 'fs';
 import osutils from "os-utils";
 import fetch from 'node-fetch';
 import { MongoClient } from 'mongodb';
-const uri = `mongodb+srv://GamuKaren:${botconfig.mongodb}@karenbotgamu-o1gvd.azure.mongodb.net/test?retryWrites=true&w=majority`;
-const mongoClient = new MongoClient(uri, {
+
+const mongoClient = new MongoClient(botconfig.mongodb, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
