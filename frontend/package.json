@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
-    "caniuse-lite": "^1.0.30001105",
+    "caniuse-lite": "^1.0.30001112",
     "core-js": "^3.6.5",
     "eslint-plugin-vue-libs": "^4.0.0",
     "mdbvue": "^6.7.1",
