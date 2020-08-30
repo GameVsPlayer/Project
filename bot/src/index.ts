@@ -18,26 +18,28 @@ const mongoClient = new MongoClient(botconfig.mongodb, {
 });
 import * as redis from 'redis';
 
-let dbLoad: Boolean = false;
+async function dbConnect() {
+    await new Promise((res, rej) => {
+        mongoClient.connect(async (err: Error) => {
+            if (err) bot.logger.error(err);
 
-mongoClient.connect(async (err: Error) => {
-    if (err) bot.logger.error(err);
+            bot.logger.info(`Connected to database`);
 
-    bot.logger.info(`Connected to database`);
+            bot.db = mongoClient.db("datastorage");
 
-    bot.db = mongoClient.db("datastorage");
-
-    bot.db.hugsDB = await bot.db.collection("hugs");
-    bot.db.patsDB = await bot.db.collection("pats");
-    bot.db.kissDB = await bot.db.collection("kiss");
-    bot.db.xpDB = await bot.db.collection("xp");
-    bot.db.moneyDB = await bot.db.collection("money");
-    bot.db.todoDB = await bot.db.collection("todo");
-    bot.db.prefixes = await bot.db.collection("prefix");
-    bot.db.osuName = await bot.db.collection("osuName");
-    dbLoad = true;
-});
-
+            bot.db.hugsDB = await bot.db.collection("hugs");
+            bot.db.patsDB = await bot.db.collection("pats");
+            bot.db.kissDB = await bot.db.collection("kiss");
+            bot.db.xpDB = await bot.db.collection("xp");
+            bot.db.moneyDB = await bot.db.collection("money");
+            bot.db.todoDB = await bot.db.collection("todo");
+            bot.db.prefixes = await bot.db.collection("prefix");
+            bot.db.osuName = await bot.db.collection("osuName");
+            res()
+        });
+    })
+    return true;
+}
 const bot: any = new Discord.Client();
 
 bot.commands = new Discord.Collection;
@@ -85,6 +87,9 @@ setInterval(() => {
 
 bot.on("ready", async () => {
 
+    if (loggedIN === 0)
+        await dbConnect();
+
     loggedIN = 1;
     setInterval(() => {
         osutils.cpuUsage((v: any) => {
@@ -115,7 +120,7 @@ bot.on("ready", async () => {
 
     bot.logger.info(`${bot.user.username} is online!`);
 
-    if (dbLoad === false) await sleep(5000);
+
 
     await bot.db.xpDB.find({
         messageCount: 1
@@ -274,7 +279,7 @@ bot.on("message", async (message: Discord.Message) => {
     //return;
     // ------------------------------------------------------------------
     if (loggedIN === 0) return;
-    if (dbLoad === false) return;
+
     let prefix = bot.config.prefix;
 
     if (message.channel.type === "dm") return
@@ -348,7 +353,7 @@ if (botconfig.botToken === "") bot.logger.error("Bot token not set")
 else bot.login(botconfig.botToken);
 //.catch((e) => bot.logger.info(e));
 
-loggedIN = 1;
+
 //return;
 
 

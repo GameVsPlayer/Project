@@ -2,14 +2,13 @@ import { Message, MessageEmbed, GuildMember } from "discord.js";
 
 import Discord from "discord.js";
 const shortUrl = require('tinyurl');
-import sm from "string-similarity";
 import moment from "moment-timezone";
 
 
 module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds");
 
-    let memberA = await bot.extra.autocomplete(message, args);
+    let memberA = await bot.extra.autocomplete(bot, message, args);
 
 
     memberA = memberA || message.author;
@@ -25,9 +24,9 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
         var joinedAt = gMember.joinedAt;
 
         if (memberA.presence.status == "online") statusIcon = "[Online]";
-        if (memberA.presence.status == "idle") statusIcon = "[Idle]";
-        if (memberA.presence.status == "dnd") statusIcon = "[DnD]";
-        if (memberA.presence.activities !== null)
+        else if (memberA.presence.status == "idle") statusIcon = "[Idle]";
+        else if (memberA.presence.status == "dnd") statusIcon = "[DnD]";
+        else if (memberA.presence.activities !== null)
             if (memberA.presence.activities.url !== null) statusIcon = "[Streaming]";
         if (statusIcon === null) statusIcon = "[Offline]";
         if (memberA.presence.activities !== undefined && statusIcon == "[Streaming]" && memberA.presence.activities.timestamps !== null && memberA.presence.activities.url !== null) game = {
@@ -69,17 +68,18 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
 
     if (gameF == undefined) gameF = memberA.presence.activities;
 
-    if (memberA.roles == undefined) {
-        let fetched: GuildMember = await message.guild.members.fetch(memberA.id);
-        memberA.roles = fetched.roles;
-    }
-    let rolesName: any = Array.from(memberA.roles);
+    let fetched = message.guild.members.cache.get(memberA.id);
 
-    let rolesCount = (memberA.roles).size;
+    let roles: any = fetched.roles.cache;
+    let rolesName: any = Array.from(roles);
 
-    let mentionRole: any;
+    let rolesCount = rolesName.length;
 
-    for (let i = 0; i < rolesName.length; i++) {
+    let mentionRole: any = [];
+
+
+
+    for (let i = 0; i < rolesCount; i++) {
         let filteredNames = rolesName[i].splice(1);
         mentionRole.push(`${filteredNames}`);
     }

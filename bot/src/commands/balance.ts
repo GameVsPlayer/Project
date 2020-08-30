@@ -7,7 +7,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
 
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
 
-    let memberA = await bot.extra.autocomplete(message, args);
+    let memberA = await bot.extra.autocomplete(bot, message, args);
 
     if (await bot.db.moneyDB.findOne({
         userid: memberA.id

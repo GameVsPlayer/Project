@@ -31,7 +31,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (!args[0]) return message.reply("Please mention a user!").then((msg) => msg.delete({ timeout: 5000 }).catch());
 
 
-    let kissUser: User = await bot.extra.autocomplete(message, args);
+    let kissUser: User = await bot.extra.autocomplete(bot, message, args);
 
     if (kissUser.id == message.author.id) return message.channel.send("You can\'t kiss yourself")
 

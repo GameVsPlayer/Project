@@ -25,7 +25,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds")
     if (!args[0]) return message.reply("Please mention a user!").then((msg) => msg.delete({ timeout: 5000 }).catch());
 
-    let hugUser: User = await bot.extra.autocomplete(message, args);
+    let hugUser: User = await bot.extra.autocomplete(bot, message, args);
 
     if (hugUser.id == message.author.id) return message.channel.send("You can\'t hug yourself")
 
