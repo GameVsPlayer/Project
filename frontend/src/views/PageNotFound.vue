@@ -13,43 +13,43 @@
     metaInfo() {
       return {
         meta: [{
-            'name': 'description',
-            content: 'This page doesn\'t exist',
-            vmid: 'description'
+            name: "description",
+            content: "This page doesn't exist",
+            vmid: "description"
           },
           {
           itemprop: "description",
-          content: "This page doesn\'t exist",
+          content: "This page doesn't exist",
           vmid: "itemprop:description"
         },
           {
-            'property': 'og:description',
-            content: 'This page doesn\'t exist',
-            vmid: 'og:description'
+            property: "og:description",
+            content: "This page doesn't exist",
+            vmid: "og:description"
           },
           {
-            'property': 'og:title',
+            property: "og:title",
             content: document.title,
-            'vmid': 'og:title'
+            vmid: "og:title"
           },
           {
-            'property': 'og:url',
-            content: 'https://gamu.tk' + window.location.pathname,
-            'vmid': 'og:url'
+            property: "og:url",
+            content: "https://gamu.tk" + window.location.pathname,
+            vmid: "og:url"
           },
           {
-            'name': 'twitter:title',
+            name: "twitter:title",
             content: document.title,
-            vmid: 'twitter:title'
+            vmid: "twitter:title"
           },
           {
-            'name': 'twitter:site',
-            content: '@GameVsPlayer'
+            name: "twitter:site",
+            content: "@GameVsPlayer"
           },
           {
-            'name': 'twitter:description',
-            content: 'This page doesn\'t exist',
-            vmid: 'og:description'
+            name: "twitter:description",
+            content: "This page doesn't exist",
+            vmid: "og:description"
           },
         ]
       }

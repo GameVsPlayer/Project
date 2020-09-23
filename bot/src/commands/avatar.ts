@@ -2,8 +2,6 @@ import { Message, MessageEmbed, User } from "discord.js";
 
 import Discord from "discord.js";
 
-const shortUrl = require('tinyurl');
-
 
 module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (!message.guild.me.hasPermission("EMBED_LINKS")) return message.channel.send("I dont have the permission to send embeds");
@@ -13,17 +11,16 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     let avatarURLSmall = memberA.avatarURL({ format: 'png', dynamic: true, size: 128 });
     if (!avatarURL) return message.channel.send("This users doesn\'t have a Avatar!");
 
-    shortUrl.shorten(`${avatarURL}`, function (avatarLink: string, err: Error) {
 
-        let embed: MessageEmbed = new Discord.MessageEmbed()
-            .addField("Avatar", `${memberA}`)
-            .setColor(bot.config.color)
-            .setImage(`${avatarURLSmall}`)
+    let embed: MessageEmbed = new Discord.MessageEmbed()
+        .addField("Avatar", `${memberA}`)
+        .setColor(bot.config.color)
+        .setImage(`${avatarURLSmall}`)
 
-            .setDescription(`**LINK** ${avatarLink}`)
+        .setDescription(`[**LINK**](${avatarURL}?size=2048)`)
 
-        message.channel.send(embed).catch((err) => bot.logger.error(err));
-    });
+    message.channel.send(embed).catch((err) => bot.logger.error(err));
+
 }
 module.exports.help = {
     name: "avatar",

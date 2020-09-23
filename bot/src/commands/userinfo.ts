@@ -1,7 +1,6 @@
 import { Message, MessageEmbed, GuildMember } from "discord.js";
 
 import Discord from "discord.js";
-const shortUrl = require('tinyurl');
 import moment from "moment-timezone";
 
 
@@ -88,23 +87,21 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     let timeS = moment(joinedAt);
 
     if (mentionRole !== undefined) mentionRole = mentionRole.toString();
-    shortUrl.shorten(`${avatarURL}?size=2048`, function (avatarLink: string, err: Error) {
 
-        if (err) return bot.logger.info(err);
-        let embed: MessageEmbed = new Discord.MessageEmbed()
+    let embed: MessageEmbed = new Discord.MessageEmbed()
 
-            .setDescription(`**${memberA}'s Info**`)
-            .addField("Avatar url", avatarLink, true)
-            .addField(`Joined ${message.guild.name}`, moment(timeS).format("DD/MM/YYYY hh:mm:ss"), true)
-            .addField("Joined Discord", `${moment(timeJD).format("DD/MM/YYYY hh:mm:ss")}`, true)
-            .addField("ID", memberA.id, true)
-            .addField("Roles", `Number of roles [${rolesCount}] ${mentionRole}`, true)
-            .addField(`Status ${statusIcon}`, gameF, true)
-            .setThumbnail(`${avatarURL}?size=128`)
-            .setColor(bot.config.color);
+        .setDescription(`**${memberA}'s Info**`)
+        .addField("Avatar url", `[avatar](${avatarURL}?size=2048)`, true)
+        .addField(`Joined ${message.guild.name}`, moment(timeS).format("DD/MM/YYYY hh:mm:ss"), true)
+        .addField("Joined Discord", `${moment(timeJD).format("DD/MM/YYYY hh:mm:ss")}`, true)
+        .addField("ID", memberA.id, true)
+        .addField("Roles", `Number of roles [${rolesCount}] ${mentionRole}`, true)
+        .addField(`Status ${statusIcon}`, gameF, true)
+        .setThumbnail(`${avatarURL}?size=128`)
+        .setColor(bot.config.color);
 
-        return message.channel.send(embed)
-    });
+    return message.channel.send(embed)
+
 };
 module.exports.help = {
     name: "userinfo",

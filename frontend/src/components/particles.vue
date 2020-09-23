@@ -17,18 +17,18 @@ export default {
             value: 30,
             density: {
               enable: true,
-              value_area: 800
-            }
+              value_area: 800,
+            },
           },
           color: {
-            value: "#0fa1c0"
+            value: "#0fa1c0",
           },
           shape: {
             type: "circle",
             stroke: {
               width: 0,
-              color: "#000"
-            }
+              color: "#000",
+            },
           },
           opacity: {
             value: 0.3,
@@ -37,8 +37,8 @@ export default {
               enable: false,
               speed: 0.3,
               opacity_min: 0.3,
-              sync: false
-            }
+              sync: false,
+            },
           },
           size: {
             value: 50,
@@ -47,15 +47,15 @@ export default {
               enable: false,
               speed: 5,
               size_min: 40,
-              sync: false
-            }
+              sync: false,
+            },
           },
           line_linked: {
             enable: false,
             distance: 200,
             color: "#ffffff",
             opacity: 1,
-            width: 2
+            width: 2,
           },
           move: {
             enable: true,
@@ -68,53 +68,53 @@ export default {
             attract: {
               enable: true,
               rotateX: 600,
-              rotateY: 1200
-            }
-          }
+              rotateY: 1200,
+            },
+          },
         },
         interactivity: {
           detect_on: "canvas",
           events: {
             onhover: {
               enable: false,
-              mode: "grab"
+              mode: "grab",
             },
             onclick: {
               enable: false,
-              mode: "push"
+              mode: "push",
             },
-            resize: true
+            resize: true,
           },
           modes: {
             grab: {
               distance: 400,
               line_linked: {
-                opacity: 1
-              }
+                opacity: 1,
+              },
             },
             bubble: {
               distance: 400,
               size: 40,
               duration: 2,
               opacity: 8,
-              speed: 3
+              speed: 3,
             },
             repulse: {
               distance: 200,
-              duration: 0.4
+              duration: 0.4,
             },
             push: {
-              particles_nb: 4
+              particles_nb: 4,
             },
             remove: {
-              particles_nb: 2
-            }
-          }
+              particles_nb: 2,
+            },
+          },
         },
-        retina_detect: true
+        retina_detect: true,
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -127,5 +127,6 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: -1;
 }
 </style>
