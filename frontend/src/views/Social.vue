@@ -1,7 +1,10 @@
 <template>
   <div class="social">
-    <h4>If you wish to visit any of my social media, you can do that by clicking on the corresponding image</h4>
-    <a v-for="(icon,i) in media" :key="i" :href="icon[2]">
+    <h4>
+      If you wish to visit any of my social media, you can do that by clicking
+      on the corresponding image
+    </h4>
+    <a v-for="(icon, i) in media" :key="i" :href="icon[2]" rel="nofollow">
       <i :class="icon[1]" :alt="icon[0]" />
     </a>
     <p>
@@ -24,15 +27,15 @@ export default {
       } else {
         return "3x";
       }
-    }
+    },
   },
   computed: {
-    media: function() {
+    media: function () {
       for (var ii in icons) {
         icons[ii][1] = icons[ii][1] + " fa-" + this.isMobile();
       }
       return icons;
-    }
+    },
   },
   metaInfo() {
     return {
@@ -40,49 +43,49 @@ export default {
         {
           name: "description",
           content: "This page shows a list of all my general online accounts",
-          vmid: "description"
+          vmid: "description",
         },
         {
           itemprop: "description",
           content: "This page shows a list of all my general online accounts",
-          vmid: "itemprop:description"
+          vmid: "itemprop:description",
         },
         {
           property: "og:description",
           content: "This page shows a list of all my general online accounts",
-          vmid: "og:description"
+          vmid: "og:description",
         },
         {
           property: "og:title",
           content: document.title,
-          vmid: "og:title"
+          vmid: "og:title",
         },
         {
           property: "og:url",
           content: "https://gamu.tk" + window.location.pathname,
-          vmid: "og:url"
+          vmid: "og:url",
         },
         {
           name: "twitter:title",
           content: document.title,
-          vmid: "twitter:title"
+          vmid: "twitter:title",
         },
         {
           name: "twitter:site",
           content: "@GameVsPlayer",
-          vmid: "twitter:site"
+          vmid: "twitter:site",
         },
         {
           name: "twitter:description",
           content: "This page shows a list of all my general online accounts",
-          vmid: "twitter:description"
-        }
-      ]
+          vmid: "twitter:description",
+        },
+      ],
     };
   },
   mounted() {
     this.metaInfo;
-  }
+  },
 };
 let icons = [
   ["discord", "fab fa-discord", "/discord"],
@@ -93,7 +96,7 @@ let icons = [
   ["youtube", "fab fa-youtube", "/youtube"],
   ["github", "fab fa-github", "/github"],
   ["donate", "fas fa-donate", "/donate"],
-  ["xbox", "fab fa-xbox", "/xbox"]
+  ["xbox", "fab fa-xbox", "/xbox"],
 ];
 </script>
 <style scoped>

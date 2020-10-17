@@ -4,14 +4,14 @@
       <mdb-navbar-brand class="brand" to="/">Gamu</mdb-navbar-brand>
       <mdb-navbar-toggler>
         <mdb-navbar-nav>
-          <router-link class="navbar-link" to="/stats">Stats</router-link>
-          <router-link class="navbar-link" to="/commands">Commands</router-link>
-          <router-link class="navbar-link" to="/inv">Invite</router-link>
-          <router-link class="navbar-link" to="/langs">Langs</router-link>
-          <router-link class="navbar-link" to="/social">Social</router-link>
-          <router-link class="navbar-link" to="/serverstats">Server Stats</router-link>
-          <router-link class="navbar-link" to="/todo">Todolist</router-link>
-          <router-link class="navbar-link" rel="nofollow" to="/imprint">Imprint</router-link>
+          <router-link class="navbar-link" to="/stats/">Stats</router-link>
+          <router-link class="navbar-link" to="/commands/">Commands</router-link>
+          <router-link class="navbar-link" to="/inv/">Invite</router-link>
+          <router-link class="navbar-link" to="/langs/">Langs</router-link>
+          <router-link class="navbar-link" to="/social/">Social</router-link>
+          <router-link class="navbar-link" to="/serverstats/">Server Stats</router-link>
+          <router-link class="navbar-link" to="/todo/">Todolist</router-link>
+          <router-link class="navbar-link" rel="nofollow" to="/imprint/">Imprint</router-link>
           <template v-if="error">
             <router-link class="eActive" to="#">Error</router-link>
           </template>
