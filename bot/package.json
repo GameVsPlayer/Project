@@ -19,7 +19,7 @@
     "@types/helmet": "0.0.48",
     "@types/ws": "^7.2.7",
     "@vitalets/google-translate-api": "^4.0.0",
-    "adm-zip": "^0.4.16",
+    "adm-zip": "^0.5.2",
     "bufferutil": "^4.0.1",
     "chai": "^4.2.0",
     "compression": "^1.7.4",
