@@ -12,8 +12,8 @@
     "start": "vue-cli-service serve --open"
   },
   "dependencies": {
-    "axios": "^0.20.0",
-    "caniuse-lite": "^1.0.30001135",
+    "axios": "^0.21.1",
+    "caniuse-lite": "^1.0.30001140",
     "core-js": "^3.6.5",
     "eslint-plugin-vue-libs": "^4.0.0",
     "mdbvue": "^6.7.1",
@@ -23,7 +23,7 @@
     "vue-analytics": "^5.22.1",
     "vue-axios": "^2.1.5",
     "vue-recaptcha-v3": "^1.9.0",
-    "vue-router": "^3.4.3",
+    "vue-router": "^3.4.5",
     "vuex": "^3.5.1"
   },
   "devDependencies": {
