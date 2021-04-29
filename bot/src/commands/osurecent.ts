@@ -12,7 +12,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
 
     let usernameRequest: any = [];
     let Mod: string, cs: string, hp: string, position: any, prefix: string;
-    let gamemode: string;
+    let gamemode: number;
 
     let start = false;
     for (let i in args) {
@@ -36,20 +36,20 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (args[argsShift]) args = args.slice(argsShift);
     for (let i in args) {
         if (args[i].includes("-t"))
-            gamemode = "taiko"
+            gamemode = 1
         else if (args[i].includes("-m"))
-            gamemode = "mania"
+            gamemode = 3
         else if (args[i].includes("-c"))
-            gamemode = "catch"
+            gamemode = 2
         else
-            gamemode = "osu"
+            gamemode = 0
     }
     if (!isNaN(parseInt(args[0]))) {
         position = args[0];
     } else if (!isNaN(parseInt(args[1]))) {
         position = args[1];
     } else position = 1;
-
+    if(gamemode != 0 && gamemode != 1) return message.channel.send("Only STD and Taiko are currently supported by https://github.com/Francesco149/oppai-ng")
 
     if (usernameRequest.length < 3) {
         await new Promise(function (resolve, reject) {
@@ -59,7 +59,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
                     usernameRequest = name.gameID;
                     if (!gamemode) gamemode = name.gamemode
                 }
-                resolve();
+                resolve(null);
             });
 
         })
@@ -67,14 +67,14 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     await new Promise(function (resolve, reject) {
         bot.extra.getPrefix(bot, message.guild, function (prefixCB: string) {
             prefix = prefixCB;
-            resolve();
+            resolve(null);
         });
 
     })
 
     if (usernameRequest.length < 3) return message.channel.send(`You must first set a user with ${prefix}os "username"`);
     let APIData = await bot.extra.osu.recent(bot, usernameRequest, gamemode, position);
-    if (APIData === "no plays") return message.channel.send(`${usernameRequest} does not have any recent plays in ${gamemode}`);
+    if (APIData === "no plays") return message.channel.send(`${usernameRequest} does not have any recent plays`);
     await bot.extra.osu.dlMap(APIData);
     let tryC: any = APIData.try;
 
@@ -107,14 +107,12 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
         score: APIData.score
     }
 
+    
     let completetion: any = ((parseInt(playStats.count50) + parseInt(playStats.count100) + parseInt(playStats.count300) + parseInt(playStats.misses)) / Map.circle) * 100
     completetion = parseFloat(completetion).toFixed(2);
-    let dotnet = '';
-    for (let mod in Mods[0]) {
-        dotnet = dotnet + `-m ${Mods[0][mod]} `;
-    }
 
-    let data = await Promise.all([await bot.extra.osu.player(bot, usernameRequest, gamemode), await bot.extra.osu.calcCSHP(Mod, Map), await bot.extra.osu.calcBPM(Mod, Map.bpm), await bot.extra.osu.calcPP(bot, bm, playStats, dotnet, gamemode), await bot.extra.osu.calcMap(bot, bm, dotnet, gamemode)]);
+
+    let data = await Promise.all([await bot.extra.osu.player(bot, usernameRequest, gamemode), await bot.extra.osu.calcCSHP(Mod, Map), await bot.extra.osu.calcBPM(Mod, Map.bpm), await bot.extra.osu.calcPP(bot, bm, playStats, gamemode), await bot.extra.osu.calcMap(bot, bm, playStats.mods, gamemode)]);
     // let player = await bot.extra.osu.player(bot, usernameRequest, gamemode);
 
     let player = data[0]
@@ -124,23 +122,24 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     hp = modStat[1];
     let mapPlay = data[3];
     let sr = data[4];
+    console.log(mapPlay)
 
-    if (gamemode != "osu") mapPlay.maxCombo = sr[1];
+    if (gamemode != 0) mapPlay.maxCombo = sr[1];
     sr = sr[0];
     let mapPlayFC: any = {};
     if (APIData.perfect !== '1') {
         await new Promise(async function (resolve) {
             playStats.misses = 0;
             playStats.combo = mapPlay.maxCombo;
-            mapPlayFC = await bot.extra.osu.calcPP(bot, bm, playStats, dotnet, gamemode);
-            resolve();
+            mapPlayFC = await bot.extra.osu.calcPP(bot, bm, playStats, playStats.mods, gamemode);
+            resolve(null);
         })
     } else {
         mapPlay.maxCombo = mapPlay.combo;
     }
 
     const osuEmbed: MessageEmbed = new Discord.MessageEmbed()
-        .setAuthor(`${player.username}'s Recent Play in ${gamemode} Try ${tryC}`, `https://b.ppy.sh/thumb/${Map.beatmapset_id}.jpg`)
+        .setAuthor(`${player.username}'s Recent Play Try ${tryC}`, `https://b.ppy.sh/thumb/${Map.beatmapset_id}.jpg`)
         .setDescription(`${Map.title} [${Map.version}](https://osu.ppy.sh/b/${Map.beatmap_id}) + ${Mod} [${parseFloat(sr).toFixed(2)}★] \n` +
             `${APIData.rank} Rank ${mapPlay.accuracy !== undefined ? mapPlay.accuracy + "%" : ""} ${mapPlay.pp}${mapPlayFC.pp !== undefined ? "(" + mapPlayFC.pp + ")" : ""}PP\n` +
             `Score: ${APIData.score} ${completetion >= 100 ? "" : `Completetion: ${completetion}%`}\n` +

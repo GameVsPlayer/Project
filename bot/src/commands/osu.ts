@@ -51,7 +51,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
                     usernameRequest = name.gameID;
                     if (!gamemode) gamemode = name.gamemode
                 }
-                resolve();
+                resolve(null);
             });
 
         })
@@ -59,7 +59,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     await new Promise(function (resolve, reject) {
         bot.extra.getPrefix(bot, message.guild, function (prefixCB: string) {
             prefix = prefixCB;
-            resolve();
+            resolve(null);
         });
 
     })

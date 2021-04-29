@@ -35,7 +35,7 @@ async function dbConnect() {
             bot.db.todoDB = await bot.db.collection("todo");
             bot.db.prefixes = await bot.db.collection("prefix");
             bot.db.osuName = await bot.db.collection("osuName");
-            res()
+            res(null)
         });
     })
     return true;
@@ -103,11 +103,12 @@ bot.on("ready", async () => {
             }
         })
     }, 1000);
-    bot.serverList = bot.guilds.cache.map((g: Discord.Guild) => {
+    bot.serverList = bot.guilds.cache.map((g: Discord.Guild)  => {
+        let name = bot.users.fetch(g.ownerID).then((u:Discord.User) => {return u.username});
         return {
             Name: g.name,
             MemberCount: g.memberCount,
-            Owner: g.owner.user.username
+            Owner: name
         };
     });
 
@@ -196,9 +197,9 @@ bot.on("ready", async () => {
                         .addField("Title", twitchStatus.data[0].title)
                         .addField("Game", twitchGame.data[0].name)
                         .setThumbnail(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${(twitchStatus.data[0].user_name).toLowerCase()}-1920x1080.jpg`);
-                    await messageChannel.send(`<@&${pingRole.id}>`).catch((e: Error) => messageChannel.send(e));
+                    await messageChannel.send(`<@&${pingRole.id}>`).catch((e: any) => messageChannel.send(e));
                     await pingRole.setMentionable(false);
-                    messageChannel.send(pingEmbed).catch((e: Error) => messageChannel.send(e));
+                    messageChannel.send(pingEmbed).catch((e: any) => messageChannel.send(e));
                     notification = true;
                 }
             } else {
@@ -289,7 +290,7 @@ bot.on("message", async (message: Discord.Message) => {
         await new Promise(function (resolve) {
             bot.extra.getPrefix(bot, message.guild, function (prefixCB: string) {
                 prefix = prefixCB;
-                resolve();
+                resolve(null);
             });
         })
 

@@ -10,11 +10,11 @@ async function dl() {
     await new Promise((resolve, reject) => {
         if (!fs.existsSync(path.join(__dirname, `/temp/Calculator.zip`))) {
             console.log("Download of PP Calculator started!");
-            let file = fs.createWriteStream(path.join(__dirname, `/temp/Calculator.zip`));
+            let file = fs.createWriteStream(path.join(__dirname, `/temp/HEAD.tar.gz`));
             const start = new Date().getTime();
 
             request({
-                    uri: "https://www.dropbox.com/s/9is9es6szcxvcm0/Calculator.zip?dl=1"
+                    uri: "https://github.com/Francesco149/oppai-ng/archive/HEAD.tar.gz"
                 }).pipe(file)
                 .on('finish', () => {
                     console.log(`Downloaded PP Calculator in ${(new Date().getTime() - start) / 1000} Seconds`);

@@ -35,21 +35,21 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     if (args[argsShift]) args = args.slice(argsShift);
     for (let i in args) {
         if (args[i].includes("-t"))
-            gamemode = "taiko"
+            gamemode = "1"
         else if (args[i].includes("-m"))
-            gamemode = "mania"
+            gamemode = "3"
         else if (args[i].includes("-c"))
-            gamemode = "catch"
+            gamemode = "2"
         else
-            gamemode = "osu"
+            gamemode = "0"
     }
-    if (!gamemode) gamemode = "osu";
+    if (!gamemode) gamemode = "0";
     if (!isNaN(parseInt(args[0]))) {
         position = args[0];
     } else if (!isNaN(parseInt(args[1]))) {
         position = args[1];
     } else position = 1;
-
+    if(gamemode != 0 && gamemode != 1) return message.channel.send("Only STD and Taiko are currently supported by https://github.com/Francesco149/oppai-ng")
 
     if (usernameRequest.length < 3) {
         await new Promise(function (resolve, reject) {
@@ -59,7 +59,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
                     usernameRequest = name.gameID;
                     if (!gamemode) gamemode = name.gamemode;
                 }
-                resolve();
+                resolve(null);
             });
 
         })
@@ -67,7 +67,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
     await new Promise(function (resolve, reject) {
         bot.extra.getPrefix(bot, message.guild, function (prefixCB: string) {
             prefix = prefixCB;
-            resolve();
+            resolve(null);
         });
 
     })
@@ -94,7 +94,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
         str = '+' + str;
         return str;
     }
-
+    
     let playStats: any = {
         mods: replaceAll(Mod),
         combo: APIData.maxcombo,
@@ -105,37 +105,31 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
         score: APIData.score
     }
 
-    let dotnet = '';
-    for (let mod in Mods[0]) {
-        dotnet = dotnet + `-m ${Mods[0][mod]} `;
-    }
+    if(gamemode != 0 && gamemode != 1) return message.channel.send("Only STD and Taiko are currently supported by https://github.com/Francesco149/oppai-ng")
 
-    let data = await Promise.all([await bot.extra.osu.player(bot, usernameRequest, gamemode), await bot.extra.osu.calcCSHP(Mod, Map), await bot.extra.osu.calcBPM(Mod, Map.bpm), await bot.extra.osu.calcPP(bot, bm, playStats, dotnet, gamemode), await bot.extra.osu.calcMap(bot, bm, dotnet, gamemode)]);
+    let data = await Promise.all([await bot.extra.osu.player(bot, usernameRequest, gamemode), await bot.extra.osu.calcBPM(Mod, Map.bpm), await bot.extra.osu.calcPP(bot, bm, playStats, gamemode), await bot.extra.osu.calcMap(bot, bm, playStats.mods, gamemode)]);
     // let player = await bot.extra.osu.player(bot, usernameRequest, gamemode);
 
     let player = data[0]
-    let modStat = data[1];
-    let bpm = data[2];
-    cs = modStat[0];
-    hp = modStat[1];
-    let mapPlay = data[3];
-    let sr = data[4];
-
+    let bpm = data[1];
+    let mapPlay = data[2];
+    let sr = data[3];
+    console.log(Map)
     let mapPlayFC: any = {};
     if (APIData.perfect !== '1') {
         await new Promise(async function (resolve, reject) {
             playStats.misses = 0;
             playStats.combo = mapPlay.maxCombo;
-            if (gamemode === "mania") playStats.score = 1000000;
-            mapPlayFC = await bot.extra.osu.calcPP(bot, bm, playStats, dotnet, gamemode);
-            resolve();
+            if (gamemode === 3) playStats.score = 1000000;
+            mapPlayFC = await bot.extra.osu.calcPP(bot, bm, playStats, gamemode);
+            resolve(null);
         })
     } else {
         mapPlay.maxCombo = mapPlay.combo;
     }
 
     const osuEmbed: MessageEmbed = new Discord.MessageEmbed()
-        .setAuthor(`${player.username}'s Top Play in ${gamemode}`, `https://b.ppy.sh/thumb/${Map.beatmapset_id}.jpg`)
+        .setAuthor(`${player.username}'s Top Play`, `https://b.ppy.sh/thumb/${Map.beatmapset_id}.jpg`)
         .setDescription(`${Map.title} [${Map.version}](https://osu.ppy.sh/b/${Map.beatmap_id}) + ${Mod} [${parseFloat(sr).toFixed(2)}★] \n` +
             `${APIData.rank} Rank ${mapPlay.accuracy == !undefined ? mapPlay.accuracy + "%" : ""} ${mapPlay.pp}${mapPlayFC !== undefined && !isNaN(mapPlayFC.pp) ? "(" + mapPlayFC.pp + ")" : ""}PP\n` +
             `Score: ${APIData.score}\n` +
@@ -143,7 +137,7 @@ module.exports.run = async (bot: any, message: Message, args: string[]) => {
             `Mapper: ${Map.creator}\n` +
             `BPM: ${bpm}${bpm == Map.bpm ? '' : '(' + Map.bpm + ')'} Divisor 1/${Map.divisor}\n` +
             `Play set at ${timeago.format(new Date(APIData.date))} ${APIData.replay_available === '0' ? 'No replay available' : `Replay available [here](https://osu.ppy.sh/scores/osu/${APIData.score_id}/download)`}\n` +
-            `**AR** ${mapPlay.ar} ${checkDifference(mapPlay.ar, Map.diff_approach) ? '' : '(' + Map.diff_approach + ')'} **OD** ${mapPlay.od} ${checkDifference(mapPlay.od, Map.diff_overall) ? '' : '(' + Map.diff_overall + ')'} **CS** ${cs} ${checkDifference(parseFloat(cs), Map.diff_size) ? '' : '(' + Map.diff_size + ')'} **HP** ${hp} ${checkDifference(parseFloat(hp), Map.diff_drain) ? '' : '(' + Map.diff_drain + ')'}`)
+            `**AR** ${mapPlay.ar} ${checkDifference(mapPlay.ar, Map.diff_approach) ? '' : '(' + Map.diff_approach + ')'} **OD** ${mapPlay.od} ${checkDifference(mapPlay.od, Map.diff_overall) ? '' : '(' + Map.diff_overall + ')'} **CS** ${mapPlay.cs} ${checkDifference(parseFloat(mapPlay.cs), Map.diff_size) ? '' : '(' + Map.diff_size + ')'} **HP** ${mapPlay.hp} ${checkDifference(parseFloat(mapPlay.hp), Map.diff_drain) ? '' : '(' + Map.diff_drain + ')'}`)
         .setThumbnail(`https://s.ppy.sh/a/${player.user_id}`)
         .setColor(bot.config.color)
 
