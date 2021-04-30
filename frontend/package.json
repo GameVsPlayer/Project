@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "core-js": "^3.10.0",
     "caniuse-lite": "^1.0.30001208",
+    "core-js": "^3.10.1",
     "eslint-plugin-vue-libs": "^4.0.0",
     "mdbvue": "^6.7.1",
     "node-pace-progress": "^1.0.3",
@@ -24,7 +24,7 @@
     "vue-axios": "^2.1.5",
     "vue-recaptcha-v3": "^1.9.0",
     "vue-router": "^3.5.1",
-    "vuex": "^3.5.1"
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
