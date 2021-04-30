@@ -38,7 +38,7 @@
     "mathjs": "^7.5.1",
     "megajs": "^0.17.2",
     "mocha": "^8.3.2",
-    "moment-timezone": "^0.5.31",
+    "moment-timezone": "^0.5.33",
     "mongodb": "^3.6.6",
     "node-fetch": "^3.0.0-beta.8",
     "os-utils": "0.0.14",
