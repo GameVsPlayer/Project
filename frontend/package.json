@@ -14,7 +14,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.10.0",
-    "caniuse-lite": "^1.0.30001207",
+    "caniuse-lite": "^1.0.30001208",
     "eslint-plugin-vue-libs": "^4.0.0",
     "mdbvue": "^6.7.1",
     "node-pace-progress": "^1.0.3",
